@@ -7,4 +7,3 @@ RG = np.random.default_rng()
 
 HEIGHT = 6
 WIDTH = 6
-MAX_RADIUS = 6

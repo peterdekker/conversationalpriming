@@ -22,7 +22,6 @@ class Model(Model):
 
         self.height = height
         self.width = width
-        self.radius = MAX_RADIUS
 
         self.schedule = RandomActivation(self)
         self.grid = SingleGrid(width, height, torus=True)

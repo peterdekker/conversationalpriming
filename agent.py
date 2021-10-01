@@ -17,13 +17,17 @@ class Agent(Agent):
         self.pos = pos
         self.colours = "hsl(250,80%,50%)", "hsl(250,80%,50%)"
 
+        # TODO: later possibly add corpus probabilities
+        self.verb_concepts = ["a", "b"]
+        self.persons = ["1sg", "2sg", "3sg"]
+
+        self.question_answer_mapping = {"1sg":"2sg", "2sg":"1sg", "3sg":"3sg"}
+
     def step(self):
         '''
          Perform one interaction for this agent, with this agent as speaker
         '''
-        # If radius==MAX_RADIUS, every agent speaks with every other, so random mixing
-        neighbors = self.model.grid.get_neighbors(self.pos, True, False, self.model.radius)
-        listener = RG.choice(neighbors)
+        listener = RG.choice(self.model.agents)
         self.speak(listener)
 
     # Methods used when agent speaks
@@ -35,7 +39,9 @@ class Agent(Agent):
          Args:
             listener: agent to speak to
         '''
-        pass
+        
+        # Send polar question, represented by verb
+        v = Verb(concept=RG.choice(self.verb_concepts), person=RG.choice(self.persons))
 
     # Methods used when agent listens
 
