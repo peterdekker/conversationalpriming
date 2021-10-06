@@ -4,7 +4,6 @@ from mesa.space import SingleGrid
 from mesa.datacollection import DataCollector
 
 from agent import Agent
-from config import MAX_RADIUS
 
 
 class Model(Model):

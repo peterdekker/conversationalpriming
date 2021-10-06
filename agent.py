@@ -1,5 +1,7 @@
 from mesa import Agent
 
+from verb import Verb
+from util import choice_prob
 from config import RG, logging
 
 
@@ -20,6 +22,12 @@ class Agent(Agent):
         # TODO: later possibly add corpus probabilities
         self.verb_concepts = ["a", "b"]
         self.persons = ["1sg", "2sg", "3sg"]
+        forms_template = {"1":0.9, "2": 0.1}
+        self.forms = {}
+        for c in self.verb_concepts:
+            for p in self.persons:
+                self.forms[c,p] = forms_template
+        print(self.forms)
 
         self.question_answer_mapping = {"1sg":"2sg", "2sg":"1sg", "3sg":"3sg"}
 
@@ -28,44 +36,35 @@ class Agent(Agent):
          Perform one interaction for this agent, with this agent as speaker
         '''
         listener = RG.choice(self.model.agents)
-        self.speak(listener)
 
-    # Methods used when agent speaks
+        question = self.send_question()
+        answer = listener.receive_question(question)
+        self.receive_answer(answer)
 
-    def speak(self, listener):
-        '''
-         Speak to other agent
 
-         Args:
-            listener: agent to speak to
-        '''
-        
-        # Send polar question, represented by verb
-        v = Verb(concept=RG.choice(self.verb_concepts), person=RG.choice(self.persons))
+    def send_question(self):
+        # Send polar question, represented by verb: concept, person and form
+        concept_question = RG.choice(self.verb_concepts)
+        person_question = RG.choice(self.persons)
+        form_question = choice_prob(self.forms[concept_question, person_question])
+        self.boost_form(form_question)
+
+        signal_question = Verb(concept=concept_question, person=person_question, form=form_question)
+        return signal_question
 
     # Methods used when agent listens
 
-    def listen(self, signal):
-        '''
-         Agent listens to signal sent by speaker
+    def receive_question(self, signal):
+        concept_question, person_question, form_question = signal.get_content()
+        person_answer = self.question_answer_mapping[person_question]
+        form_answer = choice_prob(self.forms[concept_question, person_answer])
+        self.boost_form(form_answer)
 
-         Args:
-            signal: received signal
+        signal_answer = Verb(concept=concept_question, person=person_answer, form=form_answer)
+        return signal_answer
+    
+    def receive_answer(self, signal):
+        
 
-         Returns:
-            message: concept which listener thinks is closest to heard signal
-        '''
-        pass
-        return 0
-
-    def receive_feedback(self, feedback_speaker):
-        '''
-        Listening agent receives concept meant by speaking agent,
-        and updates its language table
-
-        Args:
-            feedback_speaker: feedback from the speaker
-        '''
-
-        pass
+        
 
