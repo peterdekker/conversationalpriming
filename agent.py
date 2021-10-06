@@ -47,7 +47,7 @@ class Agent(Agent):
         concept_question = RG.choice(self.verb_concepts)
         person_question = RG.choice(self.persons)
         form_question = choice_prob(self.forms[concept_question, person_question])
-        self.boost_form(form_question)
+        self.boost_form(concept_question, person_question, form_question)
 
         signal_question = Verb(concept=concept_question, person=person_question, form=form_question)
         return signal_question
@@ -56,15 +56,20 @@ class Agent(Agent):
 
     def receive_question(self, signal):
         concept_question, person_question, form_question = signal.get_content()
+        self.boost_form(concept_question, person_question, form_question)
+
         person_answer = self.question_answer_mapping[person_question]
         form_answer = choice_prob(self.forms[concept_question, person_answer])
-        self.boost_form(form_answer)
+        self.boost_form(concept_answer, person_answer, form_answer)
 
         signal_answer = Verb(concept=concept_question, person=person_answer, form=form_answer)
         return signal_answer
     
     def receive_answer(self, signal):
-        
+        concept_answer, person_answer, form_answer = signal.get_content()
+        self.boost_form(concept_answer, person_answer, form_answer)
+    
+    def boost_form(self, form)
 
         
 
