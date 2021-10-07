@@ -7,3 +7,5 @@ RG = np.random.default_rng()
 
 HEIGHT = 6
 WIDTH = 6
+
+BOOST = 0.01

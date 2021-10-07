@@ -5,5 +5,5 @@ class Verb():
         self.person = person
         self.form = form
     
-    def get_content():
+    def get_content(self):
         return self.concept, self.person, self.form

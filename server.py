@@ -21,10 +21,7 @@ def draw(agent):
 
 
 canvas_element = CanvasGrid(draw, HEIGHT, WIDTH, 500, 500)
-communicated_chart = ChartModule([{"Label": "prop_communicated_prefix_l1", "Color": "Blue"},
-                                  {"Label": "prop_communicated_suffix_l1", "Color": "Purple"},
-                                  {"Label": "prop_communicated_prefix_l2", "Color": "Orange"},
-                                  {"Label": "prop_communicated_suffix_l2", "Color": "Brown"}])
+communicated_chart = ChartModule([{"Label": "prop_communicated_1", "Color": "Blue"}])
 
 model_params = {
     "height": HEIGHT,
@@ -33,5 +30,5 @@ model_params = {
 }
 
 server = ModularServer(Model,
-                       [canvas_element],
+                       [canvas_element, communicated_chart],
                        "Conversational priming", model_params)
