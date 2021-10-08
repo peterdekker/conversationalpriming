@@ -4,6 +4,7 @@ from mesa.space import SingleGrid
 from mesa.datacollection import DataCollector
 
 from agent import Agent
+from config import RG
 
 
 class Model(Model):
@@ -11,16 +12,18 @@ class Model(Model):
     Model class
     '''
 
-    def __init__(self, height, width):
+    def __init__(self, height, width, proportion_innovative):
         '''
         Initialize field
         '''
         assert height % 1 == 0
         assert width % 1 == 0
+        assert proportion_innovative >= 0 and proportion_innovative <= 1
 
 
         self.height = height
         self.width = width
+        self.proportion_innovative = proportion_innovative
 
         self.schedule = RandomActivation(self)
         self.grid = SingleGrid(width, height, torus=True)
@@ -40,7 +43,8 @@ class Model(Model):
         for i, cell in enumerate(self.grid.coord_iter()):
             x = cell[1]
             y = cell[2]
-            agent = Agent((x, y), self)
+            innovative = RG.random() < self.proportion_innovative
+            agent = Agent((x, y), innovative, self)
             self.grid.position_agent(agent, (x, y))
             self.schedule.add(agent)
 

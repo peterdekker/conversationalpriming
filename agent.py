@@ -6,15 +6,9 @@ from config import RG, logging, BOOST
 
 
 class Agent(Agent):
-    def __init__(self, pos, model):
-        '''
-         Create a new speech agent.
+    def __init__(self, pos, innovative, model):
 
-         Args:
-            pos: Agent initial location.
-            model: Model in which agent is located.
-            init: Initialization mode of forms and affixes: random or data
-        '''
+
         super().__init__(pos, model)
         self.pos = pos
         self.colours = "hsl(250,80%,50%)", "hsl(250,80%,50%)"
@@ -22,11 +16,12 @@ class Agent(Agent):
         # TODO: later possibly add corpus probabilities
         self.verb_concepts = ["a", "b"]
         self.persons = ["1sg", "2sg", "3sg"]
-        forms_template = {"1":0.9, "2": 0.1}
+        forms_template_conservative = {"1":1.0, "2": 0.0}
+        forms_template_innovative = {"1":0.1, "2": 0.9}
         self.forms = {}
         for c in self.verb_concepts:
             for p in self.persons:
-                self.forms[c,p] = forms_template
+                self.forms[c,p] = forms_template_innovative if innovative else forms_template_conservative
 
         self.question_answer_mapping = {"1sg":"2sg", "2sg":"1sg", "3sg":"3sg"}
 

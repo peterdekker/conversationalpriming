@@ -4,7 +4,7 @@ from mesa.visualization.UserParam import UserSettableParameter
 
 from model import Model
 
-from config import HEIGHT, WIDTH
+from config import model_params_ui, HEIGHT, WIDTH
 
 
 def draw(agent):
@@ -23,12 +23,6 @@ def draw(agent):
 canvas_element = CanvasGrid(draw, HEIGHT, WIDTH, 500, 500)
 communicated_chart = ChartModule([{"Label": "prop_communicated_1", "Color": "Blue"}])
 
-model_params = {
-    "height": HEIGHT,
-    "width": WIDTH,
-    #proportion_l2": UserSettableParameter("slider", "Proportion L2", PROPORTION_L2, 0.0, 1.0, 0.1),
-}
-
 server = ModularServer(Model,
                        [canvas_element, communicated_chart],
-                       "Conversational priming", model_params)
+                       "Conversational priming", model_params_ui)
