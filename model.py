@@ -5,6 +5,7 @@ from mesa.datacollection import DataCollector
 
 from agent import Agent
 from config import RG
+from util import compute_prop_communicated_innovative
 
 
 class Model(Model):
@@ -27,11 +28,13 @@ class Model(Model):
 
         self.schedule = RandomActivation(self)
         self.grid = SingleGrid(width, height, torus=True)
-        self.steps = 0
+
+        self.communicated = []
 
 
         self.datacollector = DataCollector(
             {
+                "prop_communicated_innovative": compute_prop_communicated_innovative
             }
         )
 
@@ -60,4 +63,3 @@ class Model(Model):
         
         self.schedule.step()
         self.datacollector.collect(self)
-        self.steps += 1

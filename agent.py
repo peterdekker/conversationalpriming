@@ -42,6 +42,8 @@ class Agent(Agent):
         person_question = RG.choice(self.persons)
         form_question = choice_prob(self.forms[concept, person_question])
         self.boost_form(concept, person_question, form_question)
+        # Add to stats
+        self.model.communicated.append(form_question)
 
         signal_question = Verb(concept=concept, person=person_question, form=form_question)
         return signal_question
@@ -55,6 +57,8 @@ class Agent(Agent):
         person_answer = self.question_answer_mapping[person_question]
         form_answer = choice_prob(self.forms[concept, person_answer])
         self.boost_form(concept, person_answer, form_answer)
+        # Add to stats
+        self.model.communicated.append(form_answer)
 
         signal_answer = Verb(concept=concept, person=person_answer, form=form_answer)
         return signal_answer

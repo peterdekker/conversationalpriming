@@ -21,7 +21,7 @@ def draw(agent):
 
 
 canvas_element = CanvasGrid(draw, HEIGHT, WIDTH, 500, 500)
-communicated_chart = ChartModule([{"Label": "prop_communicated_1", "Color": "Blue"}])
+communicated_chart = ChartModule([{"Label": "prop_communicated_innovative", "Color": "Blue"}])
 
 server = ModularServer(Model,
                        [canvas_element, communicated_chart],
