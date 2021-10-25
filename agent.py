@@ -18,6 +18,8 @@ class Agent(Agent):
         self.persons = ["1sg", "2sg", "3sg"]
         forms_template_conservative = {"1":1.0, "2": 0.0}
         forms_template_innovative = {"1":0.1, "2": 0.9}
+        self.innovative=innovative
+        # TODO: Move initialization outside agent?
         self.forms = {}
         for c in self.verb_concepts:
             for p in self.persons:

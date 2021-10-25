@@ -13,7 +13,10 @@ def draw(agent):
     '''
     if agent is None:
         return
-    portrayal = {"Shape": "circle", "r": 0.5, "Filled": "true", "Layer": 0}
+    if agent.innovative:
+        portrayal = {"Shape": "rect", "w": 0.5, "h": 0.5, "Filled": "true", "Layer": 0}
+    else:
+        portrayal = {"Shape": "circle", "r": 0.5, "Filled": "true", "Layer": 0}
     portrayal["Color"] = agent.colours
     portrayal["stroke_color"] = "rgb(0,0,0)"
 
