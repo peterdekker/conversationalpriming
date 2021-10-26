@@ -28,6 +28,7 @@ class Model(Model):
 
         self.schedule = RandomActivation(self)
         self.grid = SingleGrid(width, height, torus=True)
+        self.steps = 0
 
         self.communicated = []
 
@@ -63,3 +64,12 @@ class Model(Model):
         
         self.schedule.step()
         self.datacollector.collect(self)
+
+        # Compute agent prop communicated every n steps
+        # This also empties variable
+        if self.steps % 10 == 0:
+            for agent in self.agents:
+                agent.prop_communicated_innovative = compute_prop_communicated_innovative(agent)
+        
+        self.steps += 1
+

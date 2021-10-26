@@ -5,6 +5,7 @@ from mesa.visualization.UserParam import UserSettableParameter
 from model import Model
 
 from config import model_params_ui, HEIGHT, WIDTH
+from util import compute_colours
 
 
 def draw(agent):
@@ -17,7 +18,7 @@ def draw(agent):
         portrayal = {"Shape": "rect", "w": 0.5, "h": 0.5, "Filled": "true", "Layer": 0}
     else:
         portrayal = {"Shape": "circle", "r": 0.5, "Filled": "true", "Layer": 0}
-    portrayal["Color"] = agent.colours
+    portrayal["Color"] = compute_colours(agent)
     portrayal["stroke_color"] = "rgb(0,0,0)"
 
     return portrayal

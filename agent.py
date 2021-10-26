@@ -1,7 +1,7 @@
 from mesa import Agent
 
 from verb import Verb
-from util import choice_prob
+from util import choice_prob, update_stats
 from config import RG, logging, BOOST
 
 
@@ -11,15 +11,14 @@ class Agent(Agent):
 
         super().__init__(pos, model)
         self.pos = pos
-        self.colours = "hsl(250,80%,50%)", "hsl(250,80%,50%)"
 
+        self.innovative=innovative
         # TODO: later possibly add corpus probabilities
-        self.verb_concepts = ["a", "b"]
+        # TODO: Move initialization outside agent?
+        self.verb_concepts = ["a"]
         self.persons = ["1sg", "2sg", "3sg"]
         forms_template_conservative = {"1":1.0, "2": 0.0}
         forms_template_innovative = {"1":0.1, "2": 0.9}
-        self.innovative=innovative
-        # TODO: Move initialization outside agent?
         self.forms = {}
         for c in self.verb_concepts:
             for p in self.persons:
@@ -27,25 +26,31 @@ class Agent(Agent):
 
         self.question_answer_mapping = {"1sg":"2sg", "2sg":"1sg", "3sg":"3sg"}
 
+        # Variables for stats (for colours)
+        self.communicated = []
+        self.prop_communicated_innovative = 0.0
+
+
     def step(self):
         '''
          Perform one interaction for this agent, with this agent as speaker
         '''
         listener = RG.choice(self.model.agents)
 
-        question = self.send_question()
+        question = self.create_question()
         answer = listener.receive_question(question)
         self.receive_answer(answer)
 
 
-    def send_question(self):
+    def create_question(self):
         # Send polar question, represented by verb: concept, person and form
         concept = RG.choice(self.verb_concepts)
         person_question = RG.choice(self.persons)
         form_question = choice_prob(self.forms[concept, person_question])
         self.boost_form(concept, person_question, form_question)
         # Add to stats
-        self.model.communicated.append(form_question)
+        update_stats(form_question, self.model, self)
+        
 
         signal_question = Verb(concept=concept, person=person_question, form=form_question)
         return signal_question
@@ -60,7 +65,7 @@ class Agent(Agent):
         form_answer = choice_prob(self.forms[concept, person_answer])
         self.boost_form(concept, person_answer, form_answer)
         # Add to stats
-        self.model.communicated.append(form_answer)
+        update_stats(form_answer, self.model, self)
 
         signal_answer = Verb(concept=concept, person=person_answer, form=form_answer)
         return signal_answer
@@ -70,14 +75,14 @@ class Agent(Agent):
         self.boost_form(concept, person_answer, form_answer)
     
     def boost_form(self, concept, person, form):
-        print("Old")
-        print(self.forms[concept, person])
+        # print("Old")
+        # print(self.forms[concept, person])
         prob_dict = self.forms[concept, person]
         new_total = sum(prob_dict.values()) + BOOST
         # Add BOOST to this form and scale by new total, scale other forms by new total
         self.forms[concept, person] = {f: (prob+BOOST)/new_total if f==form else prob/new_total for f, prob in prob_dict.items()}
-        print("New")
-        print(self.forms[concept, person])
+        # print("New")
+        # print(self.forms[concept, person])
 
 
         
