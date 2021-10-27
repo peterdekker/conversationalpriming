@@ -6,23 +6,23 @@ from config import RG, logging, BOOST
 
 
 class Agent(Agent):
-    def __init__(self, pos, innovative, model):
+    def __init__(self, pos, innovating, model):
 
 
         super().__init__(pos, model)
         self.pos = pos
 
-        self.innovative=innovative
+        self.innovating=innovating
         # TODO: later possibly add corpus probabilities
         # TODO: Move initialization outside agent?
         self.verb_concepts = ["a"]
         self.persons = ["1sg", "2sg", "3sg"]
-        forms_template_conservative = {"1":1.0, "2": 0.0}
-        forms_template_innovative = {"1":0.1, "2": 0.9}
+        forms_template_conservating = {"1":1.0, "2": 0.0}
+        forms_template_innovating = {"1":0.1, "2": 0.9}
         self.forms = {}
         for c in self.verb_concepts:
             for p in self.persons:
-                self.forms[c,p] = forms_template_innovative if innovative else forms_template_conservative
+                self.forms[c,p] = forms_template_innovating if innovating else forms_template_conservating
 
         self.question_answer_mapping = {"1sg":"2sg", "2sg":"1sg", "3sg":"3sg"}
 
@@ -49,7 +49,7 @@ class Agent(Agent):
         form_question = choice_prob(self.forms[concept, person_question])
         self.boost_form(concept, person_question, form_question)
         # Add to stats
-        update_stats(form_question, self.model, self)
+        update_stats(form_question, person_question, self.innovating, self.model, self)
         
 
         signal_question = Verb(concept=concept, person=person_question, form=form_question)
@@ -65,7 +65,7 @@ class Agent(Agent):
         form_answer = choice_prob(self.forms[concept, person_answer])
         self.boost_form(concept, person_answer, form_answer)
         # Add to stats
-        update_stats(form_answer, self.model, self)
+        update_stats(form_answer, person_answer, self.innovating, self.model, self)
 
         signal_answer = Verb(concept=concept, person=person_answer, form=form_answer)
         return signal_answer
