@@ -3,7 +3,7 @@ from config import RG, INNOVATIVE_FORM
 def choice_prob(prob_dict):
     return RG.choice([*prob_dict], p=[*prob_dict.values()])
 
-
+# TODO: call these methodse _model_?
 def compute_prop_innovative_1sg_conservating_speaker(model):
     return compute_prop_innovative(model.communicated["1sg",False])
 
@@ -22,7 +22,11 @@ def compute_prop_innovative_2sg_innovating_speaker(model):
 def compute_prop_innovative_3sg_innovating_speaker(model):
     return compute_prop_innovative(model.communicated["3sg",True])
 
-# Obj can be: model or agent
+def compute_prop_innovative_agents(agents):
+    for agent in agents:
+        agent.prop_communicated_innovative = compute_prop_innovative(agent.communicated)
+
+# Method can be applied to communicated_list of agent or model
 def compute_prop_innovative(communicated_list):
     #TODO: optimize count?
     n_utterances = len(communicated_list)
@@ -31,7 +35,7 @@ def compute_prop_innovative(communicated_list):
     communicated_list.clear()
     return stat
 
-def update_stats(form, person, agent_type, model, agent):
+def update_communicated(form, person, agent_type, model, agent):
     # For model: store forms per person and agent type
     model.communicated[person,agent_type].append(form)
 

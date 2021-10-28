@@ -32,16 +32,20 @@ class Model(Model):
         self.grid = SingleGrid(width, height, torus=True)
         self.steps = 0
 
+        # Contains utterances of last step emptied after prop_innovative calculation at end of step
         self.communicated = defaultdict(list)
+        # Contains proportion innovative of all timesteps
+        self.prop_innovative = defaultdict(list)
 
+        # Averages of last N timesteps of prop_innovative
         self.datacollector = DataCollector(
             {
-                "prop_innovative_1sg_innovating_speaker": util.compute_prop_innovative_1sg_innovating_speaker,
-                "prop_innovative_2sg_innovating_speaker": util.compute_prop_innovative_2sg_innovating_speaker,
-                "prop_innovative_3sg_innovating_speaker": util.compute_prop_innovative_3sg_innovating_speaker,
-                "prop_innovative_1sg_conservating_speaker": util.compute_prop_innovative_1sg_conservating_speaker,
-                "prop_innovative_2sg_conservating_speaker": util.compute_prop_innovative_2sg_conservating_speaker,
-                "prop_innovative_3sg_conservating_speaker": util.compute_prop_innovative_3sg_conservating_speaker,
+                "prop_innovative_1sg_innovating_avg": util.compute_prop_innovative_1sg_innovating_avg,
+                "prop_innovative_2sg_innovating_avg": util.compute_prop_innovative_2sg_innovating_avg,
+                "prop_innovative_3sg_innovating_avg": util.compute_prop_innovative_3sg_innovating_avg,
+                "prop_innovative_1sg_conservating_avg": util.compute_prop_innovative_1sg_conservating_avg,
+                "prop_innovative_2sg_conservating_avg": util.compute_prop_innovative_2sg_conservating_avg,
+                "prop_innovative_3sg_conservating_avg": util.compute_prop_innovative_3sg_conservating_avg,
             }
         )
 
@@ -74,8 +78,7 @@ class Model(Model):
         # Compute agent prop communicated every n steps
         # This also empties variable
         if self.steps % 10 == 0:
-            for agent in self.agents:
-                agent.prop_communicated_innovative = util.compute_prop_innovative(agent.communicated)
+            util.compute_prop_innovative_agents(self.agents)
         
         
         self.steps += 1

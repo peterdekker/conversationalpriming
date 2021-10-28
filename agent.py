@@ -1,7 +1,7 @@
 from mesa import Agent
 
 from verb import Verb
-from util import choice_prob, update_stats
+from util import choice_prob, update_communicated
 from config import RG, logging, BOOST
 
 
@@ -28,7 +28,7 @@ class Agent(Agent):
 
         # Variables for stats (for colours)
         self.communicated = []
-        self.prop_communicated_innovative = 0.0
+        self.prop_communicated_innovative = []
 
 
     def step(self):
@@ -49,7 +49,7 @@ class Agent(Agent):
         form_question = choice_prob(self.forms[concept, person_question])
         self.boost_form(concept, person_question, form_question)
         # Add to stats
-        update_stats(form_question, person_question, self.innovating, self.model, self)
+        update_communicated(form_question, person_question, self.innovating, self.model, self)
         
 
         signal_question = Verb(concept=concept, person=person_question, form=form_question)
@@ -65,7 +65,7 @@ class Agent(Agent):
         form_answer = choice_prob(self.forms[concept, person_answer])
         self.boost_form(concept, person_answer, form_answer)
         # Add to stats
-        update_stats(form_answer, person_answer, self.innovating, self.model, self)
+        update_communicated(form_answer, person_answer, self.innovating, self.model, self)
 
         signal_answer = Verb(concept=concept, person=person_answer, form=form_answer)
         return signal_answer
