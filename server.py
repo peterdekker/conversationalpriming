@@ -25,9 +25,9 @@ def draw(agent):
 
 
 canvas_element = CanvasGrid(draw, HEIGHT, WIDTH, 500, 500)
-communicated_1sg_chart = ChartModule([{"Label": "prop_innovative_1sg_innovating_speaker", "Color": "Green"}, {"Label": "prop_innovative_1sg_conservating_speaker", "Color": "Black"}])
-communicated_2sg_chart = ChartModule([{"Label": "prop_innovative_2sg_innovating_speaker", "Color": "Green"}, {"Label": "prop_innovative_2sg_conservating_speaker", "Color": "Black"}])
-communicated_3sg_chart = ChartModule([{"Label": "prop_innovative_3sg_innovating_speaker", "Color": "Green"}, {"Label": "prop_innovative_3sg_conservating_speaker", "Color": "Black"}])
+communicated_1sg_chart = ChartModule([{"Label": "prop_innovative_1sg_innovating_avg", "Color": "Green"}, {"Label": "prop_innovative_1sg_conservating_avg", "Color": "Black"}])
+communicated_2sg_chart = ChartModule([{"Label": "prop_innovative_2sg_innovating_avg", "Color": "Green"}, {"Label": "prop_innovative_2sg_conservating_avg", "Color": "Black"}])
+communicated_3sg_chart = ChartModule([{"Label": "prop_innovative_3sg_innovating_avg", "Color": "Green"}, {"Label": "prop_innovative_3sg_conservating_avg", "Color": "Black"}])
 
 server = ModularServer(Model,
                        [canvas_element, communicated_1sg_chart, communicated_2sg_chart, communicated_3sg_chart],

@@ -1,30 +1,46 @@
-from config import RG, INNOVATIVE_FORM
+import numpy as np
+from config import RG, INNOVATIVE_FORM, AVG_WINDOW_STATS
 
 def choice_prob(prob_dict):
     return RG.choice([*prob_dict], p=[*prob_dict.values()])
 
+def mymean(stats_list):
+    return np.mean(stats_list) if len(stats_list)>0 else 0
+
 # TODO: call these methodse _model_?
-def compute_prop_innovative_1sg_conservating_speaker(model):
-    return compute_prop_innovative(model.communicated["1sg",False])
+def compute_prop_innovative_1sg_conservating_avg(model):
+    last_stats = model.prop_innovative["1sg",False][:-AVG_WINDOW_STATS]
+    return mymean(last_stats)
 
-def compute_prop_innovative_2sg_conservating_speaker(model):
-    return compute_prop_innovative(model.communicated["2sg",False])
+def compute_prop_innovative_2sg_conservating_avg(model):
+    last_stats = model.prop_innovative["2sg",False][:-AVG_WINDOW_STATS]
+    return mymean(last_stats)
 
-def compute_prop_innovative_3sg_conservating_speaker(model):
-    return compute_prop_innovative(model.communicated["3sg",False])
+def compute_prop_innovative_3sg_conservating_avg(model):
+    last_stats = model.prop_innovative["3sg",False][:-AVG_WINDOW_STATS]
+    return mymean(last_stats)
 
-def compute_prop_innovative_1sg_innovating_speaker(model):
-    return compute_prop_innovative(model.communicated["1sg",True])
+def compute_prop_innovative_1sg_innovating_avg(model):
+    last_stats = model.prop_innovative["1sg",True][:-AVG_WINDOW_STATS]
+    return mymean(last_stats)
 
-def compute_prop_innovative_2sg_innovating_speaker(model):
-    return compute_prop_innovative(model.communicated["2sg",True])
+def compute_prop_innovative_2sg_innovating_avg(model):
+    last_stats = model.prop_innovative["2sg",True][:-AVG_WINDOW_STATS]
+    return mymean(last_stats)
 
-def compute_prop_innovative_3sg_innovating_speaker(model):
-    return compute_prop_innovative(model.communicated["3sg",True])
+def compute_prop_innovative_3sg_innovating_avg(model):
+    last_stats = model.prop_innovative["3sg",True][:-AVG_WINDOW_STATS]
+    return mymean(last_stats)
 
-def compute_prop_innovative_agents(agents):
+def update_prop_innovative_model(model, persons, speaker_types, stats_obj):
+    for person in persons:
+        for speaker_type in speaker_types:
+            stat = compute_prop_innovative(model.communicated[person, speaker_type])
+            stats_obj[person, speaker_type].append(stat)
+
+def update_prop_innovative_agents(agents):
     for agent in agents:
-        agent.prop_communicated_innovative = compute_prop_innovative(agent.communicated)
+        agent.prop_innovative = compute_prop_innovative(agent.communicated)
 
 # Method can be applied to communicated_list of agent or model
 def compute_prop_innovative(communicated_list):
@@ -43,7 +59,7 @@ def update_communicated(form, person, agent_type, model, agent):
     agent.communicated.append(form)
 
 def compute_colours(agent):
-    l = agent.prop_communicated_innovative * 50
+    l = agent.prop_innovative * 50
     # HSL: H->0-360,  S->0-100%, L->100% L50% is maximum color, 100% is white
     return colour_str([110, 90, l])
 

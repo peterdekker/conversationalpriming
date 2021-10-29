@@ -6,7 +6,7 @@ from mesa.datacollection import DataCollector
 from collections import defaultdict
 
 from agent import Agent
-from config import RG
+from config import RG, STEPS_UPDATE_AGENT_COLOR
 import util
 
 
@@ -15,7 +15,7 @@ class Model(Model):
     Model class
     '''
 
-    def __init__(self, height, width, proportion_innovating):
+    def __init__(self, height, width, proportion_innovating, repeats):
         '''
         Initialize field
         '''
@@ -27,6 +27,7 @@ class Model(Model):
         self.height = height
         self.width = width
         self.proportion_innovating = proportion_innovating
+        self.repeats = repeats
 
         self.schedule = RandomActivation(self)
         self.grid = SingleGrid(width, height, torus=True)
@@ -37,7 +38,13 @@ class Model(Model):
         # Contains proportion innovative of all timesteps
         self.prop_innovative = defaultdict(list)
 
-        # Averages of last N timesteps of prop_innovative
+        ## TODO: maybe later move data initialization from agent to model,
+        # so defining these here makes more sense
+        self.persons = ["1sg", "2sg", "3sg"]
+        self.speaker_types = [False, True]
+        ##
+
+        # Averages of last N timesteps of prop_innovative, for whole model
         self.datacollector = DataCollector(
             {
                 "prop_innovative_1sg_innovating_avg": util.compute_prop_innovative_1sg_innovating_avg,
@@ -63,6 +70,7 @@ class Model(Model):
             self.schedule.add(agent)
 
         self.agents = [a for a, x, y in self.grid.coord_iter()]
+        util.update_prop_innovative_agents(self.agents)
 
         self.running = True
         self.datacollector.collect(self)
@@ -75,10 +83,13 @@ class Model(Model):
         self.schedule.step()
         self.datacollector.collect(self)
 
-        # Compute agent prop communicated every n steps
+        # Compute agent prop, every N iterations
         # This also empties variable
-        if self.steps % 10 == 0:
-            util.compute_prop_innovative_agents(self.agents)
+        if self.steps % STEPS_UPDATE_AGENT_COLOR == 0:
+            util.update_prop_innovative_agents(self.agents)
+
+        # Compute model prop
+        util.update_prop_innovative_model(self, self.persons, self.speaker_types, self.prop_innovative)
         
         
         self.steps += 1

@@ -28,7 +28,7 @@ class Agent(Agent):
 
         # Variables for stats (for colours)
         self.communicated = []
-        self.prop_communicated_innovative = []
+        self.prop_innovative = []
 
 
     def step(self):
@@ -38,8 +38,9 @@ class Agent(Agent):
         listener = RG.choice(self.model.agents)
 
         question = self.create_question()
-        answer = listener.receive_question(question)
-        self.receive_answer(answer)
+        answer = listener.receive_question_reply(question)
+        if answer is not None:
+            self.receive_answer(answer)
 
 
     def create_question(self):
@@ -57,17 +58,21 @@ class Agent(Agent):
 
     # Methods used when agent listens
 
-    def receive_question(self, signal):
+    def receive_question_reply(self, signal):
         concept, person_question, form_question = signal.get_content()
         self.boost_form(concept, person_question, form_question)
 
-        person_answer = self.question_answer_mapping[person_question]
-        form_answer = choice_prob(self.forms[concept, person_answer])
-        self.boost_form(concept, person_answer, form_answer)
-        # Add to stats
-        update_communicated(form_answer, person_answer, self.innovating, self.model, self)
+        if self.model.repeats:
+            person_answer = self.question_answer_mapping[person_question]
+            form_answer = choice_prob(self.forms[concept, person_answer])
+            self.boost_form(concept, person_answer, form_answer)
+            # Add to stats
+            update_communicated(form_answer, person_answer, self.innovating, self.model, self)
 
-        signal_answer = Verb(concept=concept, person=person_answer, form=form_answer)
+            signal_answer = Verb(concept=concept, person=person_answer, form=form_answer)
+        else:
+            # In no-repeats model, answer with yes/no, so no form used
+            signal_answer=None
         return signal_answer
     
     def receive_answer(self, signal):
