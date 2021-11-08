@@ -35,7 +35,7 @@ class Model(Model):
 
         # Contains utterances of last step emptied after prop_innovative calculation at end of step
         self.communicated = defaultdict(list)
-        self.n_communicated = defaultdict(int)
+        self.n_communicated = defaultdict(list)
         # Contains proportion innovative of all timesteps
         self.prop_innovative = defaultdict(list)
 
@@ -54,9 +54,9 @@ class Model(Model):
                 "prop_innovative_1sg_conservating_avg": util.compute_prop_innovative_1sg_conservating_avg,
                 "prop_innovative_2sg_conservating_avg": util.compute_prop_innovative_2sg_conservating_avg,
                 "prop_innovative_3sg_conservating_avg": util.compute_prop_innovative_3sg_conservating_avg,
-                "n_communicated_1sg": lambda m: m.n_communicated["1sg"],
-                "n_communicated_2sg": lambda m: m.n_communicated["2sg"],
-                "n_communicated_3sg": lambda m: m.n_communicated["3sg"],
+                "n_communicated_1sg": util.compute_n_communicated_1sg_avg,
+                "n_communicated_2sg": util.compute_n_communicated_2sg_avg,
+                "n_communicated_3sg": util.compute_n_communicated_3sg_avg,
             }
         )
 

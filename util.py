@@ -33,17 +33,31 @@ def compute_prop_innovative_2sg_innovating_avg(model):
 def compute_prop_innovative_3sg_innovating_avg(model):
     last_stats = model.prop_innovative["3sg",True][:-AVG_WINDOW_STATS]
     return mymean(last_stats)
+
+##
+def compute_n_communicated_1sg_avg(model):
+    last_stats = model.n_communicated["1sg"][:-AVG_WINDOW_STATS]
+    return mymean(last_stats)
+
+def compute_n_communicated_2sg_avg(model):
+    last_stats = model.n_communicated["2sg"][:-AVG_WINDOW_STATS]
+    return mymean(last_stats)
+
+def compute_n_communicated_3sg_avg(model):
+    last_stats = model.n_communicated["3sg"][:-AVG_WINDOW_STATS]
+    return mymean(last_stats)
 ######
 
 ##### Called every iteration: compute proportion innovative from list of utterances in this iteration.
 # List of utterances is cleared after
 def update_prop_innovative_model(model, persons, speaker_types, prop_innovative_obj):
-    print(sorted([(k,len(v)) for k,v in model.communicated.items()]))
+    # print(sorted([(k,len(v)) for k,v in model.communicated.items()]))
     for person in persons:
         for speaker_type in speaker_types:
             stat = compute_prop_innovative(model.communicated[person, speaker_type])
             prop_innovative_obj[person, speaker_type].append(stat)
-        model.n_communicated[person] = 0
+        # TODO: should clear of communicated_list also happen here?
+        model.n_communicated[person].clear()
 
 def update_prop_innovative_agents(agents):
     for agent in agents:
@@ -62,7 +76,7 @@ def compute_prop_innovative(communicated_list):
 def update_communicated(form, person, speaker_type, model, agent):
     # For model: store forms per person and agent type
     model.communicated[person,speaker_type].append(form)
-    model.n_communicated[person] +=1
+    model.n_communicated[person][-1] +=1
 
     # For agent: store all forms together, regardless of person and speaker type 
     agent.communicated.append(form)
