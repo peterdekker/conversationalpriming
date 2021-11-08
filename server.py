@@ -28,7 +28,8 @@ canvas_element = CanvasGrid(draw, HEIGHT, WIDTH, 500, 500)
 communicated_1sg_chart = ChartModule([{"Label": "prop_innovative_1sg_innovating_avg", "Color": "Green"}, {"Label": "prop_innovative_1sg_conservating_avg", "Color": "Black"}])
 communicated_2sg_chart = ChartModule([{"Label": "prop_innovative_2sg_innovating_avg", "Color": "Green"}, {"Label": "prop_innovative_2sg_conservating_avg", "Color": "Black"}])
 communicated_3sg_chart = ChartModule([{"Label": "prop_innovative_3sg_innovating_avg", "Color": "Green"}, {"Label": "prop_innovative_3sg_conservating_avg", "Color": "Black"}])
+n_communicated_chart = ChartModule([{"Label": "n_communicated_1sg", "Color": "Red"}, {"Label": "n_communicated_2sg", "Color": "Blue"},{"Label": "n_communicated_3sg", "Color": "Yellow"}])
 
 server = ModularServer(Model,
-                       [canvas_element, communicated_1sg_chart, communicated_2sg_chart, communicated_3sg_chart],
+                       [canvas_element, communicated_1sg_chart, communicated_2sg_chart, communicated_3sg_chart, n_communicated_chart],
                        "Conversational priming", model_params_ui)
