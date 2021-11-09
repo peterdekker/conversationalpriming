@@ -57,7 +57,7 @@ def update_prop_innovative_model(model, persons, speaker_types, prop_innovative_
             stat = compute_prop_innovative(model.communicated[person, speaker_type])
             prop_innovative_obj[person, speaker_type].append(stat)
         # TODO: should clear of communicated_list also happen here?
-        model.n_communicated[person].clear()
+        model.n_communicated[person].append(0)
 
 def update_prop_innovative_agents(agents):
     for agent in agents:

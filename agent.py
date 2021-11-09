@@ -46,14 +46,14 @@ class Agent(Agent):
     def create_question(self):
         # Send polar question, represented by verb: concept, person and form
         concept = RG.choice(self.verb_concepts)
-        person_question = RG.choice(self.persons)
-        form_question = choice_prob(self.forms[concept, person_question])
-        self.boost_form(concept, person_question, form_question)
+        self.person_question = RG.choice(self.persons)
+        form_question = choice_prob(self.forms[concept, self.person_question])
+        self.boost_form(concept, self.person_question, form_question)
         # Add to stats
-        update_communicated(form_question, person_question, self.innovating, self.model, self)
+        update_communicated(form_question, self.person_question, self.innovating, self.model, self)
         
 
-        signal_question = Verb(concept=concept, person=person_question, form=form_question)
+        signal_question = Verb(concept=concept, person=self.person_question, form=form_question)
         return signal_question
 
     # Methods used when agent listens
@@ -64,8 +64,16 @@ class Agent(Agent):
 
         if self.model.repeats:
             person_answer = self.question_answer_mapping[person_question]
-            form_answer = choice_prob(self.forms[concept, person_answer])
+            if person_answer == person_question:
+                # 3sg: instead of using own forms library, just repeat form from question
+                form_answer = form_question
+            else:
+                # Other cases: use form from own library
+                form_answer = choice_prob(self.forms[concept, person_answer])
             self.boost_form(concept, person_answer, form_answer)
+            # if person_answer == person_question:
+            #     # Do extra boost if person is same!
+            #     self.boost_form(concept, person_answer, form_answer)
             # Add to stats
             update_communicated(form_answer, person_answer, self.innovating, self.model, self)
 
@@ -78,6 +86,12 @@ class Agent(Agent):
     def receive_answer(self, signal):
         concept, person_answer, form_answer = signal.get_content()
         self.boost_form(concept, person_answer, form_answer)
+        # if person_answer == self.person_question:
+        #     # Do extra boost if person is same!
+        #     self.boost_form(concept, person_answer, form_answer)
+        
+        # Reset internal person question variable
+        self.pereson_question = None
     
     def boost_form(self, concept, person, form):
         # print("Old")

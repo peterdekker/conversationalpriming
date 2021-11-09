@@ -35,7 +35,7 @@ class Model(Model):
 
         # Contains utterances of last step emptied after prop_innovative calculation at end of step
         self.communicated = defaultdict(list)
-        self.n_communicated = defaultdict(list)
+        self.n_communicated = defaultdict(lambda: [0])
         # Contains proportion innovative of all timesteps
         self.prop_innovative = defaultdict(list)
 
