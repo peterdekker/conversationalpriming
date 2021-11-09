@@ -5,7 +5,7 @@ from mesa.visualization.UserParam import UserSettableParameter
 
 logging.basicConfig(stream=sys.stderr, level=logging.ERROR)
 RG = np.random.default_rng()
-INNOVATIVE_FORM = "2"
+INNOVATIVE_FORM = "1"
 STEPS_UPDATE_AGENT_COLOR = 20
 AVG_WINDOW_STATS = 10
 

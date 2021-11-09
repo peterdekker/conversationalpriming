@@ -17,8 +17,8 @@ class Agent(Agent):
         # TODO: Move initialization outside agent?
         self.verb_concepts = ["a"]
         self.persons = ["1sg", "2sg", "3sg"]
-        forms_template_conservating = {"1":1.0, "2": 0.0}
-        forms_template_innovating = {"1":0.1, "2": 0.9}
+        forms_template_conservating = {"0":1.0, "1": 0.0}
+        forms_template_innovating = {"0":0.1, "1": 0.9}
         self.forms = {}
         for c in self.verb_concepts:
             for p in self.persons:
