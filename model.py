@@ -15,18 +15,23 @@ class Model(Model):
     Model class
     '''
 
-    def __init__(self, height, width, proportion_innovating, repeats):
+    def __init__(self, height, width, proportion_innovating, boost, surprisal, repeats):
         '''
         Initialize field
         '''
         assert height % 1 == 0
         assert width % 1 == 0
         assert proportion_innovating >= 0 and proportion_innovating <= 1
+        assert boost >= 0 and boost <= 1
+        assert type(surprisal) == bool
+        assert type(repeats) == bool
 
 
         self.height = height
         self.width = width
         self.proportion_innovating = proportion_innovating
+        self.boost = boost
+        self.surprisal = surprisal
         self.repeats = repeats
 
         self.schedule = RandomActivation(self)

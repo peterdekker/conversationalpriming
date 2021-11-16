@@ -2,7 +2,7 @@ from mesa import Agent
 
 from verb import Verb
 from util import choice_prob, update_communicated
-from config import RG, logging, BOOST
+from config import RG, logging
 
 
 class Agent(Agent):
@@ -91,15 +91,15 @@ class Agent(Agent):
         #     self.boost_form(concept, person_answer, form_answer)
         
         # Reset internal person question variable
-        self.pereson_question = None
+        self.person_question = None
     
     def boost_form(self, concept, person, form):
         # print("Old")
         # print(self.forms[concept, person])
         prob_dict = self.forms[concept, person]
-        new_total = sum(prob_dict.values()) + BOOST
+        new_total = sum(prob_dict.values()) + self.model.boost
         # Add BOOST to this form and scale by new total, scale other forms by new total
-        self.forms[concept, person] = {f: (prob+BOOST)/new_total if f==form else prob/new_total for f, prob in prob_dict.items()}
+        self.forms[concept, person] = {f: (prob+self.model.boost)/new_total if f==form else prob/new_total for f, prob in prob_dict.items()}
         # print("New")
         # print(self.forms[concept, person])
 
