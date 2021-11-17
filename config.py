@@ -8,12 +8,14 @@ RG = np.random.default_rng()
 INNOVATIVE_FORM = "1"
 STEPS_UPDATE_AGENT_COLOR = 20
 AVG_WINDOW_STATS = 10
+SMOOTHING_SURPRISAL = 0.01
 
 HEIGHT = 10
 WIDTH = 10
 PROPORTION_INNOVATING = 0.2
 BOOST = 0.01
 SURPRISAL = False
+ENTROPY = False
 REPEATS = True
 
 model_params = {
@@ -22,6 +24,7 @@ model_params = {
     "proportion_innovating": {"ui": UserSettableParameter("slider", "Proportion innovating", PROPORTION_INNOVATING, 0.0, 1.0, 0.1), "script": PROPORTION_INNOVATING},
     "boost": {"ui": UserSettableParameter("slider", "Boost", BOOST, 0.0, 1.0, 0.01), "script": BOOST},
     "surprisal": {"ui": UserSettableParameter('checkbox', 'Surprisal', value=SURPRISAL), "script": SURPRISAL},
+    "entropy": {"ui": UserSettableParameter('checkbox', 'Entropy', value=ENTROPY), "script": ENTROPY},
     "repeats": {"ui": UserSettableParameter('checkbox', 'Repeats', value=REPEATS), "script": REPEATS}
 }
 

@@ -15,7 +15,7 @@ class Model(Model):
     Model class
     '''
 
-    def __init__(self, height, width, proportion_innovating, boost, surprisal, repeats):
+    def __init__(self, height, width, proportion_innovating, boost, surprisal, entropy, repeats):
         '''
         Initialize field
         '''
@@ -24,6 +24,7 @@ class Model(Model):
         assert proportion_innovating >= 0 and proportion_innovating <= 1
         assert boost >= 0 and boost <= 1
         assert type(surprisal) == bool
+        assert type(entropy) == bool
         assert type(repeats) == bool
 
 
@@ -32,6 +33,7 @@ class Model(Model):
         self.proportion_innovating = proportion_innovating
         self.boost = boost
         self.surprisal = surprisal
+        self.entropy = entropy
         self.repeats = repeats
 
         self.schedule = RandomActivation(self)

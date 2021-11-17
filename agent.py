@@ -2,7 +2,8 @@ from mesa import Agent
 
 from verb import Verb
 from util import choice_prob, update_communicated
-from config import RG, logging
+from config import RG, logging, SMOOTHING_SURPRISAL
+import numpy as np
 
 
 class Agent(Agent):
@@ -97,9 +98,20 @@ class Agent(Agent):
         # print("Old")
         # print(self.forms[concept, person])
         prob_dict = self.forms[concept, person]
-        new_total = sum(prob_dict.values()) + self.model.boost
+        boost = self.model.boost
+        print(f"p:{prob_dict[form]}")
+        if self.model.surprisal:
+            surprisal = min(-np.log2(prob_dict[form]), 10)
+            boost = boost * surprisal
+        if self.model.entropy and not self.model.surprisal:
+            px = prob_dict[form]
+            surprisal = min(-np.log2(px), 10)
+            entropy = px * surprisal
+            boost = boost * 2 * entropy
+        print(boost)
+        new_total = sum(prob_dict.values()) + boost
         # Add BOOST to this form and scale by new total, scale other forms by new total
-        self.forms[concept, person] = {f: (prob+self.model.boost)/new_total if f==form else prob/new_total for f, prob in prob_dict.items()}
+        self.forms[concept, person] = {f: (prob+boost)/new_total if f==form else prob/new_total for f, prob in prob_dict.items()}
         # print("New")
         # print(self.forms[concept, person])
 
