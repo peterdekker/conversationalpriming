@@ -12,16 +12,20 @@ SMOOTHING_SURPRISAL = 0.01
 
 HEIGHT = 10
 WIDTH = 10
-PROPORTION_INNOVATING = 0.2
+PROP_INNOVATING_AGENTS = 0.2
+PROP_INNOVATIVE_INNOVATING = 0.9
+PROP_INNOVATIVE_CONSERVATING = 0.0
 BOOST = 0.01
-SURPRISAL = False
+SURPRISAL = True
 ENTROPY = False
 REPEATS = True
 
 model_params = {
     "height": {"ui": HEIGHT, "script": HEIGHT},
     "width": {"ui": WIDTH, "script": WIDTH},
-    "proportion_innovating": {"ui": UserSettableParameter("slider", "Proportion innovating", PROPORTION_INNOVATING, 0.0, 1.0, 0.1), "script": PROPORTION_INNOVATING},
+    "prop_innovating_agents": {"ui": UserSettableParameter("slider", "Proportion innovating agents", PROP_INNOVATING_AGENTS, 0.0, 1.0, 0.1), "script": PROP_INNOVATING_AGENTS},
+    "prop_innovative_innovating": {"ui": UserSettableParameter("slider", "Proportion innovative forms in innovating agents", PROP_INNOVATIVE_INNOVATING, 0.0, 1.0, 0.1), "script": PROP_INNOVATIVE_INNOVATING},
+    "prop_innovative_conservating": {"ui": UserSettableParameter("slider", "Proportion innovative forms in conservating agents", PROP_INNOVATIVE_CONSERVATING, 0.0, 1.0, 0.1), "script": PROP_INNOVATIVE_CONSERVATING},
     "boost": {"ui": UserSettableParameter("slider", "Boost", BOOST, 0.0, 1.0, 0.01), "script": BOOST},
     "surprisal": {"ui": UserSettableParameter('checkbox', 'Surprisal', value=SURPRISAL), "script": SURPRISAL},
     "entropy": {"ui": UserSettableParameter('checkbox', 'Entropy', value=ENTROPY), "script": ENTROPY},

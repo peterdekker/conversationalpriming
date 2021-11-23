@@ -15,13 +15,15 @@ class Model(Model):
     Model class
     '''
 
-    def __init__(self, height, width, proportion_innovating, boost, surprisal, entropy, repeats):
+    def __init__(self, height, width, prop_innovating_agents, prop_innovative_innovating, prop_innovative_conservating, boost, surprisal, entropy, repeats):
         '''
         Initialize field
         '''
         assert height % 1 == 0
         assert width % 1 == 0
-        assert proportion_innovating >= 0 and proportion_innovating <= 1
+        assert prop_innovating_agents >= 0 and prop_innovating_agents <= 1
+        assert prop_innovative_innovating >= 0 and prop_innovative_innovating <= 1
+        assert prop_innovative_conservating >= 0 and prop_innovative_conservating <= 1
         assert boost >= 0 and boost <= 1
         assert type(surprisal) == bool
         assert type(entropy) == bool
@@ -30,7 +32,7 @@ class Model(Model):
 
         self.height = height
         self.width = width
-        self.proportion_innovating = proportion_innovating
+        self.prop_innovating_agents = prop_innovating_agents
         self.boost = boost
         self.surprisal = surprisal
         self.entropy = entropy
@@ -75,8 +77,8 @@ class Model(Model):
         for i, cell in enumerate(self.grid.coord_iter()):
             x = cell[1]
             y = cell[2]
-            innovating = RG.random() < self.proportion_innovating
-            agent = Agent((x, y), innovating, self)
+            innovating = RG.random() < self.prop_innovating_agents
+            agent = Agent((x, y), innovating, prop_innovative_innovating if innovating else prop_innovative_conservating, self)
             self.grid.position_agent(agent, (x, y))
             self.schedule.add(agent)
 

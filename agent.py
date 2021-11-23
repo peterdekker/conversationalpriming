@@ -7,23 +7,20 @@ import numpy as np
 
 
 class Agent(Agent):
-    def __init__(self, pos, innovating, model):
+    def __init__(self, pos, innovating, prop_innovative_forms, model):
 
 
         super().__init__(pos, model)
         self.pos = pos
-
-        self.innovating=innovating
+        self.innovating = innovating
         # TODO: later possibly add corpus probabilities
         # TODO: Move initialization outside agent?
         self.verb_concepts = ["a"]
         self.persons = ["1sg", "2sg", "3sg"]
-        forms_template_conservating = {"0":1.0, "1": 0.0}
-        forms_template_innovating = {"0":0.1, "1": 0.9}
         self.forms = {}
         for c in self.verb_concepts:
             for p in self.persons:
-                self.forms[c,p] = forms_template_innovating if innovating else forms_template_conservating
+                self.forms[c,p] = {"0":1-prop_innovative_forms, "1": prop_innovative_forms}
 
         self.question_answer_mapping = {"1sg":"2sg", "2sg":"1sg", "3sg":"3sg"}
 
@@ -97,19 +94,18 @@ class Agent(Agent):
     def boost_form(self, concept, person, form):
         # print("Old")
         # print(self.forms[concept, person])
+        SURPRISAL_THRESHOLD = 1000000
         prob_dict = self.forms[concept, person]
         boost = self.model.boost
-        print(f"p:{prob_dict[form]}")
         if self.model.surprisal:
-            surprisal = min(-np.log2(prob_dict[form]), 10)
+            surprisal = min(-np.log2(prob_dict[form]), SURPRISAL_THRESHOLD)
             boost = boost * surprisal
         if self.model.entropy and not self.model.surprisal:
             px = prob_dict[form]
-            surprisal = min(-np.log2(px), 10)
+            surprisal = min(-np.log2(px), SURPRISAL_THRESHOLD)
             entropy = px * surprisal
             boost = boost * 2 * entropy
-        print(boost)
-        new_total = sum(prob_dict.values()) + boost
+        new_total = 1.0 + boost
         # Add BOOST to this form and scale by new total, scale other forms by new total
         self.forms[concept, person] = {f: (prob+boost)/new_total if f==form else prob/new_total for f, prob in prob_dict.items()}
         # print("New")
