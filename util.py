@@ -1,4 +1,6 @@
 import numpy as np
+import os
+
 from config import RG, INNOVATIVE_FORM, AVG_WINDOW_STATS
 
 def choice_prob(prob_dict):
@@ -89,3 +91,9 @@ def compute_colours(agent):
 
 def colour_str(c):
     return f"hsl({c[0]},{c[1]}%,{c[2]}%)"
+
+def create_output_dir(output_dir):
+    # Check if dir exists only for test scripts,
+    # in normal cases dir should be created once and not exist
+    if not os.path.exists(output_dir):
+        os.mkdir(output_dir)

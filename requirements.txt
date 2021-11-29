@@ -2,3 +2,5 @@ mesa
 argparse
 pandas
 numpy
+seaborn
+matplotlib
