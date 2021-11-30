@@ -2,7 +2,7 @@ from mesa import Agent
 
 from verb import Verb
 from util import choice_prob, update_communicated
-from config import RG, logging, SMOOTHING_SURPRISAL
+from config import RG, logging, SMOOTHING_SURPRISAL, PERSONS
 import numpy as np
 
 
@@ -15,12 +15,12 @@ class Agent(Agent):
         self.innovating = innovating
         # TODO: later possibly add corpus probabilities
         # TODO: Move initialization outside agent?
-        self.verb_concepts = ["a"]
-        self.persons = ["1sg", "2sg", "3sg"]
+        #self.verb_concepts = ["a"]
+        self.persons = PERSONS
         self.forms = {}
-        for c in self.verb_concepts:
-            for p in self.persons:
-                self.forms[c,p] = {"0":1-prop_innovative_forms, "1": prop_innovative_forms}
+        #for c in self.verb_concepts:
+        for p in self.persons:
+            self.forms[p] = {"0":1-prop_innovative_forms, "1": prop_innovative_forms}
 
         self.question_answer_mapping = {"1sg":"2sg", "2sg":"1sg", "3sg":"3sg"}
 
@@ -43,22 +43,22 @@ class Agent(Agent):
 
     def create_question(self):
         # Send polar question, represented by verb: concept, person and form
-        concept = RG.choice(self.verb_concepts)
+        #concept = RG.choice(self.verb_concepts)
         self.person_question = RG.choice(self.persons)
-        form_question = choice_prob(self.forms[concept, self.person_question])
-        self.boost_form(concept, self.person_question, form_question)
+        form_question = choice_prob(self.forms[self.person_question])
+        self.boost_form(self.person_question, form_question)
         # Add to stats
         update_communicated(form_question, self.person_question, self.innovating, self.model, self)
         
 
-        signal_question = Verb(concept=concept, person=self.person_question, form=form_question)
+        signal_question = Verb(person=self.person_question, form=form_question)
         return signal_question
 
     # Methods used when agent listens
 
     def receive_question_reply(self, signal):
-        concept, person_question, form_question = signal.get_content()
-        self.boost_form(concept, person_question, form_question)
+        person_question, form_question = signal.get_content()
+        self.boost_form(person_question, form_question)
 
         if self.model.repeats:
             person_answer = self.question_answer_mapping[person_question]
@@ -67,49 +67,44 @@ class Agent(Agent):
                 form_answer = form_question
             else:
                 # Other cases: use form from own library
-                form_answer = choice_prob(self.forms[concept, person_answer])
-            self.boost_form(concept, person_answer, form_answer)
+                form_answer = choice_prob(self.forms[person_answer])
+            self.boost_form(person_answer, form_answer)
             # if person_answer == person_question:
             #     # Do extra boost if person is same!
             #     self.boost_form(concept, person_answer, form_answer)
             # Add to stats
             update_communicated(form_answer, person_answer, self.innovating, self.model, self)
 
-            signal_answer = Verb(concept=concept, person=person_answer, form=form_answer)
+            signal_answer = Verb(person=person_answer, form=form_answer)
         else:
             # In no-repeats model, answer with yes/no, so no form used
             signal_answer=None
         return signal_answer
     
     def receive_answer(self, signal):
-        concept, person_answer, form_answer = signal.get_content()
-        self.boost_form(concept, person_answer, form_answer)
-        # if person_answer == self.person_question:
-        #     # Do extra boost if person is same!
-        #     self.boost_form(concept, person_answer, form_answer)
-        
+        person_answer, form_answer = signal.get_content()
+        self.boost_form(person_answer, form_answer)
+
         # Reset internal person question variable
         self.person_question = None
     
-    def boost_form(self, concept, person, form):
-        # print("Old")
-        # print(self.forms[concept, person])
+    def boost_form(self, person, form):
         SURPRISAL_THRESHOLD = 1000000
-        prob_dict = self.forms[concept, person]
+        prob_dict = self.forms[person]
         boost = self.model.boost
         if self.model.surprisal:
-            surprisal = min(-np.log2(prob_dict[form]), SURPRISAL_THRESHOLD)
+            #surprisal = min(-np.log2(prob_dict[form]), SURPRISAL_THRESHOLD)
+            surprisal = -np.log2(prob_dict[form])
             boost = boost * surprisal
         if self.model.entropy and not self.model.surprisal:
             px = prob_dict[form]
-            surprisal = min(-np.log2(px), SURPRISAL_THRESHOLD)
+            # surprisal = min(-np.log2(px), SURPRISAL_THRESHOLD)
+            surprisal = -np.log2(px)
             entropy = px * surprisal
             boost = boost * 2 * entropy
         new_total = 1.0 + boost
         # Add BOOST to this form and scale by new total, scale other forms by new total
-        self.forms[concept, person] = {f: (prob+boost)/new_total if f==form else prob/new_total for f, prob in prob_dict.items()}
-        # print("New")
-        # print(self.forms[concept, person])
+        self.forms[person] = {f: (prob+boost)/new_total if f==form else prob/new_total for f, prob in prob_dict.items()}
 
 
         

@@ -8,9 +8,11 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 
 from model import Model
-from config import model_params_script, evaluation_params, bool_params, string_params, OUTPUT_DIR, IMG_FORMAT, LAST_N_STEPS_END_GRAPH
+from config import model_params_script, evaluation_params, bool_params, string_params, OUTPUT_DIR, IMG_FORMAT, LAST_N_STEPS_END_GRAPH, PERSONS
 
-stats = ["prop_innovative_1sg_innovating_avg", "prop_innovative_1sg_conservating_avg", "prop_innovative_2sg_innovating_avg", "prop_innovative_2sg_conservating_avg", "prop_innovative_3sg_innovating_avg", "prop_innovative_3sg_conservating_avg"]
+communicated_stats = ["prop_innovative_1sg_innovating_avg", "prop_innovative_1sg_conservating_avg", "prop_innovative_2sg_innovating_avg", "prop_innovative_2sg_conservating_avg", "prop_innovative_3sg_innovating_avg", "prop_innovative_3sg_conservating_avg"]
+internal_stats = ["prop_innovative_1sg_innovating_internal", "prop_innovative_1sg_conservating_internal", "prop_innovative_2sg_innovating_internal", "prop_innovative_2sg_conservating_internal", "prop_innovative_3sg_innovating_internal", "prop_innovative_3sg_conservating_internal"]
+
 
 def str2bool(v):
     if isinstance(v, bool):
@@ -26,17 +28,12 @@ def str2bool(v):
 def params_print(params):
     return "".join([f"{k}: {v}   " for k, v in params.items()])
 
-def create_graph_course_sb(run_data, fixed_params, variable_param, variable_param_settings, stats, output_dir):
-    course_df = get_course_df_sb(run_data, variable_param, variable_param_settings, stats)
-    plot_graph_course_sb(course_df, fixed_params, variable_param,
-                      variable_param_settings, output_dir)
-
 
 def create_graph_end_sb(run_data, fixed_params, variable_param, variable_param_settings, stats, output_dir):
     course_df = get_course_df_sb(run_data, variable_param, variable_param_settings, stats)
-    plot_graph_end_sb(fixed_params, variable_param, variable_param_settings, stats, output_dir, course_df)
+    plot_graph_end_sb(course_df, fixed_params, variable_param, variable_param_settings, stats, output_dir)
 
-def plot_graph_end_sb(fixed_params, variable_param, variable_param_settings, stats, output_dir, course_df):
+def plot_graph_end_sb(course_df, fixed_params, variable_param, variable_param_settings, stats, output_dir):
     n_steps = fixed_params["steps"]
     # We want all the index labels above a certain number (the tail),
     # but the indices are non-unique (because of multiple runs), so slice does not work
@@ -69,6 +66,12 @@ def plot_graph_end_sb(fixed_params, variable_param, variable_param_settings, sta
     # plt.figtext(0.05, 0.03, graphtext, fontsize=8, ha="left")
     plt.savefig(os.path.join(output_dir, f"{variable_param}-end-sb.{IMG_FORMAT}"), format=IMG_FORMAT)
 
+def create_graph_course_sb(run_data, fixed_params, variable_param, variable_param_settings, stats, mode, output_dir):
+    course_df = get_course_df_sb(run_data, variable_param, variable_param_settings, stats)
+    for person in PERSONS:
+        stats_person = [stat for stat in stats if person in stat] # if person (eg. 1sg) is substring of stat name
+        plot_graph_course_sb(course_df, fixed_params, variable_param,
+                        variable_param_settings, stats_person, mode, output_dir, person)
 
 def get_course_df_sb(run_data, variable_param, variable_param_settings, stats):
     iteration_dfs = []
@@ -79,40 +82,18 @@ def get_course_df_sb(run_data, variable_param, variable_param_settings, stats):
         iteration_df = iteration_df.drop(0)
         iteration_dfs.append(iteration_df)
     course_df = pd.concat(iteration_dfs)
+    # Old index (with duplicates because of different param settings and runs) becomes explicit column 'timesteps'
+    course_df = course_df.reset_index().rename(columns={"index":"timesteps"})
     return course_df
 
 
-def plot_graph_course_sb(course_df, fixed_params, variable_param, variable_param_settings, output_dir):
-    print(course_df)
-    # Old index (with duplicates because of different param settings and runs) becomes explicit column 'index'
-    course_df = course_df.reindex()
-    df.melt(id_vars=["index","repeats"], value_vars = ["prop_innovative_1sg_innovating_avg", "prop_innovative_1sg_conservating_avg", "prop_innovative_2sg_innovating_avg", "prop_innovative_2sg_conservating_avg", "prop_innovative_3sg_innovating_avg", "prop_innovative_3sg_conservating_avg"])
-    #course_only_stat = course_df.pivot(index=course_df.index, columns = "proportion_l2", values =stat)
-    #print(course_only_stat)
-    course_df.to_csv("course_df.csv")
-    sns.lineplot(data=course_df, style=variable_param)
+def plot_graph_course_sb(course_df, fixed_params, variable_param, variable_param_settings, stats, mode, output_dir, label):
+    df_melted = course_df.melt(id_vars=["timesteps",variable_param], value_vars = stats, value_name = "proportion innovative", var_name="statistic")
+    sns.lineplot(data=df_melted, x="timesteps", y="proportion innovative", hue="statistic", style=variable_param)
 
-    # fig, ax = plt.subplots()
-    # steps_ix = course_df.index
-    # for param_setting in variable_param_settings:
-    #     ax.plot(steps_ix, course_df[param_setting, stat],
-    #             label=f"{variable_param}={param_setting}", linewidth=1.0)
-    # # Add some text for labels, title and custom x-axis tick labels, etc.
-    # if mode == "internal":
-    #     ax.set_ylabel('proportion paradigm cells filled')
-    # elif mode == "communicated":
-    #     ax.set_ylabel('proportion non-empty utterances')
-    # ax.set_xlabel(variable_param)
-    # ax.set_title(f"{variable_param} ({mode})")
-    # # ax.set_xticks(x+1.5*width)
-    # # ax.set_xticklabels(labels)
-    # ax.legend()
-    # # fig.tight_layout()
-    # graphtext = textwrap.fill(params_print(fixed_params), width=100)
-    # plt.subplots_adjust(bottom=0.25)
-    # plt.figtext(0.05, 0.03, graphtext, fontsize=8, ha="left")
-    # # bbox_inches="tight"
-    plt.savefig(os.path.join(output_dir, f"{variable_param}-course-sb.{IMG_FORMAT}"), format=IMG_FORMAT)
+    # Label is usually person (e.g. 1sg)
+    plt.savefig(os.path.join(output_dir, f"{variable_param}-{label}-{mode}.{IMG_FORMAT}"), format=IMG_FORMAT)
+    plt.clf()
 
 def evaluate_model(fixed_params, variable_params, iterations, steps, output_dir):
     print(f"- Running batch: {iterations} iterations of {steps} steps")
@@ -178,7 +159,10 @@ def main():
         # create_graph_end_sb(run_data, fixed_params_print, var_param, var_param_settings,
         #                  stats=stats, output_dir=output_dir_custom)
         create_graph_course_sb(run_data, fixed_params_print, var_param, var_param_settings,
-                            stats=stats, output_dir=output_dir_custom)
+                            stats=communicated_stats, mode="communicated", output_dir=output_dir_custom)
+        
+        create_graph_course_sb(run_data, fixed_params_print, var_param, var_param_settings,
+                            stats=internal_stats, mode="internal", output_dir=output_dir_custom)
 
 
 if __name__ == "__main__":

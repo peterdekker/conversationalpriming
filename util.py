@@ -37,6 +37,30 @@ def compute_prop_innovative_3sg_innovating_avg(model):
     return mymean(last_stats)
 
 ##
+
+def compute_internal(agents, person, innovating):
+    probs = [agent.forms[person][INNOVATIVE_FORM] for agent in agents if agent.innovating==innovating]
+    return mymean(probs)
+
+def compute_prop_innovative_1sg_conservating_internal(model):
+    return compute_internal(model.agents, "1sg", False)
+
+def compute_prop_innovative_2sg_conservating_internal(model):
+    return compute_internal(model.agents, "2sg", False)
+
+def compute_prop_innovative_3sg_conservating_internal(model):
+    return compute_internal(model.agents, "3sg", False)
+
+def compute_prop_innovative_1sg_innovating_internal(model):
+    return compute_internal(model.agents, "1sg", True)
+
+def compute_prop_innovative_2sg_innovating_internal(model):
+    return compute_internal(model.agents, "2sg", True)
+
+def compute_prop_innovative_3sg_innovating_internal(model):
+    return compute_internal(model.agents, "3sg", True)
+
+##
 def compute_n_communicated_1sg_avg(model):
     last_stats = model.n_communicated["1sg"][:-AVG_WINDOW_STATS]
     return mymean(last_stats)
