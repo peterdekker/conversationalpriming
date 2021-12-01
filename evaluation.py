@@ -64,7 +64,7 @@ def plot_graph_end_sb(course_df, fixed_params, variable_param, variable_param_se
     # graphtext = textwrap.fill(params_print(fixed_params), width=100)
     # plt.subplots_adjust(bottom=0.25)
     # plt.figtext(0.05, 0.03, graphtext, fontsize=8, ha="left")
-    plt.savefig(os.path.join(output_dir, f"{variable_param}-end-sb.{IMG_FORMAT}"), format=IMG_FORMAT)
+    plt.savefig(os.path.join(output_dir, f"{variable_param}-end-sb.{IMG_FORMAT}"), format=IMG_FORMAT, dpi=300)
 
 def create_graph_course_sb(run_data, fixed_params, variable_param, variable_param_settings, stats, mode, output_dir):
     course_df = get_course_df_sb(run_data, variable_param, variable_param_settings, stats)
@@ -94,11 +94,11 @@ def get_course_df_sb(run_data, variable_param, variable_param_settings, stats):
 
 
 def plot_graph_course_sb(course_df, fixed_params, variable_param, variable_param_settings, stats, mode, output_dir, label):
-    df_melted = course_df.melt(id_vars=["timesteps",variable_param], value_vars = stats, value_name = "proportion innovative", var_name="statistic")
-    sns.lineplot(data=df_melted, x="timesteps", y="proportion innovative", hue="statistic", style=variable_param)
+    df_melted = course_df.melt(id_vars=["timesteps",variable_param], value_vars = stats, value_name = "proportion innovative forms", var_name="statistic")
+    sns.lineplot(data=df_melted, x="timesteps", y="proportion innovative forms", hue="statistic", style=variable_param)
 
     # Label is usually person (e.g. 1sg)
-    plt.savefig(os.path.join(output_dir, f"{variable_param}-{label}-{mode}.{IMG_FORMAT}"), format=IMG_FORMAT)
+    plt.savefig(os.path.join(output_dir, f"{variable_param}-{label}-{mode}.{IMG_FORMAT}"), format=IMG_FORMAT, dpi=300)
     plt.clf()
 
 def evaluate_model(fixed_params, variable_params, iterations, steps, output_dir):
