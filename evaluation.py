@@ -68,6 +68,12 @@ def plot_graph_end_sb(course_df, fixed_params, variable_param, variable_param_se
 
 def create_graph_course_sb(run_data, fixed_params, variable_param, variable_param_settings, stats, mode, output_dir):
     course_df = get_course_df_sb(run_data, variable_param, variable_param_settings, stats)
+
+    # Comparison 1sg-3sg
+    stats_1sg_3sg = [stat for stat in stats if "1sg" in stat or "3sg" in stat]
+    plot_graph_course_sb(course_df, fixed_params, variable_param,
+                        variable_param_settings, stats_1sg_3sg, mode, output_dir, "1sg-3sg")
+
     for person in PERSONS:
         stats_person = [stat for stat in stats if person in stat] # if person (eg. 1sg) is substring of stat name
         plot_graph_course_sb(course_df, fixed_params, variable_param,
