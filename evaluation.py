@@ -65,6 +65,7 @@ def plot_graph_end_sb(course_df, fixed_params, variable_param, variable_param_se
     # plt.subplots_adjust(bottom=0.25)
     # plt.figtext(0.05, 0.03, graphtext, fontsize=8, ha="left")
     plt.savefig(os.path.join(output_dir, f"{variable_param}-end-sb.{IMG_FORMAT}"), format=IMG_FORMAT, dpi=300)
+    plt.clf()
 
 def create_graph_course_sb(run_data, fixed_params, variable_param, variable_param_settings, stats, mode, output_dir):
     course_df = get_course_df_sb(run_data, variable_param, variable_param_settings, stats)
