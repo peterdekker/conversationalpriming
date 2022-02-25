@@ -31,9 +31,9 @@ def params_print(params):
 
 def create_graph_end_sb(run_data, fixed_params, variable_param, variable_param_settings, stats, output_dir):
     course_df = get_course_df_sb(run_data, variable_param, stats)
-    plot_graph_end_sb(course_df, fixed_params, variable_param, variable_param_settings, stats, output_dir)
+    plot_graph_end_sb(course_df, fixed_params, variable_param, output_dir)
 
-def plot_graph_end_sb(course_df, fixed_params, variable_param, variable_param_settings, stats, output_dir):
+def plot_graph_end_sb(course_df, fixed_params, variable_param, output_dir):
     n_steps = fixed_params["steps"]
     # We want all the index labels above a certain number (the tail),
     # but the indices are non-unique (because of multiple runs), so slice does not work
@@ -67,7 +67,7 @@ def plot_graph_end_sb(course_df, fixed_params, variable_param, variable_param_se
     plt.savefig(os.path.join(output_dir, f"{variable_param}-end-sb.{IMG_FORMAT}"), format=IMG_FORMAT, dpi=300)
     plt.clf()
 
-def create_graph_course_sb(run_data, fixed_params, variable_param, variable_param_settings, stats, mode, output_dir):
+def create_graph_course_sb(run_data, variable_param, stats, mode, output_dir):
     course_df = get_course_df_sb(run_data, variable_param, stats)
 
     # Comparison 1sg-3sg
@@ -157,16 +157,14 @@ def main():
         iterations_setting = iterations[0]
         steps_setting = steps[0]
         fixed_params = {k: v for k, v in model_params_script.items() if k != var_param}
-        fixed_params_print = {**fixed_params, **
-                                {"iterations": iterations_setting, "steps": steps_setting}}
         run_data = evaluate_model(fixed_params, {var_param: var_param_settings},
                                     iterations_setting, steps_setting)
         # create_graph_end_sb(run_data, fixed_params_print, var_param, var_param_settings,
         #                  stats=stats, output_dir=output_dir_custom)
-        create_graph_course_sb(run_data, fixed_params_print, var_param, var_param_settings,
+        create_graph_course_sb(run_data, var_param,
                             stats=communicated_stats, mode="communicated", output_dir=output_dir_custom)
         
-        create_graph_course_sb(run_data, fixed_params_print, var_param, var_param_settings,
+        create_graph_course_sb(run_data, var_param,
                             stats=internal_stats, mode="internal", output_dir=output_dir_custom)
 
 
