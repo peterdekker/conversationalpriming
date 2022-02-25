@@ -10,8 +10,8 @@ import matplotlib.pyplot as plt
 from model import Model
 from config import model_params_script, evaluation_params, bool_params, string_params, OUTPUT_DIR, IMG_FORMAT, LAST_N_STEPS_END_GRAPH, PERSONS
 
-communicated_stats = ["prop_innovative_1sg_innovating_avg", "prop_innovative_1sg_conservating_avg", "prop_innovative_2sg_innovating_avg", "prop_innovative_2sg_conservating_avg", "prop_innovative_3sg_innovating_avg", "prop_innovative_3sg_conservating_avg"]
-internal_stats = ["prop_innovative_1sg_innovating_internal", "prop_innovative_1sg_conservating_internal", "prop_innovative_2sg_innovating_internal", "prop_innovative_2sg_conservating_internal", "prop_innovative_3sg_innovating_internal", "prop_innovative_3sg_conservating_internal"]
+communicated_stats = ["prop_innovative_1sg_innovating_avg", "prop_innovative_1sg_conservating_avg", "prop_innovative_1sg_total_avg", "prop_innovative_2sg_innovating_avg", "prop_innovative_2sg_conservating_avg", "prop_innovative_2sg_total_avg", "prop_innovative_3sg_innovating_avg", "prop_innovative_3sg_conservating_avg", "prop_innovative_3sg_total_avg"]
+internal_stats = ["prop_innovative_1sg_innovating_internal", "prop_innovative_1sg_conservating_internal", "prop_innovative_1sg_total_internal", "prop_innovative_2sg_innovating_internal", "prop_innovative_2sg_conservating_internal", "prop_innovative_2sg_total_internal", "prop_innovative_3sg_innovating_internal", "prop_innovative_3sg_conservating_internal", "prop_innovative_3sg_total_internal"]
 
 
 def str2bool(v):
@@ -30,7 +30,7 @@ def params_print(params):
 
 
 def create_graph_end_sb(run_data, fixed_params, variable_param, variable_param_settings, stats, output_dir):
-    course_df = get_course_df_sb(run_data, variable_param, variable_param_settings, stats)
+    course_df = get_course_df_sb(run_data, variable_param, stats)
     plot_graph_end_sb(course_df, fixed_params, variable_param, variable_param_settings, stats, output_dir)
 
 def plot_graph_end_sb(course_df, fixed_params, variable_param, variable_param_settings, stats, output_dir):
@@ -68,19 +68,17 @@ def plot_graph_end_sb(course_df, fixed_params, variable_param, variable_param_se
     plt.clf()
 
 def create_graph_course_sb(run_data, fixed_params, variable_param, variable_param_settings, stats, mode, output_dir):
-    course_df = get_course_df_sb(run_data, variable_param, variable_param_settings, stats)
+    course_df = get_course_df_sb(run_data, variable_param, stats)
 
     # Comparison 1sg-3sg
     stats_1sg_3sg = [stat for stat in stats if "1sg" in stat or "3sg" in stat]
-    plot_graph_course_sb(course_df, fixed_params, variable_param,
-                        variable_param_settings, stats_1sg_3sg, mode, output_dir, "1sg-3sg")
+    plot_graph_course_sb(course_df, variable_param, stats_1sg_3sg, mode, output_dir, "1sg-3sg")
 
     for person in PERSONS:
         stats_person = [stat for stat in stats if person in stat] # if person (eg. 1sg) is substring of stat name
-        plot_graph_course_sb(course_df, fixed_params, variable_param,
-                        variable_param_settings, stats_person, mode, output_dir, person)
+        plot_graph_course_sb(course_df, variable_param, stats_person, mode, output_dir, person)
 
-def get_course_df_sb(run_data, variable_param, variable_param_settings, stats):
+def get_course_df_sb(run_data, variable_param, stats):
     iteration_dfs = []
     for i, row in run_data.iterrows():
         iteration_df = row["datacollector"].get_model_vars_dataframe()[stats]
@@ -94,7 +92,7 @@ def get_course_df_sb(run_data, variable_param, variable_param_settings, stats):
     return course_df
 
 
-def plot_graph_course_sb(course_df, fixed_params, variable_param, variable_param_settings, stats, mode, output_dir, label):
+def plot_graph_course_sb(course_df, variable_param, stats, mode, output_dir, label):
     df_melted = course_df.melt(id_vars=["timesteps",variable_param], value_vars = stats, value_name = "proportion innovative forms", var_name="statistic")
     sns.lineplot(data=df_melted, x="timesteps", y="proportion innovative forms", hue="statistic", style=variable_param)
 
@@ -102,7 +100,7 @@ def plot_graph_course_sb(course_df, fixed_params, variable_param, variable_param
     plt.savefig(os.path.join(output_dir, f"{variable_param}-{label}-{mode}.{IMG_FORMAT}"), format=IMG_FORMAT, dpi=300)
     plt.clf()
 
-def evaluate_model(fixed_params, variable_params, iterations, steps, output_dir):
+def evaluate_model(fixed_params, variable_params, iterations, steps):
     print(f"- Running batch: {iterations} iterations of {steps} steps")
     print(f"  Variable parameters: {params_print(variable_params)}")
     print(f"  Fixed parameters: {params_print(fixed_params)}")
@@ -162,7 +160,7 @@ def main():
         fixed_params_print = {**fixed_params, **
                                 {"iterations": iterations_setting, "steps": steps_setting}}
         run_data = evaluate_model(fixed_params, {var_param: var_param_settings},
-                                    iterations_setting, steps_setting, output_dir=output_dir_custom)
+                                    iterations_setting, steps_setting)
         # create_graph_end_sb(run_data, fixed_params_print, var_param, var_param_settings,
         #                  stats=stats, output_dir=output_dir_custom)
         create_graph_course_sb(run_data, fixed_params_print, var_param, var_param_settings,

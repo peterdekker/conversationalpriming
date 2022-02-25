@@ -106,6 +106,3 @@ class Agent(Agent):
         # Add BOOST to this form and scale by new total, scale other forms by new total
         self.forms[person] = {f: (prob+boost)/new_total if f==form else prob/new_total for f, prob in prob_dict.items()}
 
-
-        
-

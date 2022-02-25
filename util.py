@@ -36,10 +36,23 @@ def compute_prop_innovative_3sg_innovating_avg(model):
     last_stats = model.prop_innovative["3sg",True][:-AVG_WINDOW_STATS]
     return mymean(last_stats)
 
+def compute_prop_innovative_1sg_total_avg(model):
+    last_stats = model.prop_innovative["1sg",None][:-AVG_WINDOW_STATS]
+    return mymean(last_stats)
+
+def compute_prop_innovative_2sg_total_avg(model):
+    last_stats = model.prop_innovative["2sg",None][:-AVG_WINDOW_STATS]
+    return mymean(last_stats)
+
+def compute_prop_innovative_3sg_total_avg(model):
+    last_stats = model.prop_innovative["3sg",None][:-AVG_WINDOW_STATS]
+    return mymean(last_stats)
+
 ##
 
 def compute_internal(agents, person, innovating):
-    probs = [agent.forms[person][INNOVATIVE_FORM] for agent in agents if agent.innovating==innovating]
+    # If innovating==None, compute internal prob for all agents
+    probs = [agent.forms[person][INNOVATIVE_FORM] for agent in agents if agent.innovating==innovating or innovating==None]
     return mymean(probs)
 
 def compute_prop_innovative_1sg_conservating_internal(model):
@@ -59,6 +72,15 @@ def compute_prop_innovative_2sg_innovating_internal(model):
 
 def compute_prop_innovative_3sg_innovating_internal(model):
     return compute_internal(model.agents, "3sg", True)
+
+def compute_prop_innovative_1sg_total_internal(model):
+    return compute_internal(model.agents, "1sg", None)
+
+def compute_prop_innovative_2sg_total_internal(model):
+    return compute_internal(model.agents, "2sg", None)
+
+def compute_prop_innovative_3sg_total_internal(model):
+    return compute_internal(model.agents, "3sg", None)
 
 ##
 def compute_n_communicated_1sg_avg(model):
@@ -80,8 +102,12 @@ def update_prop_innovative_model(model, persons, speaker_types, prop_innovative_
     # print(sorted([(k,len(v)) for k,v in model.communicated.items()]))
     for person in persons:
         for speaker_type in speaker_types:
+            # Stat per speaker
             stat = compute_prop_innovative(model.communicated[person, speaker_type])
             prop_innovative_obj[person, speaker_type].append(stat)
+        # Total stat
+        stat_total = compute_prop_innovative(model.communicated[person, None])
+        prop_innovative_obj[person, None].append(stat_total)
         # TODO: should clear of communicated_list also happen here?
         model.n_communicated[person].append(0)
 
@@ -103,6 +129,9 @@ def update_communicated(form, person, speaker_type, model, agent):
     # For model: store forms per person and agent type
     model.communicated[person,speaker_type].append(form)
     model.n_communicated[person][-1] +=1
+
+    # Also store forms for both speaker_types together
+    model.communicated[person,None].append(form)
 
     # For agent: store all forms together, regardless of person and speaker type 
     agent.communicated.append(form)
