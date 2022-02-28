@@ -11,7 +11,7 @@ from model import Model
 from config import model_params_script, evaluation_params, bool_params, string_params, OUTPUT_DIR, IMG_FORMAT, LAST_N_STEPS_END_GRAPH, PERSONS
 
 communicated_stats = ["prop_innovative_1sg_innovating_avg", "prop_innovative_1sg_conservating_avg", "prop_innovative_1sg_total_avg", "prop_innovative_2sg_innovating_avg", "prop_innovative_2sg_conservating_avg", "prop_innovative_2sg_total_avg", "prop_innovative_3sg_innovating_avg", "prop_innovative_3sg_conservating_avg", "prop_innovative_3sg_total_avg"]
-internal_stats = ["prop_innovative_1sg_innovating_internal", "prop_innovative_1sg_conservating_internal", "prop_innovative_1sg_total_internal", "prop_innovative_2sg_innovating_internal", "prop_innovative_2sg_conservating_internal", "prop_innovative_2sg_total_internal", "prop_innovative_3sg_innovating_internal", "prop_innovative_3sg_conservating_internal", "prop_innovative_3sg_total_internal"]
+internal_stats = ["prop_innovative_1sg_innovating_internal", "prop_innovative_1sg_conservating_internal", "prop_innovative_1sg_total_internal", "prop_innovative_1sg_dominant", "prop_innovative_2sg_innovating_internal", "prop_innovative_2sg_conservating_internal", "prop_innovative_2sg_total_internal", "prop_innovative_2sg_dominant", "prop_innovative_3sg_innovating_internal", "prop_innovative_3sg_conservating_internal", "prop_innovative_3sg_total_internal", "prop_innovative_3sg_dominant"]
 
 
 def str2bool(v):
@@ -38,32 +38,7 @@ def plot_graph_end_sb(course_df, fixed_params, variable_param, output_dir):
     # We want all the index labels above a certain number (the tail),
     # but the indices are non-unique (because of multiple runs), so slice does not work
     course_tail = course_df.loc[course_df.index > n_steps-LAST_N_STEPS_END_GRAPH]
-    #print(course_tail)
     sns.barplot(x=variable_param, data=course_tail)
-    # labels = variable_param_settings  # run_data_means.index  # variable values
-    # x = np.arange(len(labels))  # the label locations
-    # width = 0.2  # the width of the bars
-    # fig, ax = plt.subplots()
-    # rects = {}
-    # colors = ["deepskyblue", "royalblue", "orange", "darkgoldenrod"]
-    # for i, stat in enumerate(stats):
-    #     stat_label = stat.replace(
-    #         "prop_internal_", "") if mode == "internal" else stat.replace("prop_communicated_", "")
-    #     rects[stat] = ax.bar(x+i*width, course_tail_avg[:,stat],
-    #                          width=width, edgecolor="white", label=stat_label, color=colors[i])
-    # # # Add some text for labels, title and custom x-axis tick labels, etc.
-    # if mode == "internal":
-    #     ax.set_ylabel('proportion paradigm cells filled')
-    # elif mode == "communicated":
-    #     ax.set_ylabel('proportion utterances non-empty')
-    # ax.set_xlabel(variable_param)
-    # ax.set_title(f"{variable_param} ({mode})")
-    # ax.set_xticks(x+1.5*width)
-    # ax.set_xticklabels(labels)
-    # ax.legend()
-    # graphtext = textwrap.fill(params_print(fixed_params), width=100)
-    # plt.subplots_adjust(bottom=0.25)
-    # plt.figtext(0.05, 0.03, graphtext, fontsize=8, ha="left")
     plt.savefig(os.path.join(output_dir, f"{variable_param}-end-sb.{IMG_FORMAT}"), format=IMG_FORMAT, dpi=300)
     plt.clf()
 
@@ -74,7 +49,7 @@ def create_graph_course_sb(run_data, variable_param, stats, mode, output_dir):
     stats_1sg_3sg = [stat for stat in stats if "1sg" in stat or "3sg" in stat]
     plot_graph_course_sb(course_df, variable_param, stats_1sg_3sg, mode, output_dir, "1sg-3sg")
 
-    for person in PERSONS:
+    for person in ["1sg","3sg"]: # For now, don't plot 2sg because it is the same as 1sg
         stats_person = [stat for stat in stats if person in stat] # if person (eg. 1sg) is substring of stat name
         plot_graph_course_sb(course_df, variable_param, stats_person, mode, output_dir, person)
 

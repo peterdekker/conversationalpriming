@@ -82,6 +82,15 @@ def compute_prop_innovative_2sg_total_internal(model):
 def compute_prop_innovative_3sg_total_internal(model):
     return compute_internal(model.agents, "3sg", None)
 
+def compute_prop_innovative_1sg_dominant(model):
+    return compute_dominant(model.agents, "1sg", None)
+
+def compute_prop_innovative_2sg_dominant(model):
+    return compute_dominant(model.agents, "2sg", None)
+
+def compute_prop_innovative_3sg_dominant(model):
+    return compute_dominant(model.agents, "3sg", None)
+
 ##
 def compute_n_communicated_1sg_avg(model):
     last_stats = model.n_communicated["1sg"][:-AVG_WINDOW_STATS]
