@@ -11,8 +11,8 @@ from model import Model
 from config import model_params_script, evaluation_params, bool_params, string_params, OUTPUT_DIR, IMG_FORMAT, LAST_N_STEPS_END_GRAPH, PERSONS
 
 communicated_stats = ["prop_innovative_1sg_innovating_avg", "prop_innovative_1sg_conservating_avg", "prop_innovative_1sg_total_avg", "prop_innovative_2sg_innovating_avg", "prop_innovative_2sg_conservating_avg", "prop_innovative_2sg_total_avg", "prop_innovative_3sg_innovating_avg", "prop_innovative_3sg_conservating_avg", "prop_innovative_3sg_total_avg"]
-internal_stats = ["prop_innovative_1sg_innovating_internal", "prop_innovative_1sg_conservating_internal", "prop_innovative_1sg_total_internal", "prop_innovative_1sg_dominant", "prop_innovative_2sg_innovating_internal", "prop_innovative_2sg_conservating_internal", "prop_innovative_2sg_total_internal", "prop_innovative_2sg_dominant", "prop_innovative_3sg_innovating_internal", "prop_innovative_3sg_conservating_internal", "prop_innovative_3sg_total_internal", "prop_innovative_3sg_dominant"]
-
+internal_stats = ["prop_innovative_1sg_innovating_internal", "prop_innovative_1sg_conservating_internal", "prop_innovative_1sg_total_internal", "prop_innovative_2sg_innovating_internal", "prop_innovative_2sg_conservating_internal", "prop_innovative_2sg_total_internal", "prop_innovative_3sg_innovating_internal", "prop_innovative_3sg_conservating_internal", "prop_innovative_3sg_total_internal"]
+dominant_stats = ["prop_1sg_conservating_dominant", "prop_2sg_conservating_dominant", "prop_3sg_conservating_dominant", "prop_1sg_innovating_dominant", "prop_2sg_innovating_dominant", "prop_3sg_innovating_dominant", "prop_1sg_total_dominant", "prop_2sg_total_dominant", "prop_3sg_total_dominant"]
 
 def str2bool(v):
     if isinstance(v, bool):
@@ -137,10 +137,14 @@ def main():
         # create_graph_end_sb(run_data, fixed_params_print, var_param, var_param_settings,
         #                  stats=stats, output_dir=output_dir_custom)
         create_graph_course_sb(run_data, var_param,
+                            stats=dominant_stats, mode="dominant", output_dir=output_dir_custom)
+
+        create_graph_course_sb(run_data, var_param,
                             stats=communicated_stats, mode="communicated", output_dir=output_dir_custom)
         
         create_graph_course_sb(run_data, var_param,
                             stats=internal_stats, mode="internal", output_dir=output_dir_custom)
+        
 
 
 if __name__ == "__main__":

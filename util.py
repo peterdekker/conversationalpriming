@@ -12,6 +12,8 @@ def mymean(stats_list):
 
 #### DataCollector functions, called every iteration: take mean of last AVG_WINDOW values
 # TODO: call these methods _model_?
+
+# Communicated measures 
 def compute_prop_innovative_1sg_conservating_avg(model):
     last_stats = model.prop_innovative["1sg",False][:-AVG_WINDOW_STATS]
     return mymean(last_stats)
@@ -48,12 +50,21 @@ def compute_prop_innovative_3sg_total_avg(model):
     last_stats = model.prop_innovative["3sg",None][:-AVG_WINDOW_STATS]
     return mymean(last_stats)
 
-##
+## Internal measures
 
 def compute_internal(agents, person, innovating):
     # If innovating==None, compute internal prob for all agents
     probs = [agent.forms[person][INNOVATIVE_FORM] for agent in agents if agent.innovating==innovating or innovating==None]
     return mymean(probs)
+
+def compute_dominant(agents, person, innovating):
+    if innovating == None:
+        speakers_type = agents
+    else:
+        speakers_type = [agent for agent in agents if agent.innovating==innovating]
+    speakers_dominant = [agent for agent in speakers_type if agent.forms[person][INNOVATIVE_FORM]>= 0.5]
+    prop_speakers_dominant = len(speakers_dominant)/len(speakers_type)
+    return prop_speakers_dominant
 
 def compute_prop_innovative_1sg_conservating_internal(model):
     return compute_internal(model.agents, "1sg", False)
@@ -82,13 +93,33 @@ def compute_prop_innovative_2sg_total_internal(model):
 def compute_prop_innovative_3sg_total_internal(model):
     return compute_internal(model.agents, "3sg", None)
 
-def compute_prop_innovative_1sg_dominant(model):
+# Dominant measures
+
+def compute_prop_1sg_conservating_dominant(model):
+    return compute_dominant(model.agents, "1sg", False)
+
+def compute_prop_2sg_conservating_dominant(model):
+    return compute_dominant(model.agents, "2sg", False)
+
+def compute_prop_3sg_conservating_dominant(model):
+    return compute_dominant(model.agents, "3sg", False)
+
+def compute_prop_1sg_innovating_dominant(model):
+    return compute_dominant(model.agents, "1sg", True)
+
+def compute_prop_2sg_innovating_dominant(model):
+    return compute_dominant(model.agents, "2sg", True)
+
+def compute_prop_3sg_innovating_dominant(model):
+    return compute_dominant(model.agents, "3sg", True)
+
+def compute_prop_1sg_total_dominant(model):
     return compute_dominant(model.agents, "1sg", None)
 
-def compute_prop_innovative_2sg_dominant(model):
+def compute_prop_2sg_total_dominant(model):
     return compute_dominant(model.agents, "2sg", None)
 
-def compute_prop_innovative_3sg_dominant(model):
+def compute_prop_3sg_total_dominant(model):
     return compute_dominant(model.agents, "3sg", None)
 
 ##
