@@ -2,7 +2,7 @@ from mesa import Agent
 
 from verb import Verb
 from util import choice_prob, update_communicated
-from config import RG, logging, SMOOTHING_SURPRISAL, PERSONS
+from config import RG, logging, SMOOTHING_SURPRISAL, PERSONS, INNOVATIVE_FORM
 import numpy as np
 
 
@@ -92,6 +92,8 @@ class Agent(Agent):
         SURPRISAL_THRESHOLD = 1000000
         prob_dict = self.forms[person]
         boost = self.model.boost
+        if form == INNOVATIVE_FORM:
+            boost = boost * 5
         if self.model.surprisal:
             #surprisal = min(-np.log2(prob_dict[form]), SURPRISAL_THRESHOLD)
             surprisal = -np.log2(prob_dict[form])
