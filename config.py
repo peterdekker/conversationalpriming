@@ -48,9 +48,10 @@ model_params_script = {k:v["script"] for k,v in model_params.items()}
 evaluation_params = {
     "iterations": ITERATIONS,
     "steps": STEPS,
-    "runlabel": ""
+    "runlabel": "",
+    "plot_from_raw": ""
 }
 
 bool_params = ["surprisal", "entropy", "repeats"]
 
-string_params = ["runlabel"]
+string_params = ["runlabel", "plot_from_raw"]

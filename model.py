@@ -24,10 +24,14 @@ class Model(Model):
         assert init_prop_innovating_agents >= 0 and init_prop_innovating_agents <= 1
         assert init_prop_innovative_innovating >= 0 and init_prop_innovative_innovating <= 1
         assert init_prop_innovative_conservating >= 0 and init_prop_innovative_conservating <= 1
+
         assert boost >= 0 and boost <= 1
         assert type(surprisal) == bool
         assert type(entropy) == bool
         assert type(repeats) == bool
+
+        if (surprisal or entropy) and (init_prop_innovative_conservating == 0.0 or init_prop_innovative_innovating == 0.0):
+            raise ValueError("If surprisal or entropy is on, the proportion of innovative forms in innovating and conservating agents have to be > 0.0; to prevent NaN values in surprisal calculations.")
 
 
         self.height = height
