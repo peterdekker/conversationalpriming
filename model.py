@@ -15,7 +15,7 @@ class Model(Model):
     Model class
     '''
 
-    def __init__(self, height, width, init_prop_innovating_agents, init_prop_innovative_innovating, init_prop_innovative_conservating, boost, surprisal, entropy, repeats):
+    def __init__(self, height, width, init_prop_innovating_agents, init_prop_innovative_innovating, init_prop_innovative_conservating, boost_conservative, boost_innovative, surprisal, entropy, repeats):
         '''
         Initialize field
         '''
@@ -25,7 +25,8 @@ class Model(Model):
         assert init_prop_innovative_innovating >= 0 and init_prop_innovative_innovating <= 1
         assert init_prop_innovative_conservating >= 0 and init_prop_innovative_conservating <= 1
 
-        assert boost >= 0 and boost <= 1
+        assert boost_conservative >= 0 and boost_conservative <= 1
+        assert boost_innovative >= 0 and boost_innovative <= 1
         assert type(surprisal) == bool
         assert type(entropy) == bool
         assert type(repeats) == bool
@@ -37,7 +38,8 @@ class Model(Model):
         self.height = height
         self.width = width
         self.init_prop_innovating_agents = init_prop_innovating_agents
-        self.boost = boost
+        self.boost_conservative = boost_conservative
+        self.boost_innovative = boost_innovative
         self.surprisal = surprisal
         self.entropy = entropy
         self.repeats = repeats

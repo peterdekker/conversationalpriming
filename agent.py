@@ -91,9 +91,10 @@ class Agent(Agent):
     def boost_form(self, person, form):
         SURPRISAL_THRESHOLD = 1000000
         prob_dict = self.forms[person]
-        boost = self.model.boost
         if form == INNOVATIVE_FORM:
-            boost = boost * 5
+            boost = self.model.boost_innovative
+        else:
+            boost = self.model.boost_conservative
         if self.model.surprisal:
             #surprisal = min(-np.log2(prob_dict[form]), SURPRISAL_THRESHOLD)
             surprisal = -np.log2(prob_dict[form])
