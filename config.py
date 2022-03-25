@@ -30,6 +30,7 @@ BOOST_INNOVATIVE = 0.01
 SURPRISAL = False
 ENTROPY = False
 REPEATS = True
+INNOVATING_NO_PRIMING = False
 
 model_params = {
     "height": {"ui": HEIGHT, "script": HEIGHT},
@@ -41,7 +42,8 @@ model_params = {
     "boost_innovative": {"ui": UserSettableParameter("slider", "Boost innovative", BOOST_INNOVATIVE, 0.0, 1.0, 0.01), "script": BOOST_INNOVATIVE},
     "surprisal": {"ui": UserSettableParameter('checkbox', 'Surprisal', value=SURPRISAL), "script": SURPRISAL},
     "entropy": {"ui": UserSettableParameter('checkbox', 'Entropy', value=ENTROPY), "script": ENTROPY},
-    "repeats": {"ui": UserSettableParameter('checkbox', 'Repeats', value=REPEATS), "script": REPEATS}
+    "repeats": {"ui": UserSettableParameter('checkbox', 'Repeats', value=REPEATS), "script": REPEATS},
+    "innovating_no_priming": {"ui": UserSettableParameter('checkbox', 'Innovating no priming', value=INNOVATING_NO_PRIMING), "script": INNOVATING_NO_PRIMING}
 }
 
 model_params_ui = {k:v["ui"] for k,v in model_params.items()}
