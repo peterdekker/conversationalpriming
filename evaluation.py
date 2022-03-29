@@ -154,8 +154,8 @@ def main():
             fixed_params = {k: v for k, v in model_params_script.items() if k != var_param}
             run_data = evaluate_model(fixed_params, {var_param: var_param_settings},
                                         iterations_setting, steps_setting)
-            create_graph_course_sb(run_data, var_param,
-                                stats=dominant_stats, mode="dominant", output_dir=output_dir_custom)
+            # create_graph_course_sb(run_data, var_param,
+            #                     stats=dominant_stats, mode="dominant", output_dir=output_dir_custom)
 
             create_graph_course_sb(run_data, var_param,
                                 stats=communicated_stats, mode="communicated", output_dir=output_dir_custom)
