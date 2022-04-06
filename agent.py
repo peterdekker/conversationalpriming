@@ -58,7 +58,8 @@ class Agent(Agent):
 
     def receive_question_reply(self, signal):
         person_question, form_question = signal.get_content()
-        self.boost_form(person_question, form_question)
+        if not (self.model.innovating_only_boost_production and self.innovating):
+            self.boost_form(person_question, form_question)
 
         if self.model.repeats:
             person_answer = self.question_answer_mapping[person_question]
@@ -69,9 +70,6 @@ class Agent(Agent):
                 # Other cases: use form from own library
                 form_answer = choice_prob(self.forms[person_answer])
             self.boost_form(person_answer, form_answer)
-            # if person_answer == person_question:
-            #     # Do extra boost if person is same!
-            #     self.boost_form(concept, person_answer, form_answer)
             # Add to stats
             update_communicated(form_answer, person_answer, self.innovating, self.model, self)
 
@@ -83,12 +81,15 @@ class Agent(Agent):
     
     def receive_answer(self, signal):
         person_answer, form_answer = signal.get_content()
-        self.boost_form(person_answer, form_answer)
+        if not (self.model.innovating_only_boost_production and self.innovating):
+            self.boost_form(person_answer, form_answer)
 
         # Reset internal person question variable
         self.person_question = None
     
     def boost_form(self, person, form):
+        # if (self.innovating and form != INNOVATIVE_FORM):
+        #     return
         SURPRISAL_THRESHOLD = 1000000
         prob_dict = self.forms[person]
         if form == INNOVATIVE_FORM:

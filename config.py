@@ -17,7 +17,7 @@ IMG_FORMAT = "png"
 OUTPUT_DIR = f'output-{str(datetime.datetime.now()).replace(" ","-")}'
 
 # For evaluation script (not browser visualization)
-ITERATIONS = [3]
+ITERATIONS = [5]
 STEPS = [5000]
 
 HEIGHT = 10
@@ -31,6 +31,7 @@ SURPRISAL = False
 ENTROPY = False
 REPEATS = True
 INNOVATING_NO_PRIMING = False
+INNOVATING_ONLY_BOOST_PRODUCTION = False
 
 model_params = {
     "height": {"ui": HEIGHT, "script": HEIGHT},
@@ -43,7 +44,8 @@ model_params = {
     "surprisal": {"ui": UserSettableParameter('checkbox', 'Surprisal', value=SURPRISAL), "script": SURPRISAL},
     "entropy": {"ui": UserSettableParameter('checkbox', 'Entropy', value=ENTROPY), "script": ENTROPY},
     "repeats": {"ui": UserSettableParameter('checkbox', 'Repeats', value=REPEATS), "script": REPEATS},
-    "innovating_no_priming": {"ui": UserSettableParameter('checkbox', 'Innovating no priming', value=INNOVATING_NO_PRIMING), "script": INNOVATING_NO_PRIMING}
+    "innovating_no_priming": {"ui": UserSettableParameter('checkbox', 'Innovating no priming', value=INNOVATING_NO_PRIMING), "script": INNOVATING_NO_PRIMING},
+    "innovating_only_boost_production": {"ui": UserSettableParameter('checkbox', 'Innovating only boost production', value=INNOVATING_ONLY_BOOST_PRODUCTION), "script": INNOVATING_ONLY_BOOST_PRODUCTION}
 }
 
 model_params_ui = {k:v["ui"] for k,v in model_params.items()}
@@ -56,6 +58,6 @@ evaluation_params = {
     "plot_from_raw": ""
 }
 
-bool_params = ["surprisal", "entropy", "repeats", "innovating_no_priming"]
+bool_params = ["surprisal", "entropy", "repeats", "innovating_no_priming", "innovating_only_boost_production"]
 
 string_params = ["runlabel", "plot_from_raw"]

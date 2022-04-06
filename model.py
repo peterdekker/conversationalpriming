@@ -15,7 +15,7 @@ class Model(Model):
     Model class
     '''
 
-    def __init__(self, height, width, init_prop_innovating_agents, init_prop_innovative_innovating, init_prop_innovative_conservating, boost_conservative, boost_innovative, surprisal, entropy, repeats, innovating_no_priming):
+    def __init__(self, height, width, init_prop_innovating_agents, init_prop_innovative_innovating, init_prop_innovative_conservating, boost_conservative, boost_innovative, surprisal, entropy, repeats, innovating_no_priming, innovating_only_boost_production):
         '''
         Initialize field
         '''
@@ -31,6 +31,7 @@ class Model(Model):
         assert type(entropy) == bool
         assert type(repeats) == bool
         assert type(innovating_no_priming) == bool
+        assert type(innovating_only_boost_production) == bool
 
         if (surprisal or entropy) and (init_prop_innovative_conservating == 0.0 or init_prop_innovative_innovating == 0.0):
             raise ValueError("If surprisal or entropy is on, the proportion of innovative forms in innovating and conservating agents have to be > 0.0; to prevent NaN values in surprisal calculations.")
@@ -45,6 +46,7 @@ class Model(Model):
         self.entropy = entropy
         self.repeats = repeats
         self.innovating_no_priming = innovating_no_priming
+        self.innovating_only_boost_production = innovating_only_boost_production
 
         self.schedule = RandomActivation(self)
         self.grid = SingleGrid(width, height, torus=True)
