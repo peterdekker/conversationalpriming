@@ -32,6 +32,7 @@ ENTROPY = False
 REPEATS = True
 INNOVATING_NO_PRIMING = False
 INNOVATING_ONLY_BOOST_PRODUCTION = False
+N_INTERACTIONS_INTERLOCUTOR = 1
 
 model_params = {
     "height": {"ui": HEIGHT, "script": HEIGHT},
@@ -45,7 +46,8 @@ model_params = {
     "entropy": {"ui": UserSettableParameter('checkbox', 'Entropy', value=ENTROPY), "script": ENTROPY},
     "repeats": {"ui": UserSettableParameter('checkbox', 'Repeats', value=REPEATS), "script": REPEATS},
     "innovating_no_priming": {"ui": UserSettableParameter('checkbox', 'Innovating no priming', value=INNOVATING_NO_PRIMING), "script": INNOVATING_NO_PRIMING},
-    "innovating_only_boost_production": {"ui": UserSettableParameter('checkbox', 'Innovating only boost production', value=INNOVATING_ONLY_BOOST_PRODUCTION), "script": INNOVATING_ONLY_BOOST_PRODUCTION}
+    "innovating_only_boost_production": {"ui": UserSettableParameter('checkbox', 'Innovating only boost production', value=INNOVATING_ONLY_BOOST_PRODUCTION), "script": INNOVATING_ONLY_BOOST_PRODUCTION},
+    "n_interactions_interlocutor": {"ui": UserSettableParameter("slider", "# interactions per interlocutor", N_INTERACTIONS_INTERLOCUTOR, 1, 100, 1), "script": N_INTERACTIONS_INTERLOCUTOR},
 }
 
 model_params_ui = {k:v["ui"] for k,v in model_params.items()}

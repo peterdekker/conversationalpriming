@@ -34,11 +34,11 @@ class Agent(Agent):
          Perform one interaction for this agent, with this agent as speaker
         '''
         listener = RG.choice(self.model.agents)
-
-        question = self.create_question()
-        answer = listener.receive_question_reply(question)
-        if answer is not None:
-            self.receive_answer(answer)
+        for i in range(self.model.n_interactions_interlocutor):
+            question = self.create_question()
+            answer = listener.receive_question_reply(question)
+            if answer is not None:
+                self.receive_answer(answer)
 
 
     def create_question(self):
