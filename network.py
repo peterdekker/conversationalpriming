@@ -18,6 +18,7 @@ def check_clustering_degree(graph):
     print(f"Degree: {nx.degree_histogram(graph)}")
     print(f"avg clustering: {nx.average_clustering(graph)}.")
     print(f"Clustering coefficients per node: {nx.clustering(graph)}")
+    print(f"Betweenness centrality: {nx.betweenness_centrality(graph)}")
 
 def draw(graph):
     nx.draw(graph)
@@ -45,20 +46,21 @@ def experiment_small_world():
     print(nx.degree_histogram(scale_free))
     draw(scale_free)
 
-def create_connected_cliques_graph():
-    half_nodes = N_NODES // 2
-    clique1 = nx.complete_graph(half_nodes)
-    connecting_node1 = list(clique1.nodes())[0]
-    clique2 = nx.relabel_nodes(clique1, mapping=lambda x:x+half_nodes)
-    connecting_node2 = list(clique2.nodes())[0]
-    combined = nx.compose(clique1,clique2)
-    combined.add_edge(connecting_node1,connecting_node2)
-    return combined
+# def create_connected_cliques_graph():
+#     half_nodes = N_NODES // 2
+#     clique1 = nx.complete_graph(half_nodes)
+#     connecting_node1 = list(clique1.nodes())[0]
+#     clique2 = nx.relabel_nodes(clique1, mapping=lambda x:x+half_nodes)
+#     connecting_node2 = list(clique2.nodes())[0]
+#     combined = nx.compose(clique1,clique2)
+#     combined.add_edge(connecting_node1,connecting_node2)
+#     return combined
 
-def experiment_connected_cliques():
-    connected_cliques = create_connected_cliques_graph()
-    check_clustering_degree(connected_cliques)
-    draw(connected_cliques)
+def experiment_barbell():
+    # connected_cliques = create_connected_cliques_graph()
+    # check_clustering_degree(connected_cliques)
+    barbell = nx.barbell_graph(50,0)
+    check_clustering_degree(barbell)
     
 
 #experiment_small_world()
