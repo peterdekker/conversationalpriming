@@ -18,7 +18,7 @@ OUTPUT_DIR = f'output-{str(datetime.datetime.now()).replace(" ","-")}'
 
 # For evaluation script (not browser visualization)
 ITERATIONS = [5]
-STEPS = [5000]
+STEPS = [4000]
 
 HEIGHT = 10
 WIDTH = 10
