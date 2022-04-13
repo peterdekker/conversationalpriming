@@ -1,5 +1,8 @@
 import networkx as nx
 import matplotlib.pyplot as plt
+from itertools import combinations
+import random
+import numpy as np
 
 N_NODES = 100
 N_NEIGHBOURS = 4
@@ -61,7 +64,54 @@ def experiment_barbell():
     # check_clustering_degree(connected_cliques)
     barbell = nx.barbell_graph(50,0)
     check_clustering_degree(barbell)
+
+def create_innovative_agents(n_agents, p_innovative):
+    return np.random.choice([0,1], size=n_agents, p=[1-p_innovative,p_innovative])
+
+def experiment_friend_of_friend(n_iterations=1):
+    agent_types = create_innovative_agents(n_agents=100,p_innovative=0.1)
+    agents = range(len(agent_types))
+    g = nx.Graph()
+    for a in agents:
+        g.add_node(a, agent_type=agent_types[a])
+    print(g.nodes(data=True))
+    stranger_connect_prob = 0.2
+    conservative_friend_of_friend_connect_prob = 0.5
+    innovative_friend_of_friend_connect_prob = 0.2
+    pairs = list(combinations(agents,2))
+    # TODO: Shuffle combinations list?
+    for it in range(n_iterations):
+        # print(f"Iteration: {it}")
+        for i,j in pairs:
+            # print(f"Evaluating edge {i,j}")
+            if g.has_edge(i,j):
+                # print(f"- Edge {i,j} already exists. Only possible when running multiple iterations.")
+                continue
+            # Check if friend of a friend
+            common_neighbors = list(nx.common_neighbors(g,i,j))
+            connect_prob = None
+            if not common_neighbors:
+                # print(f"- No common neighbors: {common_neighbors}")
+                connect_prob = stranger_connect_prob
+            else:
+                # If there is a neighbor in common
+                # print(f"- Common neighbors: {common_neighbors}")
+                # Use innovative prob if one of the nodes is innovative
+                if g.nodes[i]["agent_type"]==1 or g.nodes[j]["agent_type"]==1:
+                    # print(f"- One of the nodes {i,j} is innovative")
+                    connect_prob = innovative_friend_of_friend_connect_prob
+                else:
+                    # print(f"- None of the nodes {i,j} is innovative")
+                    connect_prob = conservative_friend_of_friend_connect_prob
+            if random.random() < connect_prob:
+                # print(f"- Add edge {i,j}")
+                g.add_edge(i,j)
+    print(nx.clustering(g))
+    # TODO: Computer clusterings per agent type
+
+
     
 
 #experiment_small_world()
-experiment_connected_cliques()
+#experiment_connected_cliques()
+experiment_friend_of_friend(2)
