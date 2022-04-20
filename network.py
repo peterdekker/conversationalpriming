@@ -72,13 +72,28 @@ def experiment_barbell():
 
 
 def create_innovative_agents(n_agents, p_innovating):
-    return np.random.choice([0, 1], size=n_agents, p=[1-p_innovating, p_innovating])
+    agent_types = np.random.choice([0, 1], size=n_agents, p=[1-p_innovating, p_innovating])
+    agents = range(len(agent_types))
+    return agent_types, agents
 
 
 def experiment_friend_of_friend(n_agents, p_innovating, stranger_connect_prob=0.2, conservating_friend_of_friend_connect_prob=0.5,
                                 innovating_friend_of_friend_connect_prob=0.2, n_iterations=1):
-    agent_types = create_innovative_agents(n_agents, p_innovating)
-    agents = range(len(agent_types))
+    agent_types, agents = create_innovative_agents(n_agents, p_innovating)
+    g = create_network_friend_of_friend(stranger_connect_prob, conservating_friend_of_friend_connect_prob, innovating_friend_of_friend_connect_prob, n_iterations, agent_types, agents)
+    clustering_coeffs = nx.clustering(g)
+    ids_innovating = [id for id, attrs in g.nodes(data=True) if attrs["agent_type"] == 1]
+    ids_conservating = [id for id, attrs in g.nodes(data=True) if attrs["agent_type"] == 0]
+    print(ids_innovating)
+    clustering_innovating_mean = np.mean([clustering_coeffs[id] for id in ids_innovating])
+    clustering_conservating_mean = np.mean([clustering_coeffs[id] for id in ids_conservating])
+    print(f"Mean clustering coefficient, innovating: {clustering_innovating_mean}, conservating: {clustering_conservating_mean}")
+
+    degree_innovating_mean = np.mean([g.degree[id] for id in ids_innovating])
+    degree_conservating_mean = np.mean([g.degree[id] for id in ids_conservating])
+    print(f"Degree, innovating: {degree_innovating_mean}, conservating: {degree_conservating_mean}")
+
+def create_network_friend_of_friend(stranger_connect_prob, conservating_friend_of_friend_connect_prob, innovating_friend_of_friend_connect_prob, n_iterations, agent_types, agents):
     g = nx.Graph()
     for a in agents:
         g.add_node(a, agent_type=agent_types[a])
@@ -111,18 +126,9 @@ def experiment_friend_of_friend(n_agents, p_innovating, stranger_connect_prob=0.
             if random.random() < connect_prob:
                 # print(f"- Add edge {i,j}")
                 g.add_edge(i, j)
-    clustering_coeffs = nx.clustering(g)
-    ids_innovating = [id for id, attrs in g.nodes(data=True) if attrs["agent_type"] == 1]
-    ids_conservating = [id for id, attrs in g.nodes(data=True) if attrs["agent_type"] == 0]
-    print(ids_innovating)
-    clustering_innovating_mean = np.mean([clustering_coeffs[id] for id in ids_innovating])
-    clustering_conservating_mean = np.mean([clustering_coeffs[id] for id in ids_conservating])
-    print(f"Mean clustering coefficient, innovating: {clustering_innovating_mean}, conservating: {clustering_conservating_mean}")
-
-    degree_innovating_mean = np.mean([g.degree[id] for id in ids_innovating])
-    degree_conservating_mean = np.mean([g.degree[id] for id in ids_conservating])
-    print(f"Degree, innovating: {degree_innovating_mean}, conservating: {degree_conservating_mean}")
+    return g
 
 # experiment_small_world()
 # experiment_connected_cliques()
-experiment_friend_of_friend(n_agents=100, p_innovating=0.1)
+experiment_friend_of_friend(n_agents=100, p_innovating=0.1, stranger_connect_prob=0.1, conservating_friend_of_friend_connect_prob=0.7,
+                                innovating_friend_of_friend_connect_prob=0.2)

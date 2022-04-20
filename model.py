@@ -1,12 +1,15 @@
 from mesa import Model
 from mesa.time import RandomActivation
-from mesa.space import SingleGrid
+from mesa.space import SingleGrid, NetworkGrid
 from mesa.datacollection import DataCollector
+
+import networkx as nx
 
 from collections import defaultdict
 
 from agent import Agent
 from config import RG, STEPS_UPDATE_AGENT_COLOR
+from network import create_innovative_agents, create_network_friend_of_friend
 import util
 
 
@@ -15,13 +18,13 @@ class Model(Model):
     Model class
     '''
 
-    def __init__(self, height, width, init_prop_innovating_agents, init_prop_innovative_innovating, init_prop_innovative_conservating, boost_conservative, boost_innovative, surprisal, entropy, repeats, innovating_no_priming, innovating_only_boost_production, n_interactions_interlocutor):
+    def __init__(self, height, width, prop_innovating_agents, init_prop_innovative_innovating, init_prop_innovative_conservating, boost_conservative, boost_innovative, surprisal, entropy, repeats, innovating_no_priming, innovating_only_boost_production, n_interactions_interlocutor):
         '''
         Initialize field
         '''
         assert height % 1 == 0
         assert width % 1 == 0
-        assert init_prop_innovating_agents >= 0 and init_prop_innovating_agents <= 1
+        assert prop_innovating_agents >= 0 and prop_innovating_agents <= 1
         assert init_prop_innovative_innovating >= 0 and init_prop_innovative_innovating <= 1
         assert init_prop_innovative_conservating >= 0 and init_prop_innovative_conservating <= 1
 
@@ -35,12 +38,12 @@ class Model(Model):
         assert n_interactions_interlocutor >= 1 and n_interactions_interlocutor <= 100
 
         if (surprisal or entropy) and (init_prop_innovative_conservating == 0.0 or init_prop_innovative_innovating == 0.0):
-            raise ValueError("If surprisal or entropy is on, the proportion of innovative forms in innovating and conservating agents have to be > 0.0; to prevent NaN values in surprisal calculations.")
-
+            raise ValueError(
+                "If surprisal or entropy is on, the proportion of innovative forms in innovating and conservating agents have to be > 0.0; to prevent NaN values in surprisal calculations.")
 
         self.height = height
         self.width = width
-        self.init_prop_innovating_agents = init_prop_innovating_agents
+        self.prop_innovating_agents = prop_innovating_agents
         self.boost_conservative = boost_conservative
         self.boost_innovative = boost_innovative
         self.surprisal = surprisal
@@ -60,7 +63,7 @@ class Model(Model):
         # Contains proportion innovative of all timesteps
         self.prop_innovative = defaultdict(list)
 
-        ## TODO: maybe later move data initialization from agent to model,
+        # TODO: maybe later move data initialization from agent to model,
         # so defining these here makes more sense
         self.persons = ["1sg", "2sg", "3sg"]
         self.speaker_types = [False, True]
@@ -102,6 +105,19 @@ class Model(Model):
             }
         )
 
+        if self.network:
+            agent_types, agents = create_innovative_agents(
+                self.height*self.width, self.prop_innovating_agents)
+            self.g = create_network_friend_of_friend(stranger_connect_prob=0.1, conservating_friend_of_friend_connect_prob=0.5,
+                                                     innovating_friend_of_friend_connect_prob=0.2, n_iterations=1, agent_types=agent_types, agents=agents)
+            self.grid = NetworkGrid(self.g)
+            for node_name, node_data in self.g.nodes(data=True):
+                innovating = bool(node_data["agent_type"])
+                a = Agent(
+                    None, innovating, init_prop_innovative_innovating if innovating else init_prop_innovative_conservating, self)
+                self.schedule.add(a)
+                # Add the agent to the node
+                self.grid.place_agent(a, node_name)
 
         # Set up agents
         # We use a grid iterator that returns
@@ -110,8 +126,9 @@ class Model(Model):
         for i, cell in enumerate(self.grid.coord_iter()):
             x = cell[1]
             y = cell[2]
-            innovating = RG.random() < self.init_prop_innovating_agents
-            agent = Agent((x, y), innovating, init_prop_innovative_innovating if innovating else init_prop_innovative_conservating, self)
+            innovating = RG.random() < self.prop_innovating_agents
+            agent = Agent(
+                (x, y), innovating, init_prop_innovative_innovating if innovating else init_prop_innovative_conservating, self)
             self.grid.position_agent(agent, (x, y))
             self.schedule.add(agent)
 
@@ -125,7 +142,7 @@ class Model(Model):
         '''
         Run one step of the model.
         '''
-        
+
         self.schedule.step()
         self.datacollector.collect(self)
 
@@ -135,9 +152,7 @@ class Model(Model):
             util.update_prop_innovative_agents(self.agents)
 
         # Compute model prop
-        util.update_prop_innovative_model(self, self.persons, self.speaker_types, self.prop_innovative)
-        
-        
-        self.steps += 1
-    
+        util.update_prop_innovative_model(
+            self, self.persons, self.speaker_types, self.prop_innovative)
 
+        self.steps += 1

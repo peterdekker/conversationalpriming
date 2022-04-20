@@ -22,7 +22,7 @@ STEPS = [4000]
 
 HEIGHT = 10
 WIDTH = 10
-INIT_PROP_INNOVATING_AGENTS = 0.2
+PROP_INNOVATING_AGENTS = 0.2
 INIT_PROP_INNOVATIVE_INNOVATING = 0.9
 INIT_PROP_INNOVATIVE_CONSERVATING = 0.0
 BOOST_CONSERVATIVE = 0.01
@@ -37,7 +37,7 @@ N_INTERACTIONS_INTERLOCUTOR = 1
 model_params = {
     "height": {"ui": HEIGHT, "script": HEIGHT},
     "width": {"ui": WIDTH, "script": WIDTH},
-    "init_prop_innovating_agents": {"ui": UserSettableParameter("slider", "Proportion innovating agents", INIT_PROP_INNOVATING_AGENTS, 0.0, 1.0, 0.1), "script": INIT_PROP_INNOVATING_AGENTS},
+    "prop_innovating_agents": {"ui": UserSettableParameter("slider", "Proportion innovating agents", PROP_INNOVATING_AGENTS, 0.0, 1.0, 0.1), "script": PROP_INNOVATING_AGENTS},
     "init_prop_innovative_innovating": {"ui": UserSettableParameter("slider", "Proportion innovative forms in innovating agents", INIT_PROP_INNOVATIVE_INNOVATING, 0.0, 1.0, 0.1), "script": INIT_PROP_INNOVATIVE_INNOVATING},
     "init_prop_innovative_conservating": {"ui": UserSettableParameter("slider", "Proportion innovative forms in conservating agents", INIT_PROP_INNOVATIVE_CONSERVATING, 0.0, 1.0, 0.1), "script": INIT_PROP_INNOVATIVE_CONSERVATING},
     "boost_conservative": {"ui": UserSettableParameter("slider", "Boost conservative", BOOST_CONSERVATIVE, 0.0, 1.0, 0.01), "script": BOOST_CONSERVATIVE},

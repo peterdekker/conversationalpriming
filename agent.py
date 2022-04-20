@@ -11,7 +11,10 @@ class Agent(Agent):
 
 
         super().__init__(pos, model)
-        self.pos = pos
+
+        # Only set pos explicitly in random mixing grid model. Not in network model.
+        if pos:
+            self.pos = pos
         self.innovating = innovating
         # TODO: later possibly add corpus probabilities
         # TODO: Move initialization outside agent?
@@ -34,6 +37,7 @@ class Agent(Agent):
          Perform one interaction for this agent, with this agent as speaker
         '''
         listener = RG.choice(self.model.agents)
+        # TODO: in network choose interlocutor differently
         for i in range(self.model.n_interactions_interlocutor):
             question = self.create_question()
             answer = listener.receive_question_reply(question)
