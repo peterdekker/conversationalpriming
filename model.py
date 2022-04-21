@@ -18,7 +18,7 @@ class Model(Model):
     Model class
     '''
 
-    def __init__(self, height, width, prop_innovating_agents, init_prop_innovative_innovating, init_prop_innovative_conservating, boost_conservative, boost_innovative, surprisal, entropy, repeats, innovating_no_priming, innovating_only_boost_production, n_interactions_interlocutor):
+    def __init__(self, height, width, prop_innovating_agents, init_prop_innovative_innovating, init_prop_innovative_conservating, boost_conservative, boost_innovative, surprisal, entropy, repeats, network, innovating_no_priming, innovating_only_boost_production, n_interactions_interlocutor):
         '''
         Initialize field
         '''
@@ -33,6 +33,7 @@ class Model(Model):
         assert type(surprisal) == bool
         assert type(entropy) == bool
         assert type(repeats) == bool
+        assert type(network) == bool
         assert type(innovating_no_priming) == bool
         assert type(innovating_only_boost_production) == bool
         assert n_interactions_interlocutor >= 1 and n_interactions_interlocutor <= 100
@@ -49,6 +50,7 @@ class Model(Model):
         self.surprisal = surprisal
         self.entropy = entropy
         self.repeats = repeats
+        self.network = network
         self.innovating_no_priming = innovating_no_priming
         self.innovating_only_boost_production = innovating_only_boost_production
         self.n_interactions_interlocutor = int(n_interactions_interlocutor)
@@ -108,31 +110,34 @@ class Model(Model):
         if self.network:
             agent_types, agents = create_innovative_agents(
                 self.height*self.width, self.prop_innovating_agents)
-            self.g = create_network_friend_of_friend(stranger_connect_prob=0.1, conservating_friend_of_friend_connect_prob=0.5,
-                                                     innovating_friend_of_friend_connect_prob=0.2, n_iterations=1, agent_types=agent_types, agents=agents)
-            self.grid = NetworkGrid(self.g)
-            for node_name, node_data in self.g.nodes(data=True):
+            #self.G = create_network_friend_of_friend(stranger_connect_prob=0.1, conservating_friend_of_friend_connect_prob=0.5,
+            #                                         innovating_friend_of_friend_connect_prob=0.2, n_iterations=1, agent_types=agent_types, agents=agents)
+            # TODO: check if grid and fully connected network do the same
+            self.G = nx.complete_graph(self.height*self.width)
+            self.grid = NetworkGrid(self.G)
+            for node_name, node_data in self.G.nodes(data=True):
                 innovating = bool(node_data["agent_type"])
-                a = Agent(
-                    None, innovating, init_prop_innovative_innovating if innovating else init_prop_innovative_conservating, self)
-                self.schedule.add(a)
-                # Add the agent to the node
-                self.grid.place_agent(a, node_name)
+                agent = Agent(
+                    node_name, innovating, init_prop_innovative_innovating if innovating else init_prop_innovative_conservating, self)
+                # Add the agent to the graph node
+                self.grid.place_agent(agent, node_name)
+                self.schedule.add(agent)
+            # [print(node_name, node_data["agent_type"], node_data["agent"][0].innovating) for node_name, node_data in self.G.nodes(data=True)]
+        else:
+            # Set up agents
+            # We use a grid iterator that returns
+            # the coordinates of a cell as well as
+            # its contents. (coord_iter)
+            for i, cell in enumerate(self.grid.coord_iter()):
+                x = cell[1]
+                y = cell[2]
+                innovating = RG.random() < self.prop_innovating_agents
+                agent = Agent(
+                    (x, y), innovating, init_prop_innovative_innovating if innovating else init_prop_innovative_conservating, self)
+                self.grid.position_agent(agent, (x, y))
+                self.schedule.add(agent)
 
-        # Set up agents
-        # We use a grid iterator that returns
-        # the coordinates of a cell as well as
-        # its contents. (coord_iter)
-        for i, cell in enumerate(self.grid.coord_iter()):
-            x = cell[1]
-            y = cell[2]
-            innovating = RG.random() < self.prop_innovating_agents
-            agent = Agent(
-                (x, y), innovating, init_prop_innovative_innovating if innovating else init_prop_innovative_conservating, self)
-            self.grid.position_agent(agent, (x, y))
-            self.schedule.add(agent)
-
-        self.agents = [a for a, x, y in self.grid.coord_iter()]
+        self.agents = self.schedule.agents
         util.update_prop_innovative_agents(self.agents)
 
         self.running = True

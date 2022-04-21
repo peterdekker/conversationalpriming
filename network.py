@@ -74,6 +74,7 @@ def experiment_barbell():
 def create_innovative_agents(n_agents, p_innovating):
     agent_types = np.random.choice([0, 1], size=n_agents, p=[1-p_innovating, p_innovating])
     agents = range(len(agent_types))
+    print(agent_types)
     return agent_types, agents
 
 
@@ -84,7 +85,6 @@ def experiment_friend_of_friend(n_agents, p_innovating, stranger_connect_prob=0.
     clustering_coeffs = nx.clustering(g)
     ids_innovating = [id for id, attrs in g.nodes(data=True) if attrs["agent_type"] == 1]
     ids_conservating = [id for id, attrs in g.nodes(data=True) if attrs["agent_type"] == 0]
-    print(ids_innovating)
     clustering_innovating_mean = np.mean([clustering_coeffs[id] for id in ids_innovating])
     clustering_conservating_mean = np.mean([clustering_coeffs[id] for id in ids_conservating])
     print(f"Mean clustering coefficient, innovating: {clustering_innovating_mean}, conservating: {clustering_conservating_mean}")
@@ -130,5 +130,6 @@ def create_network_friend_of_friend(stranger_connect_prob, conservating_friend_o
 
 # experiment_small_world()
 # experiment_connected_cliques()
-experiment_friend_of_friend(n_agents=100, p_innovating=0.1, stranger_connect_prob=0.1, conservating_friend_of_friend_connect_prob=0.7,
-                                innovating_friend_of_friend_connect_prob=0.2)
+if __name__ == "__main__":
+    experiment_friend_of_friend(n_agents=100, p_innovating=0.1, stranger_connect_prob=0.1, conservating_friend_of_friend_connect_prob=0.7,
+                                    innovating_friend_of_friend_connect_prob=0.2)

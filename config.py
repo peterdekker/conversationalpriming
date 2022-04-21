@@ -30,6 +30,7 @@ BOOST_INNOVATIVE = 0.01
 SURPRISAL = False
 ENTROPY = False
 REPEATS = True
+NETWORK = True
 INNOVATING_NO_PRIMING = False
 INNOVATING_ONLY_BOOST_PRODUCTION = False
 N_INTERACTIONS_INTERLOCUTOR = 1
@@ -45,6 +46,7 @@ model_params = {
     "surprisal": {"ui": UserSettableParameter('checkbox', 'Surprisal', value=SURPRISAL), "script": SURPRISAL},
     "entropy": {"ui": UserSettableParameter('checkbox', 'Entropy', value=ENTROPY), "script": ENTROPY},
     "repeats": {"ui": UserSettableParameter('checkbox', 'Repeats', value=REPEATS), "script": REPEATS},
+    "network": {"ui": UserSettableParameter('checkbox', 'Network', value=NETWORK), "script": NETWORK},
     "innovating_no_priming": {"ui": UserSettableParameter('checkbox', 'Innovating no priming', value=INNOVATING_NO_PRIMING), "script": INNOVATING_NO_PRIMING},
     "innovating_only_boost_production": {"ui": UserSettableParameter('checkbox', 'Innovating only boost production', value=INNOVATING_ONLY_BOOST_PRODUCTION), "script": INNOVATING_ONLY_BOOST_PRODUCTION},
     "n_interactions_interlocutor": {"ui": UserSettableParameter("slider", "# interactions per interlocutor", N_INTERACTIONS_INTERLOCUTOR, 1, 100, 1), "script": N_INTERACTIONS_INTERLOCUTOR},
@@ -60,6 +62,6 @@ evaluation_params = {
     "plot_from_raw": ""
 }
 
-bool_params = ["surprisal", "entropy", "repeats", "innovating_no_priming", "innovating_only_boost_production"]
+bool_params = ["surprisal", "entropy", "repeats", "network" "innovating_no_priming", "innovating_only_boost_production"]
 
 string_params = ["runlabel", "plot_from_raw"]
