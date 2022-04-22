@@ -62,6 +62,6 @@ evaluation_params = {
     "plot_from_raw": ""
 }
 
-bool_params = ["surprisal", "entropy", "repeats", "network" "innovating_no_priming", "innovating_only_boost_production"]
+bool_params = ["surprisal", "entropy", "repeats", "network", "innovating_no_priming", "innovating_only_boost_production"]
 
 string_params = ["runlabel", "plot_from_raw"]

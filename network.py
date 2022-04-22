@@ -128,6 +128,12 @@ def create_network_friend_of_friend(stranger_connect_prob, conservating_friend_o
                 g.add_edge(i, j)
     return g
 
+def create_network_complete(n_agents, agent_types):
+    graph = nx.complete_graph(n_agents)
+    agent_types_dict = dict(enumerate(agent_types))
+    nx.set_node_attributes(graph, agent_types_dict, name="agent_type")
+    return graph
+
 # experiment_small_world()
 # experiment_connected_cliques()
 if __name__ == "__main__":

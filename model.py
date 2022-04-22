@@ -9,7 +9,7 @@ from collections import defaultdict
 
 from agent import Agent
 from config import RG, STEPS_UPDATE_AGENT_COLOR
-from network import create_innovative_agents, create_network_friend_of_friend
+from network import create_innovative_agents, create_network_friend_of_friend, create_network_complete
 import util
 
 
@@ -44,6 +44,7 @@ class Model(Model):
 
         self.height = height
         self.width = width
+        self.n_agents = self.height * self.width
         self.prop_innovating_agents = prop_innovating_agents
         self.boost_conservative = boost_conservative
         self.boost_innovative = boost_innovative
@@ -109,11 +110,11 @@ class Model(Model):
 
         if self.network:
             agent_types, agents = create_innovative_agents(
-                self.height*self.width, self.prop_innovating_agents)
+                self.n_agents, self.prop_innovating_agents)
             #self.G = create_network_friend_of_friend(stranger_connect_prob=0.1, conservating_friend_of_friend_connect_prob=0.5,
             #                                         innovating_friend_of_friend_connect_prob=0.2, n_iterations=1, agent_types=agent_types, agents=agents)
             # TODO: check if grid and fully connected network do the same
-            self.G = nx.complete_graph(self.height*self.width)
+            self.G = create_network_complete(self.n_agents, agent_types)
             self.grid = NetworkGrid(self.G)
             for node_name, node_data in self.G.nodes(data=True):
                 innovating = bool(node_data["agent_type"])
@@ -153,6 +154,7 @@ class Model(Model):
 
         # Compute agent prop, every N iterations
         # This also empties variable
+        # TODO: Remove this when running as script
         if self.steps % STEPS_UPDATE_AGENT_COLOR == 0:
             util.update_prop_innovative_agents(self.agents)
 
