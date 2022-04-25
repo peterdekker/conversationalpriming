@@ -74,7 +74,6 @@ def experiment_barbell():
 def create_innovative_agents(n_agents, p_innovating):
     agent_types = np.random.choice([0, 1], size=n_agents, p=[1-p_innovating, p_innovating])
     agents = range(len(agent_types))
-    print(agent_types)
     return agent_types, agents
 
 

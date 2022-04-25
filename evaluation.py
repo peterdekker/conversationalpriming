@@ -110,7 +110,6 @@ def main():
     parser = argparse.ArgumentParser(description='Run agent model from terminal.')
     model_group = parser.add_argument_group('model', 'Model parameters')
     for param in model_params_script:
-        print(param, param in bool_params)
         model_group.add_argument(f"--{param}", nargs="+",
                                  type=str2bool if param in bool_params else float)
     evaluation_group = parser.add_argument_group('evaluation', 'Evaluation parameters')
