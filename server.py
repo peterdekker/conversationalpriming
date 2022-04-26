@@ -4,7 +4,7 @@ from mesa.visualization.UserParam import UserSettableParameter
 
 from model import Model
 
-from config import model_params_ui, HEIGHT, WIDTH, NETWORK
+from config import model_params_ui
 from util import compute_colours
 
 
@@ -31,7 +31,7 @@ def network_portrayal(G):
         {
             "id": node_id,
             "size": 3 if agents else 1,
-            "color": "#007959", # "#CC0000" if not agents or agents[0].wealth == 0 else "#007959",
+            "color": compute_colours(agents[0]), #"#007959", # "#CC0000" if not agents or agents[0].wealth == 0 else "#007959",
             "label": None
             if not agents
             else f"Agent:{agents[0].unique_id}",
@@ -47,10 +47,9 @@ def network_portrayal(G):
     return portrayal
 
 
-if NETWORK:
-    canvas_element = NetworkModule(network_portrayal, 500, 500)
-else:
-    canvas_element = CanvasGrid(draw, HEIGHT, WIDTH, 500, 500)
+canvas_element = NetworkModule(network_portrayal, 500, 500)
+## Old random mixing grid
+# canvas_element = CanvasGrid(draw, HEIGHT, WIDTH, 500, 500)
 
 
 communicated_1sg_chart = ChartModule([{"Label": "prop_innovative_1sg_innovating_avg", "Color": "Green"}, {"Label": "prop_innovative_1sg_conservating_avg", "Color": "Black"}, {"Label": "prop_innovative_1sg_total_avg", "Color": "Blue"}])
