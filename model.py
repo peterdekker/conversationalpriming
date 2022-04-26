@@ -12,13 +12,14 @@ from config import RG, STEPS_UPDATE_AGENT_COLOR
 from network import create_innovative_agents, create_network_friend_of_friend, create_network_complete
 import util
 
+import numpy as np
 
 class Model(Model):
     '''
     Model class
     '''
 
-    def __init__(self, height, width, prop_innovating_agents, init_prop_innovative_innovating, init_prop_innovative_conservating, boost_conservative, boost_innovative, surprisal, entropy, repeats, network, innovating_no_priming, innovating_only_boost_production, n_interactions_interlocutor):
+    def __init__(self, height, width, prop_innovating_agents, init_prop_innovative_innovating, init_prop_innovative_conservating, boost_conservative, boost_innovative, surprisal, entropy, repeats, network, innovating_no_priming, innovating_only_boost_production, n_interactions_interlocutor, browser_visualization=True):
         '''
         Initialize field
         '''
@@ -37,6 +38,7 @@ class Model(Model):
         assert type(innovating_no_priming) == bool
         assert type(innovating_only_boost_production) == bool
         assert n_interactions_interlocutor >= 1 and n_interactions_interlocutor <= 100
+        assert type(browser_visualization) == bool
 
         if (surprisal or entropy) and (init_prop_innovative_conservating == 0.0 or init_prop_innovative_innovating == 0.0):
             raise ValueError(
@@ -55,6 +57,7 @@ class Model(Model):
         self.innovating_no_priming = innovating_no_priming
         self.innovating_only_boost_production = innovating_only_boost_production
         self.n_interactions_interlocutor = int(n_interactions_interlocutor)
+        self.browser_visualization = browser_visualization
 
         self.schedule = RandomActivation(self)
         self.grid = SingleGrid(width, height, torus=True)
@@ -111,8 +114,8 @@ class Model(Model):
         if self.network:
             agent_types, agents = create_innovative_agents(
                 self.n_agents, self.prop_innovating_agents)
-            #self.G = create_network_friend_of_friend(stranger_connect_prob=0.1, conservating_friend_of_friend_connect_prob=0.5,
-            #                                         innovating_friend_of_friend_connect_prob=0.2, n_iterations=1, agent_types=agent_types, agents=agents)
+            # self.G = create_network_friend_of_friend(stranger_connect_prob=0.1, conservating_friend_of_friend_connect_prob=0.5,
+            #                                          innovating_friend_of_friend_connect_prob=0.2, n_iterations=1, agent_types=agent_types, agents=agents)
             # TODO: check if grid and fully connected network do the same
             self.G = create_network_complete(self.n_agents, agent_types)
             self.grid = NetworkGrid(self.G)
@@ -139,7 +142,8 @@ class Model(Model):
                 self.schedule.add(agent)
 
         self.agents = self.schedule.agents
-        util.update_prop_innovative_agents(self.agents)
+        if self.browser_visualization:
+            util.update_prop_innovative_agents(self.agents)
 
         self.running = True
         self.datacollector.collect(self)
@@ -155,7 +159,7 @@ class Model(Model):
         # Compute agent prop, every N iterations
         # This also empties variable
         # TODO: Remove this when running as script
-        if self.steps % STEPS_UPDATE_AGENT_COLOR == 0:
+        if self.steps % STEPS_UPDATE_AGENT_COLOR == 0 and self.browser_visualization:
             util.update_prop_innovative_agents(self.agents)
 
         # Compute model prop

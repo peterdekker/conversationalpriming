@@ -54,6 +54,8 @@ model_params = {
 
 model_params_ui = {k:v["ui"] for k,v in model_params.items()}
 model_params_script = {k:v["script"] for k,v in model_params.items()}
+model_params_script["browser_visualization"] = False
+
 
 evaluation_params = {
     "iterations": ITERATIONS,
