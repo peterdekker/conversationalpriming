@@ -177,9 +177,10 @@ def update_communicated(form, person, speaker_type, model, agent):
     agent.communicated.append(form)
 
 def compute_colours(agent):
-    l = agent.prop_innovative * 50
+    #l = agent.prop_innovative * 50
     # HSL: H->0-360,  S->0-100%, L->100% L50% is maximum color, 100% is white
-    return colour_str([110, 90, l])
+    #return colour_str([110, 90, l])
+    return "#04b529" if agent.prop_innovative > 0.5 else "#000000"
 
 
 def colour_str(c):
