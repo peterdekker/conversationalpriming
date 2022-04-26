@@ -72,7 +72,7 @@ def experiment_barbell():
 
 
 def create_innovative_agents(n_agents, p_innovating):
-    agent_types = np.random.choice([0, 1], size=n_agents, p=[1-p_innovating, p_innovating])
+    agent_types = np.random.choice([False, True], size=n_agents, p=[1-p_innovating, p_innovating])
     agents = range(len(agent_types))
     return agent_types, agents
 
@@ -82,8 +82,8 @@ def experiment_friend_of_friend(n_agents, p_innovating, stranger_connect_prob=0.
     agent_types, agents = create_innovative_agents(n_agents, p_innovating)
     g = create_network_friend_of_friend(stranger_connect_prob, conservating_friend_of_friend_connect_prob, innovating_friend_of_friend_connect_prob, n_iterations, agent_types, agents)
     clustering_coeffs = nx.clustering(g)
-    ids_innovating = [id for id, attrs in g.nodes(data=True) if attrs["agent_type"] == 1]
-    ids_conservating = [id for id, attrs in g.nodes(data=True) if attrs["agent_type"] == 0]
+    ids_innovating = [id for id, attrs in g.nodes(data=True) if attrs["innovating"] == True]
+    ids_conservating = [id for id, attrs in g.nodes(data=True) if attrs["innovating"] == False]
     clustering_innovating_mean = np.mean([clustering_coeffs[id] for id in ids_innovating])
     clustering_conservating_mean = np.mean([clustering_coeffs[id] for id in ids_conservating])
     print(f"Mean clustering coefficient, innovating: {clustering_innovating_mean}, conservating: {clustering_conservating_mean}")
@@ -95,7 +95,7 @@ def experiment_friend_of_friend(n_agents, p_innovating, stranger_connect_prob=0.
 def create_network_friend_of_friend(stranger_connect_prob, conservating_friend_of_friend_connect_prob, innovating_friend_of_friend_connect_prob, n_iterations, agent_types, agents):
     g = nx.Graph()
     for a in agents:
-        g.add_node(a, agent_type=agent_types[a])
+        g.add_node(a, innovating=agent_types[a])
     pairs = list(combinations(agents, 2))
     # TODO: Make sure innovating and conservating agents have same degree
     # TODO: Shuffle combinations list?
@@ -116,7 +116,7 @@ def create_network_friend_of_friend(stranger_connect_prob, conservating_friend_o
                 # If there is a neighbor in common
                 # print(f"- Common neighbors: {common_neighbors}")
                 # Use innovative prob if one of the nodes is innovative
-                if g.nodes[i]["agent_type"] == 1 or g.nodes[j]["agent_type"] == 1:
+                if g.nodes[i]["innovating"] == 1 or g.nodes[j]["innovating"] == 1:
                     # print(f"- One of the nodes {i,j} is innovative")
                     connect_prob = innovating_friend_of_friend_connect_prob
                 else:
@@ -130,7 +130,7 @@ def create_network_friend_of_friend(stranger_connect_prob, conservating_friend_o
 def create_network_complete(n_agents, agent_types):
     graph = nx.complete_graph(n_agents)
     agent_types_dict = dict(enumerate(agent_types))
-    nx.set_node_attributes(graph, agent_types_dict, name="agent_type")
+    nx.set_node_attributes(graph, agent_types_dict, name="innovating")
     return graph
 
 # experiment_small_world()

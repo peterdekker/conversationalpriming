@@ -117,13 +117,13 @@ class Model(Model):
             self.G = create_network_complete(self.n_agents, agent_types)
         self.grid = NetworkGrid(self.G)
         for node_name, node_data in self.G.nodes(data=True):
-            innovating = bool(node_data["agent_type"])
+            innovating = node_data["innovating"]
             agent = Agent(
                 node_name, innovating, init_prop_innovative_innovating if innovating else init_prop_innovative_conservating, self)
             # Add the agent to the graph node
             self.grid.place_agent(agent, node_name)
             self.schedule.add(agent)
-        # [print(node_name, node_data["agent_type"], node_data["agent"][0].innovating) for node_name, node_data in self.G.nodes(data=True)]
+        # [print(node_name, node_data["innovating"], node_data["agent"][0].innovating) for node_name, node_data in self.G.nodes(data=True)]
         ## Old random mixing grid code
         # else:
         #     # Set up agents
