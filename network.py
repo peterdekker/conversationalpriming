@@ -127,6 +127,42 @@ def create_network_friend_of_friend(stranger_connect_prob, conservating_friend_o
                 g.add_edge(i, j)
     return g
 
+    def create_network_friend_of_friend_fixed_degree(stranger_connect_prob, conservating_friend_of_friend_connect_prob, innovating_friend_of_friend_connect_prob, agent_types, agents):
+        g = nx.Graph()
+        for a in agents:
+            g.add_node(a, innovating=agent_types[a])
+        pairs = list(combinations(agents, 2))
+        # TODO: Make sure innovating and conservating agents have same degree
+        # TODO: Shuffle combinations list?
+        while (condition):
+            for i in agents:
+                # print(f"Evaluating edge {i,j}")
+                if g.has_edge(i, j):
+                    # print(f"- Edge {i,j} already exists. Only possible when running multiple iterations.")
+                    continue
+                # Check if friend of a friend
+                common_neighbors = list(nx.common_neighbors(g, i, j))
+                connect_prob = None
+                if not common_neighbors:
+                    # print(f"- No common neighbors: {common_neighbors}")
+                    connect_prob = stranger_connect_prob
+                else:
+                    # If there is a neighbor in common
+                    # print(f"- Common neighbors: {common_neighbors}")
+                    # Use innovative prob if one of the nodes is innovative
+                    if g.nodes[i]["innovating"] == 1 or g.nodes[j]["innovating"] == 1:
+                        # print(f"- One of the nodes {i,j} is innovative")
+                        connect_prob = innovating_friend_of_friend_connect_prob
+                    else:
+                        # print(f"- None of the nodes {i,j} is innovative")
+                        connect_prob = conservating_friend_of_friend_connect_prob
+                if random.random() < connect_prob:
+                    # print(f"- Add edge {i,j}")
+                    g.add_edge(i, j)
+            
+            # TODO: Recompute condition
+        return g
+
 def create_network_complete(n_agents, agent_types):
     graph = nx.complete_graph(n_agents)
     agent_types_dict = dict(enumerate(agent_types))
