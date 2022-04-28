@@ -77,8 +77,8 @@ def create_innovative_agents(n_agents, p_innovating):
     return agent_types, agents
 
 
-def experiment_friend_of_friend(n_agents, p_innovating, stranger_connect_prob=0.2, conservating_friend_of_friend_connect_prob=0.5,
-                                innovating_friend_of_friend_connect_prob=0.2, n_iterations=1):
+def experiment_friend_of_friend(n_agents, p_innovating, stranger_connect_prob, conservating_friend_of_friend_connect_prob,
+                                innovating_friend_of_friend_connect_prob, n_iterations=1):
     agent_types, agents = create_innovative_agents(n_agents, p_innovating)
     g = create_network_friend_of_friend(stranger_connect_prob, conservating_friend_of_friend_connect_prob, innovating_friend_of_friend_connect_prob, n_iterations, agent_types, agents)
     clustering_coeffs = nx.clustering(g)
@@ -92,10 +92,10 @@ def experiment_friend_of_friend(n_agents, p_innovating, stranger_connect_prob=0.
     degree_conservating_mean = np.mean([g.degree[id] for id in ids_conservating])
     print(f"Degree, innovating: {degree_innovating_mean}, conservating: {degree_conservating_mean}")
 
-def experiment_friend_of_friend_fixed_degree(n_agents, p_innovating, stranger_connect_prob=0.2, conservating_friend_of_friend_connect_prob=0.5,
-                                innovating_friend_of_friend_connect_prob=0.2):
+def experiment_friend_of_friend_fixed_degree(n_agents, p_innovating, stranger_connect_prob, conservating_friend_of_friend_connect_prob,
+                                innovating_friend_of_friend_connect_prob, max_degree):
     agent_types, agents = create_innovative_agents(n_agents, p_innovating)
-    g = create_network_friend_of_friend_fixed_degree(stranger_connect_prob, conservating_friend_of_friend_connect_prob, innovating_friend_of_friend_connect_prob, agent_types, agents)
+    g = create_network_friend_of_friend_fixed_degree(stranger_connect_prob, conservating_friend_of_friend_connect_prob, innovating_friend_of_friend_connect_prob, max_degree, agent_types, agents)
     clustering_coeffs = nx.clustering(g)
     ids_innovating = [id for id, attrs in g.nodes(data=True) if attrs["innovating"] == True]
     ids_conservating = [id for id, attrs in g.nodes(data=True) if attrs["innovating"] == False]
@@ -146,13 +146,26 @@ def get_agents_not_max_degree(g, max_degree):
     agents_not_max = [n for n,degree in g.degree if degree < max_degree]
     return agents_not_max
 
-def create_network_friend_of_friend_fixed_degree(stranger_connect_prob, conservating_friend_of_friend_connect_prob, innovating_friend_of_friend_connect_prob, agent_types, agents):
-    max_degree = 10
+def create_network_friend_of_friend_fixed_degree(stranger_connect_prob, conservating_friend_of_friend_connect_prob, innovating_friend_of_friend_connect_prob, max_degree, agent_types, agents):
+    max_retries = 100
     g = nx.Graph()
     for a in agents:
         g.add_node(a, innovating=agent_types[a])
     agents_not_full = get_agents_not_max_degree(g, max_degree)
+    n_agents_not_full_iterations = []
+    n_agents_not_full_prev = -1
+    counter=0
     while (agents_not_full):
+        n_agents_not_full = len(agents_not_full)
+        # If 100 iterations same number of not full agents, quit
+        if n_agents_not_full == n_agents_not_full_prev:
+            counter += 1
+            if counter == max_retries:
+                break
+        else:
+            counter = 0
+        n_agents_not_full_prev=n_agents_not_full
+
         # Run only through not-full (not max degree) agents to save run time, this is no guarantee, agents can be filled during loop
         for i in agents_not_full:
             for j in agents_not_full:
@@ -161,7 +174,6 @@ def create_network_friend_of_friend_fixed_degree(stranger_connect_prob, conserva
                 if g.has_edge(i, j):
                     continue
                 if g.degree[i] == max_degree or g.degree[j] == max_degree:
-                    print("max")
                     continue
                 # Check if friend of a friend
                 common_neighbors = list(nx.common_neighbors(g, i, j))
@@ -196,7 +208,7 @@ def create_network_complete(n_agents, agent_types):
 # experiment_small_world()
 # experiment_connected_cliques()
 if __name__ == "__main__":
-    experiment_friend_of_friend_fixed_degree(n_agents=100, p_innovating=0.2, stranger_connect_prob=0.1, conservating_friend_of_friend_connect_prob=0.7,
-                                    innovating_friend_of_friend_connect_prob=0.2)
+    experiment_friend_of_friend_fixed_degree(n_agents=100, p_innovating=0.2, stranger_connect_prob=0.1, conservating_friend_of_friend_connect_prob=0.9,
+                                    innovating_friend_of_friend_connect_prob=0.2, max_degree=10)
     # experiment_friend_of_friend(n_agents=100, p_innovating=0.2, stranger_connect_prob=0.1, conservating_friend_of_friend_connect_prob=0.7,
     #                                 innovating_friend_of_friend_connect_prob=0.2)
