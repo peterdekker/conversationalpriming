@@ -91,6 +91,7 @@ def experiment_friend_of_friend(n_agents, p_innovating, stranger_connect_prob, c
     degree_innovating_mean = np.mean([g.degree[id] for id in ids_innovating])
     degree_conservating_mean = np.mean([g.degree[id] for id in ids_conservating])
     print(f"Degree, innovating: {degree_innovating_mean}, conservating: {degree_conservating_mean}")
+    draw(g)
 
 def experiment_friend_of_friend_fixed_degree(n_agents, p_innovating, stranger_connect_prob, conservating_friend_of_friend_connect_prob,
                                 innovating_friend_of_friend_connect_prob, max_degree):
@@ -106,6 +107,7 @@ def experiment_friend_of_friend_fixed_degree(n_agents, p_innovating, stranger_co
     degree_innovating_mean = np.mean([g.degree[id] for id in ids_innovating])
     degree_conservating_mean = np.mean([g.degree[id] for id in ids_conservating])
     print(f"Degree, innovating: {degree_innovating_mean}, conservating: {degree_conservating_mean}")
+    draw(g)
 
 def create_network_friend_of_friend(stranger_connect_prob, conservating_friend_of_friend_connect_prob, innovating_friend_of_friend_connect_prob, n_iterations, agent_types, agents):
     g = nx.Graph()
@@ -208,7 +210,9 @@ def create_network_complete(n_agents, agent_types):
 # experiment_small_world()
 # experiment_connected_cliques()
 if __name__ == "__main__":
-    experiment_friend_of_friend_fixed_degree(n_agents=100, p_innovating=0.2, stranger_connect_prob=0.1, conservating_friend_of_friend_connect_prob=0.9,
-                                    innovating_friend_of_friend_connect_prob=0.2, max_degree=10)
-    # experiment_friend_of_friend(n_agents=100, p_innovating=0.2, stranger_connect_prob=0.1, conservating_friend_of_friend_connect_prob=0.7,
-    #                                 innovating_friend_of_friend_connect_prob=0.2)
+    print("Fixed:")
+    experiment_friend_of_friend_fixed_degree(n_agents=200, p_innovating=0.2, stranger_connect_prob=0.1, conservating_friend_of_friend_connect_prob=0.9,
+                                    innovating_friend_of_friend_connect_prob=0.2, max_degree=5)
+    # print("Non-fixed:")
+    # experiment_friend_of_friend(n_agents=100, p_innovating=0.2, stranger_connect_prob=0.1, conservating_friend_of_friend_connect_prob=0.5,
+    #                                 innovating_friend_of_friend_connect_prob=0.2, n_iterations=1)
