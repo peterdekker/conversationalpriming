@@ -111,7 +111,7 @@ class Model(Model):
         agent_types, agents = create_innovative_agents(
                 self.n_agents, self.prop_innovating_agents)
         if self.friend_network:
-            self.G = create_network_friend_of_friend_fixed_degree(stranger_connect_prob=0.1, conservating_friend_of_friend_connect_prob=0.9, innovating_friend_of_friend_connect_prob=0.2, max_degree=10, agent_types=agent_types, agents=agents)
+            self.G = create_network_friend_of_friend_fixed_degree(stranger_connect_prob=0.3, conservating_friend_of_friend_connect_prob=1.0, innovating_friend_of_friend_connect_prob=0.3, max_degree=10, agent_types=agent_types, agents=agents)
         else:
             self.G = create_network_complete(self.n_agents, agent_types)
         self.grid = NetworkGrid(self.G)
