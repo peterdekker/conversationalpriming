@@ -123,13 +123,13 @@ def main():
 
     # Parse arguments
     args = vars(parser.parse_args())
-    variable_params = {k: v for k, v in args.items() if k in model_params_script and v is not None}
     iterations = args["iterations"]
     steps = args["steps"]
     plot_from_raw = args["plot_from_raw"]
     plot_from_raw_on = args["plot_from_raw"] != ""
+    contrast_persons = args["contrast_persons"]
 
-    print(f"Evaluating iterations {iterations} and steps {steps}")
+    
     output_dir_custom = OUTPUT_DIR
     if args["runlabel"] != "":
         output_dir_custom = f'{OUTPUT_DIR}-{args["runlabel"]}'
@@ -143,25 +143,49 @@ def main():
         # Give "from_raw" as mode, because we dont know with which mode the file was generated
         # Assume 'repeats' was var_param
         course_plots_persons("repeats", stats_import, "from_raw", output_dir_custom, course_df_import)
-    
-    if not plot_from_raw_on:
-        # Try variable parameters one by one, while keeping all of the other parameters fixed
-        for var_param, var_param_settings in variable_params.items():
+    else:
+        # If not plot_from_raw, perform new run of the model. 2 options:
+        # - Contrast persons: plot 1sg vs 3sg, no variable param. Every supplied param is a fixed param
+        if contrast_persons:
+            print("Contrast persons")
             assert len(iterations) == 1
             assert len(steps) == 1
             iterations_setting = iterations[0]
             steps_setting = steps[0]
-            fixed_params = {k: v for k, v in model_params_script.items() if k != var_param}
-            run_data = evaluate_model(fixed_params, {var_param: var_param_settings},
+            # Take only first item from every parameter, which is list because of nargs=+
+            given_model_params = {k: v[0] for k, v in args.items() if k in model_params_script and v is not None}
+            fixed_params = {k: (v if k not in given_model_params else given_model_params[k]) for k, v in model_params_script.items()}
+            print(fixed_params)
+            run_data = evaluate_model(fixed_params, {},
                                         iterations_setting, steps_setting)
-            # create_graph_course_sb(run_data, var_param,
-            #                     stats=dominant_stats, mode="dominant", output_dir=output_dir_custom)
 
             create_graph_course_sb(run_data, var_param,
                                 stats=communicated_stats, mode="communicated", output_dir=output_dir_custom)
             
-            create_graph_course_sb(run_data, var_param,
-                                stats=internal_stats, mode="internal", output_dir=output_dir_custom)
+            # create_graph_course_sb(run_data, var_param,
+            #                     stats=internal_stats, mode="internal", output_dir=output_dir_custom)
+        else:
+            # - Regular run:
+            # Try variable parameters one by one, while keeping all of the other parameters fixed
+            variable_params = {k: v for k, v in args.items() if k in model_params_script and v is not None}
+            assert len(variable_params)>0
+            print(f"Evaluating iterations {iterations} and steps {steps}")
+            for var_param, var_param_settings in variable_params.items():
+                assert len(iterations) == 1
+                assert len(steps) == 1
+                iterations_setting = iterations[0]
+                steps_setting = steps[0]
+                fixed_params = {k: v for k, v in model_params_script.items() if k != var_param}
+                run_data = evaluate_model(fixed_params, {var_param: var_param_settings},
+                                            iterations_setting, steps_setting)
+                # create_graph_course_sb(run_data, var_param,
+                #                     stats=dominant_stats, mode="dominant", output_dir=output_dir_custom)
+
+                create_graph_course_sb(run_data, var_param,
+                                    stats=communicated_stats, mode="communicated", output_dir=output_dir_custom)
+                
+                create_graph_course_sb(run_data, var_param,
+                                    stats=internal_stats, mode="internal", output_dir=output_dir_custom)
         
 
 

@@ -48,7 +48,8 @@ model_params = {
     "innovating_no_priming": {"ui": UserSettableParameter('checkbox', 'Innovating no priming', value=INNOVATING_NO_PRIMING), "script": INNOVATING_NO_PRIMING},
     "innovating_only_boost_production": {"ui": UserSettableParameter('checkbox', 'Innovating only boost production', value=INNOVATING_ONLY_BOOST_PRODUCTION), "script": INNOVATING_ONLY_BOOST_PRODUCTION},
     "n_interactions_interlocutor": {"ui": UserSettableParameter("slider", "# interactions per interlocutor", N_INTERACTIONS_INTERLOCUTOR, 1, 100, 1), "script": N_INTERACTIONS_INTERLOCUTOR},
-    "browser_visualization": {"ui": True, "script": False}
+    "browser_visualization": {"ui": True, "script": False},
+    "dummy": {"ui": False, "script": False},
 }
 
 model_params_ui = {k:v["ui"] for k,v in model_params.items()}
@@ -59,9 +60,10 @@ evaluation_params = {
     "iterations": ITERATIONS,
     "steps": STEPS,
     "runlabel": "",
-    "plot_from_raw": ""
+    "plot_from_raw": "",
+    "contrast_persons": False
 }
 
-bool_params = ["surprisal", "entropy", "repeats", "friend_network", "innovating_no_priming", "innovating_only_boost_production", "browser_visualization"]
+bool_params = ["surprisal", "entropy", "repeats", "friend_network", "innovating_no_priming", "innovating_only_boost_production", "browser_visualization", "dummy", "contrast_persons"]
 
 string_params = ["runlabel", "plot_from_raw"]
