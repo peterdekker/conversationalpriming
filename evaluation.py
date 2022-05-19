@@ -35,12 +35,12 @@ def create_graph(run_data, variable_param, stats, mode, output_dir):
 
     plots(variable_param, stats, mode, output_dir, course_df)
 
-def create_contrast_persons_graph(run_data, stats, mode, output_dir):
+def create_contrast_persons_graph(run_data, stats, mode, output_dir, runlabel):
     print(f"{mode}:")
     course_df = get_course_df(run_data, None, stats, mode, output_dir)
 
     stats_1sg_3sg_contrast = [stat for stat in stats if ("1sg" in stat or "3sg" in stat) and "total" not in stat]
-    plot_contrast_persons_graph(course_df, stats_1sg_3sg_contrast, mode, output_dir, "1sg-3sg-contrast")
+    plot_contrast_persons_graph(course_df, stats_1sg_3sg_contrast, mode, output_dir, runlabel)
 
 def plots(variable_param, stats, mode, output_dir, course_df):
     print("Plot graph 1sg-3sg.")
@@ -79,10 +79,12 @@ def plot_graph(course_df, variable_param, stats, mode, output_dir, label):
     plt.savefig(os.path.join(output_dir, f"{variable_param}-{label}-{mode}.{IMG_FORMAT}"), format=IMG_FORMAT, dpi=300)
     plt.clf()
 
-def plot_contast_persons_graph(course_df, stats, mode, output_dir, label):
+def plot_contrast_persons_graph(course_df, stats, mode, output_dir, label):
     df_melted = course_df.melt(id_vars=["timesteps"], value_vars = stats, value_name = "proportion innovative forms", var_name="statistic")
-    print(df_melted)
-    sns.lineplot(data=df_melted, x="timesteps", y="proportion innovative forms", style="statistic")
+    # These splits assume names like: prop_innovative_1sg_innovating_avg
+    df_melted["person"] = df_melted["statistic"].str.split("_").apply(lambda x: x[2])
+    df_melted["agent type"] = df_melted["statistic"].str.split("_").apply(lambda x: x[3])
+    sns.lineplot(data=df_melted, x="timesteps", y="proportion innovative forms", hue="person", style="agent type")
 
     # Label is usually person (e.g. 1sg)
     plt.savefig(os.path.join(output_dir, f"{label}-{mode}.{IMG_FORMAT}"), format=IMG_FORMAT, dpi=300)
@@ -134,11 +136,14 @@ def main():
     plot_from_raw = args["plot_from_raw"]
     plot_from_raw_on = args["plot_from_raw"] != ""
     contrast_persons = args["contrast_persons"]
+    runlabel = args["runlabel"]
 
     
     output_dir_custom = OUTPUT_DIR
-    if args["runlabel"] != "":
-        output_dir_custom = f'{OUTPUT_DIR}-{args["runlabel"]}'
+    if runlabel != "":
+        if contrast_persons:
+            runlabel += "-contrast"
+        output_dir_custom = f'{OUTPUT_DIR}-{runlabel}'
     util.create_output_dir(output_dir_custom)
 
     if plot_from_raw_on:
@@ -161,12 +166,9 @@ def main():
             # Take only first item from every parameter, which is list because of nargs=+
             given_model_params = {k: v[0] for k, v in args.items() if k in model_params_script and v is not None}
             fixed_params = {k: (v if k not in given_model_params else given_model_params[k]) for k, v in model_params_script.items()}
-            print(fixed_params)
             run_data = evaluate_model(fixed_params, None,
                                         iterations_setting, steps_setting)
-            print(run_data)
-            create_contrast_persons_graph(run_data, None,
-                                stats=communicated_stats, mode="communicated", output_dir=output_dir_custom)
+            create_contrast_persons_graph(run_data, stats=communicated_stats, mode="communicated", output_dir=output_dir_custom, runlabel=runlabel)
             
             # create_graph(run_data, var_param,
             #                     stats=internal_stats, mode="internal", output_dir=output_dir_custom)
