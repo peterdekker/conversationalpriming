@@ -128,7 +128,14 @@ def experiment_friend_of_friend_fixed_degree(n_agents, p_innovating, stranger_co
     # print(
     #     f"Degree, innovating: {degree_innovating_mean}, conservating: {degree_conservating_mean}")
     if dodraw:
-        draw(g)
+        #draw(g)
+        pos = nx.kamada_kawai_layout(g)
+        nodes=g.nodes()
+        colors = ids_innovating = ["green" if attrs["innovating"] == True else "grey" for id, attrs in g.nodes(data=True)]
+        ec = nx.draw_networkx_edges(g, pos, alpha=0.2)
+        nc = nx.draw_networkx_nodes(g, pos, nodelist=nodes, node_color=colors, 
+                                    node_size=100)
+        plt.savefig("friendoffriend.png",dpi=300)
     record =  {"n_agents": n_agents, "stranger_connect_prob": stranger_connect_prob, "conservating_friend_of_friend_connect_prob": conservating_friend_of_friend_connect_prob,
             "innovating_friend_of_friend_connect_prob": innovating_friend_of_friend_connect_prob, "max_degree": max_degree,
             "cl_inn": clustering_innovating_mean, "cl_con": clustering_conservating_mean, "deg_inn": degree_innovating_mean, "deg_conn": degree_conservating_mean}
