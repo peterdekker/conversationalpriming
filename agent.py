@@ -35,11 +35,13 @@ class Agent(Agent):
         '''
          Perform one interaction for this agent, with this agent as speaker
         '''
-        neighbors_nodes = self.model.grid.get_neighbors(self.pos, include_center=False)
-        neighbors = self.model.grid.get_cell_list_contents(neighbors_nodes)
-        listener = RG.choice(neighbors)
-        ## Old grid random mixing code
-        #     listener = RG.choice(self.model.agents)
+        if not self.model.use_grid: # default> use network
+            neighbors_nodes = self.model.grid.get_neighbors(self.pos, include_center=False)
+            neighbors = self.model.grid.get_cell_list_contents(neighbors_nodes)
+            listener = RG.choice(neighbors)
+        
+        if self.model.use_grid:
+             listener = RG.choice([a for a in self.model.agents if a.pos != self.pos])
         for i in range(self.model.n_interactions_interlocutor):
             question = self.create_question()
             answer = listener.receive_question_reply(question)

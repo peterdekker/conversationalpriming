@@ -19,7 +19,7 @@ class Model(Model):
     Model class
     '''
 
-    def __init__(self, n_agents, prop_innovating_agents, init_prop_innovative_innovating, init_prop_innovative_conservating, boost_conservative, boost_innovative, surprisal, entropy, repeats, friend_network, innovating_no_priming, innovating_only_boost_production, n_interactions_interlocutor, browser_visualization):
+    def __init__(self, n_agents, prop_innovating_agents, init_prop_innovative_innovating, init_prop_innovative_conservating, boost_conservative, boost_innovative, surprisal, entropy, repeats, friend_network, innovating_no_priming, innovating_only_boost_production, n_interactions_interlocutor, browser_visualization, use_grid, dummy):
         '''
         Initialize field
         '''
@@ -38,6 +38,8 @@ class Model(Model):
         assert type(innovating_only_boost_production) == bool
         assert n_interactions_interlocutor >= 1 and n_interactions_interlocutor <= 100
         assert type(browser_visualization) == bool
+        assert type(use_grid)==bool
+        assert type(dummy)==bool
 
         if (surprisal or entropy) and (init_prop_innovative_conservating == 0.0 or init_prop_innovative_innovating == 0.0):
             raise ValueError(
@@ -55,9 +57,9 @@ class Model(Model):
         self.innovating_only_boost_production = innovating_only_boost_production
         self.n_interactions_interlocutor = int(n_interactions_interlocutor)
         self.browser_visualization = browser_visualization
+        self.use_grid = use_grid
 
         self.schedule = RandomActivation(self)
-        #self.grid = SingleGrid(width, height, torus=True)
         self.steps = 0
 
         # Contains utterances of last step emptied after prop_innovative calculation at end of step
@@ -108,35 +110,36 @@ class Model(Model):
             }
         )
 
-        agent_types, agents = create_innovative_agents(
-                self.n_agents, self.prop_innovating_agents)
-        if self.friend_network:
-            self.G = create_network_friend_of_friend_fixed_degree(stranger_connect_prob=0.1, conservating_friend_of_friend_connect_prob=0.9, innovating_friend_of_friend_connect_prob=0.2, max_degree=10, agent_types=agent_types, agents=agents)
-        else:
-            self.G = create_network_complete(self.n_agents, agent_types)
-        self.grid = NetworkGrid(self.G)
-        for node_name, node_data in self.G.nodes(data=True):
-            innovating = node_data["innovating"]
-            agent = Agent(
-                node_name, innovating, init_prop_innovative_innovating if innovating else init_prop_innovative_conservating, self)
-            # Add the agent to the graph node
-            self.grid.place_agent(agent, node_name)
-            self.schedule.add(agent)
-        # [print(node_name, node_data["innovating"], node_data["agent"][0].innovating) for node_name, node_data in self.G.nodes(data=True)]
+        if not self.use_grid: # use network, default
+            agent_types, agents = create_innovative_agents(
+                    self.n_agents, self.prop_innovating_agents)
+            if self.friend_network:
+                self.G = create_network_friend_of_friend_fixed_degree(stranger_connect_prob=0.3, conservating_friend_of_friend_connect_prob=1.0, innovating_friend_of_friend_connect_prob=0.3, max_degree=10, agent_types=agent_types, agents=agents)
+            else:
+                self.G = create_network_complete(self.n_agents, agent_types)
+            self.grid = NetworkGrid(self.G)
+            for node_name, node_data in self.G.nodes(data=True):
+                innovating = node_data["innovating"]
+                agent = Agent(
+                    node_name, innovating, init_prop_innovative_innovating if innovating else init_prop_innovative_conservating, self)
+                # Add the agent to the graph node
+                self.grid.place_agent(agent, node_name)
+                self.schedule.add(agent)
         ## Old random mixing grid code
-        # else:
-        #     # Set up agents
-        #     # We use a grid iterator that returns
-        #     # the coordinates of a cell as well as
-        #     # its contents. (coord_iter)
-        #     for i, cell in enumerate(self.grid.coord_iter()):
-        #         x = cell[1]
-        #         y = cell[2]
-        #         innovating = RG.random() < self.prop_innovating_agents
-        #         agent = Agent(
-        #             (x, y), innovating, init_prop_innovative_innovating if innovating else init_prop_innovative_conservating, self)
-        #         self.grid.position_agent(agent, (x, y))
-        #         self.schedule.add(agent)
+        if self.use_grid:
+            # Set up agents
+            # We use a grid iterator that returns
+            # the coordinates of a cell as well as
+            # its contents. (coord_iter)
+            self.grid = SingleGrid(10,10, torus=True)
+            for i, cell in enumerate(self.grid.coord_iter()):
+                x = cell[1]
+                y = cell[2]
+                innovating = RG.random() < self.prop_innovating_agents
+                agent = Agent(
+                    (x, y), innovating, init_prop_innovative_innovating if innovating else init_prop_innovative_conservating, self)
+                self.grid.position_agent(agent, (x, y))
+                self.schedule.add(agent)
 
         self.agents = self.schedule.agents
         if self.browser_visualization:
