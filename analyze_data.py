@@ -16,6 +16,7 @@ CLTS_PATH = os.path.join(currentdir, "clts-2.1.0")
 
 OUTPUT_DIR = "output_data"
 pd.set_option('display.max_rows', 100)
+img_extension = "png"
 
 def download_if_needed(archive_path, archive_url, file_path, label):
     if not os.path.exists(file_path):
@@ -40,7 +41,7 @@ def load_clts():
 
 def normalized_levenshtein(a,b):
     max_len = max(len(a),len(b))
-    return editdistance.eval(a,b) /max_len if max_len > 0 else 0
+    return editdistance.eval(a,b) # /max_len if max_len > 0 else 0
 
 def get_first(x):
     return x[0]
@@ -89,7 +90,7 @@ if __name__ == "__main__":
     families_above_threshold = nunique_family[nunique_family >= 10]
 
     ### Analysis length
-    df["diff_length"] = (df["modern_length"] - df["proto_length"])
+    df["modern_proto_diff_length"] = (df["modern_length"] - df["proto_length"])
     # for a in df.groupby("proto_language")
     grouped_length = df.groupby(["person_number", "proto_language"]).mean().sort_values("proto_language")
     #print(grouped.head)
@@ -120,7 +121,7 @@ if __name__ == "__main__":
         ## Delete *
         df[f"{form_type}_corr"] = df[f"{form_type}_corr"].str.replace("*", "", regex=False)
 
-        df[f"{form_type}_corr"] = df[f"{form_type}_corr"].apply(ipa_to_soundclass)
+        # df[f"{form_type}_corr"] = df[f"{form_type}_corr"].apply(ipa_to_soundclass)
 
     df["modern_proto_levenshtein"] = df.apply(lambda x: normalized_levenshtein(x["modern_form_corr"], x["proto_form_corr"]), axis=1)
     # Edit dist, grouped per language family
@@ -130,35 +131,35 @@ if __name__ == "__main__":
     ### Create all plots 
 
     sns.violinplot(x="person_number", y="modern_proto_levenshtein", data=df) # hue="proto_language"
-    plt.savefig(os.path.join(OUTPUT_DIR,"modern_proto_levenshtein_violin.pdf"))
+    plt.savefig(os.path.join(OUTPUT_DIR,f"modern_proto_levenshtein_violin.{img_extension}"))
     plt.clf()
     sns.stripplot(x="person_number", y="modern_proto_levenshtein", data=df)
-    plt.savefig(os.path.join(OUTPUT_DIR,"modern_proto_levenshtein_strip.pdf"))
+    plt.savefig(os.path.join(OUTPUT_DIR,f"modern_proto_levenshtein_strip.{img_extension}"))
     plt.clf()
 
-    sns.violinplot(x="person_number", y="diff_length", data=df) # hue="proto_language"
-    plt.savefig(os.path.join(OUTPUT_DIR,"diff_length_violin.pdf"))
+    sns.violinplot(x="person_number", y="modern_proto_diff_length", data=df) # hue="proto_language"
+    plt.savefig(os.path.join(OUTPUT_DIR,f"modern_proto_diff_length_violin.{img_extension}"))
     plt.clf()
-    sns.stripplot(x="person_number", y="diff_length", data=df)
-    plt.savefig(os.path.join(OUTPUT_DIR,"diff_length_strip.pdf"))
+    sns.stripplot(x="person_number", y="modern_proto_diff_length", data=df)
+    plt.savefig(os.path.join(OUTPUT_DIR,f"modern_proto_diff_length_strip.{img_extension}"))
     plt.clf()
 
     for fam, group in df.groupby("proto_language"):
         if fam not in families_above_threshold:
             continue
         sns.violinplot(x="person_number", y="modern_proto_levenshtein", data=group) # hue="proto_language"
-        plt.savefig(os.path.join(OUTPUT_DIR,f"modern_proto_levenshtein_violin_{fam}.pdf"))
+        plt.savefig(os.path.join(OUTPUT_DIR,f"modern_proto_levenshtein_violin_{fam}.{img_extension}"))
         plt.clf()
         sns.stripplot(x="person_number", y="modern_proto_levenshtein", data=group)
-        plt.savefig(os.path.join(OUTPUT_DIR,f"modern_proto_levenshtein_strip_{fam}.pdf"))
+        plt.savefig(os.path.join(OUTPUT_DIR,f"modern_proto_levenshtein_strip_{fam}.{img_extension}"))
         plt.clf()
 
-        sns.violinplot(x="person_number", y="diff_length", data=group) # hue="proto_language"
-        plt.savefig(os.path.join(OUTPUT_DIR,f"diff_length_violin_{fam}.pdf"))
+        sns.violinplot(x="person_number", y="modern_proto_diff_length", data=group) # hue="proto_language"
+        plt.savefig(os.path.join(OUTPUT_DIR,f"modern_proto_diff_length_violin_{fam}.{img_extension}"))
         plt.clf()
-        sns.stripplot(x="person_number", y="diff_length",data=group)
-        plt.savefig(os.path.join(OUTPUT_DIR,f"diff_length_strip_{fam}.pdf"))
+        sns.stripplot(x="person_number", y="modern_proto_diff_length",data=group)
+        plt.savefig(os.path.join(OUTPUT_DIR,f"modern_proto_diff_length_strip_{fam}.{img_extension}"))
         plt.clf()
 
 
-    df[["language","modern_form", "modern_form_corr", "proto_form", "proto_form_corr", "modern_length", "proto_length", "diff_length","modern_proto_levenshtein"]].to_csv(os.path.join(OUTPUT_DIR,"metrics.csv"))
+    df[["language","modern_form", "modern_form_corr", "proto_form", "proto_form_corr", "modern_length", "proto_length", "modern_proto_diff_length","modern_proto_levenshtein"]].to_csv(os.path.join(OUTPUT_DIR,"metrics.csv"))
