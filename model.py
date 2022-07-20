@@ -45,7 +45,7 @@ class Model(Model):
             raise ValueError(
                 "If surprisal or entropy is on, the proportion of innovative forms in innovating and conservating agents have to be > 0.0; to prevent NaN values in surprisal calculations.")
 
-        self.n_agents = n_agents
+        self.n_agents = int(n_agents)
         self.prop_innovating_agents = prop_innovating_agents
         self.boost_conservative = boost_conservative
         self.boost_innovative = boost_innovative
