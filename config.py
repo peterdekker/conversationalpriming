@@ -2,7 +2,7 @@ import numpy as np
 import logging
 import sys
 import datetime
-from mesa.visualization.UserParam import UserSettableParameter
+from mesa.visualization.UserParam import UserSettableParameter, Slider, Checkbox
 
 logging.basicConfig(stream=sys.stderr, level=logging.ERROR)
 RG = np.random.default_rng()
@@ -35,19 +35,19 @@ INNOVATING_ONLY_BOOST_PRODUCTION = False
 N_INTERACTIONS_INTERLOCUTOR = 1
 
 model_params = {
-    "n_agents": {"ui": UserSettableParameter("slider", "# agents", N_AGENTS, 0, 1000, 10), "script": N_AGENTS},
-    "prop_innovating_agents": {"ui": UserSettableParameter("slider", "Proportion innovating agents", PROP_INNOVATING_AGENTS, 0.0, 1.0, 0.1), "script": PROP_INNOVATING_AGENTS},
-    "init_prop_innovative_innovating": {"ui": UserSettableParameter("slider", "Proportion innovative forms in innovating agents", INIT_PROP_INNOVATIVE_INNOVATING, 0.0, 1.0, 0.1), "script": INIT_PROP_INNOVATIVE_INNOVATING},
-    "init_prop_innovative_conservating": {"ui": UserSettableParameter("slider", "Proportion innovative forms in conservating agents", INIT_PROP_INNOVATIVE_CONSERVATING, 0.0, 1.0, 0.1), "script": INIT_PROP_INNOVATIVE_CONSERVATING},
-    "boost_conservative": {"ui": UserSettableParameter("slider", "Boost conservative", BOOST_CONSERVATIVE, 0.0, 1.0, 0.01), "script": BOOST_CONSERVATIVE},
-    "boost_innovative": {"ui": UserSettableParameter("slider", "Boost innovative", BOOST_INNOVATIVE, 0.0, 1.0, 0.01), "script": BOOST_INNOVATIVE},
-    "surprisal": {"ui": UserSettableParameter('checkbox', 'Surprisal', value=SURPRISAL), "script": SURPRISAL},
-    "entropy": {"ui": UserSettableParameter('checkbox', 'Entropy', value=ENTROPY), "script": ENTROPY},
-    "repeats": {"ui": UserSettableParameter('checkbox', 'Repeats', value=REPEATS), "script": REPEATS},
-    "friend_network": {"ui": UserSettableParameter('checkbox', 'Friend network', value=FRIEND_NETWORK), "script": FRIEND_NETWORK},
-    "innovating_no_priming": {"ui": UserSettableParameter('checkbox', 'Innovating no priming', value=INNOVATING_NO_PRIMING), "script": INNOVATING_NO_PRIMING},
-    "innovating_only_boost_production": {"ui": UserSettableParameter('checkbox', 'Innovating only boost production', value=INNOVATING_ONLY_BOOST_PRODUCTION), "script": INNOVATING_ONLY_BOOST_PRODUCTION},
-    "n_interactions_interlocutor": {"ui": UserSettableParameter("slider", "# interactions per interlocutor", N_INTERACTIONS_INTERLOCUTOR, 1, 100, 1), "script": N_INTERACTIONS_INTERLOCUTOR},
+    "n_agents": {"ui": Slider("# agents", N_AGENTS, 0, 1000, 10), "script": N_AGENTS},
+    "prop_innovating_agents": {"ui": Slider("Proportion innovating agents", PROP_INNOVATING_AGENTS, 0.0, 1.0, 0.1), "script": PROP_INNOVATING_AGENTS},
+    "init_prop_innovative_innovating": {"ui": Slider("Proportion innovative forms in innovating agents", INIT_PROP_INNOVATIVE_INNOVATING, 0.0, 1.0, 0.1), "script": INIT_PROP_INNOVATIVE_INNOVATING},
+    "init_prop_innovative_conservating": {"ui": Slider("Proportion innovative forms in conservating agents", INIT_PROP_INNOVATIVE_CONSERVATING, 0.0, 1.0, 0.1), "script": INIT_PROP_INNOVATIVE_CONSERVATING},
+    "boost_conservative": {"ui": Slider("Boost conservative", BOOST_CONSERVATIVE, 0.0, 1.0, 0.01), "script": BOOST_CONSERVATIVE},
+    "boost_innovative": {"ui": Slider("Boost innovative", BOOST_INNOVATIVE, 0.0, 1.0, 0.01), "script": BOOST_INNOVATIVE},
+    "surprisal": {"ui": Checkbox('Surprisal', value=SURPRISAL), "script": SURPRISAL},
+    "entropy": {"ui": Checkbox('Entropy', value=ENTROPY), "script": ENTROPY},
+    "repeats": {"ui": Checkbox('Repeats', value=REPEATS), "script": REPEATS},
+    "friend_network": {"ui": Checkbox('Friend network', value=FRIEND_NETWORK), "script": FRIEND_NETWORK},
+    "innovating_no_priming": {"ui": Checkbox('Innovating no priming', value=INNOVATING_NO_PRIMING), "script": INNOVATING_NO_PRIMING},
+    "innovating_only_boost_production": {"ui": Checkbox('Innovating only boost production', value=INNOVATING_ONLY_BOOST_PRODUCTION), "script": INNOVATING_ONLY_BOOST_PRODUCTION},
+    "n_interactions_interlocutor": {"ui": Slider("# interactions per interlocutor", N_INTERACTIONS_INTERLOCUTOR, 1, 100, 1), "script": N_INTERACTIONS_INTERLOCUTOR},
     "browser_visualization": {"ui": True, "script": False},
     "use_grid": {"ui": False, "script": False},
     "dummy": {"ui": False, "script": False},
