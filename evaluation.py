@@ -1,7 +1,7 @@
 import argparse
 import pandas as pd
 import numpy as np
-from mesa.batchrunner import BatchRunner
+from mesa.batchrunner import BatchRunner, batch_run
 import os
 import util
 import seaborn as sns
@@ -31,13 +31,18 @@ def params_print(params):
 
 def create_graph(run_data, variable_param, stats, mode, output_dir):
     print(f"{mode}:")
-    course_df = get_course_df(run_data, variable_param, stats, mode, output_dir)
+    # course_df = get_course_df(run_data, variable_param, stats, mode, output_dir)
+    # Drop first
+    course_df = run_data
+    course_df.to_csv(os.path.join(output_dir, f"{variable_param}-{mode}-raw.csv"))
 
     plots(variable_param, stats, mode, output_dir, course_df)
 
 def create_contrast_persons_graph(run_data, stats, mode, output_dir, runlabel):
     print(f"{mode}:")
-    course_df = get_course_df(run_data, None, stats, mode, output_dir)
+    #course_df = get_course_df(run_data, None, stats, mode, output_dir)
+    course_df = run_data
+    course_df.to_csv(os.path.join(output_dir, f"{mode}-raw.csv"))
 
     stats_1sg_3sg_contrast = [stat for stat in stats if ("1sg" in stat or "3sg" in stat) and "total" not in stat]
     plot_contrast_persons_graph(course_df, stats_1sg_3sg_contrast, mode, output_dir, runlabel)
@@ -96,20 +101,33 @@ def evaluate_model(fixed_params, variable_params, iterations, steps):
         print(f"  Variable parameters: {params_print(variable_params)}")
     print(f"  Fixed parameters: {params_print(fixed_params)}")
 
-    batch_run = BatchRunner(
-        Model,
-        variable_params,
-        fixed_params,
-        iterations=iterations,
-        max_steps=steps,
-        model_reporters={"datacollector": lambda m: m.datacollector}
-    )
+    # batch_run = BatchRunner(
+    #     Model,
+    #     variable_params,
+    #     fixed_params,
+    #     iterations=iterations,
+    #     max_steps=steps,
+    #     model_reporters={"datacollector": lambda m: m.datacollector}
+    # )
 
-    batch_run.run_all()
+    # batch_run.run_all()
 
 
-    run_data = batch_run.get_model_vars_dataframe()
-
+    # run_data = batch_run.get_model_vars_dataframe()
+    if variable_params:
+        all_params = variable_params | fixed_params
+    else:
+        all_params = fixed_params
+    results = batch_run(Model, 
+                        parameters=all_params,
+                        number_processes=None,
+                        iterations=iterations,
+                        data_collection_period=1,
+                        max_steps=steps)
+    run_data = pd.DataFrame(results)
+    run_data = run_data.rename(columns={"Step":"timesteps"})
+    # Drop first timestep
+    run_data = run_data[run_data.timesteps != 0]
 
     return run_data
 
