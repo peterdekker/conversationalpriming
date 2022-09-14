@@ -7,6 +7,9 @@ import os
 import requests
 import shutil
 from pyclts import CLTS
+import unidecode
+
+plt.rcParams['savefig.dpi'] = 300
 
 currentdir = os.path.dirname(os.path.realpath(__file__))
 
@@ -41,7 +44,7 @@ def load_clts():
 
 def normalized_levenshtein(a,b):
     max_len = max(len(a),len(b))
-    return editdistance.eval(a,b) # /max_len if max_len > 0 else 0
+    return editdistance.eval(a,b) /max_len if max_len > 0 else 0
 
 def get_first(x):
     return x[0]
@@ -122,6 +125,7 @@ if __name__ == "__main__":
         df[f"{form_type}_corr"] = df[f"{form_type}_corr"].str.replace("*", "", regex=False)
 
         # df[f"{form_type}_corr"] = df[f"{form_type}_corr"].apply(ipa_to_soundclass)
+        df[f"{form_type}_corr"] = df[f"{form_type}_corr"].apply(unidecode.unidecode)
 
     df["modern_proto_levenshtein"] = df.apply(lambda x: normalized_levenshtein(x["modern_form_corr"], x["proto_form_corr"]), axis=1)
     # Edit dist, grouped per language family
