@@ -8,3 +8,7 @@ In normal mode, give the variable parameter and its parameter values you want to
 
 In 'contrast persons' mode, the script will output one graph, where 1sg and 3sg are contrasted. Only lines for innovative and conservative speakers are shown, no total. No variable parameters can be given. Every model parameter you give (with only one value per parameter) will be interpreted as a fixed parameter. E.g. to create a 1sg-3sg contrast plot for a friend network:
 ```python3 evaluation.py --contrast_persons --friend_network True```
+
+
+## Data analysis
+With the script ``analyze_data.py``, an analysis of the rate of change of person markers for different grammatical persons is performed. This script requires the file ``verbal_person-number_indexes_merged.csv`` from https://zenodo.org/record/6028260 to be in the folder ``data``.
