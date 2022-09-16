@@ -8,6 +8,8 @@ import requests
 import shutil
 from pyclts import CLTS
 import unidecode
+import numpy as np
+from scipy.spatial.distance import pdist, squareform
 
 plt.rcParams['savefig.dpi'] = 300
 
@@ -74,7 +76,7 @@ def get_first(x):
     return x[0]
 
 
-if __name__ == "__main__":
+def main():
     # load_clts()
     # clts = CLTS(f"{currentdir}/clts-2.1.0")
     # asjp = clts.soundclass("asjp")
@@ -102,12 +104,22 @@ if __name__ == "__main__":
     # print(nunique_family)
     families_above_threshold = nunique_family[nunique_family >= 10]
 
-    ### Analysis length
+    ### Analysis length: difference modern form and protoform
     df["proto_diff_length"] = (df["modern_length"] - df["proto_length"])
     # for a in df.groupby("proto_language")
     grouped_length = df.groupby(["person_number", "proto_language"]).mean().sort_values("proto_language")
     #print(grouped.head)
     #grouped.to_csv("output.csv")
+
+    ## Analysis length: difference between modern forms within language family
+    print(df.groupby(["proto_language", "person_number"])["modern_length"].aggregate(lambda x: np.mean(pdist(np.array(x)[np.newaxis].T))))
+    # Also calculate std
+    
+    # for i, df in df.groupby(["proto_language", "person_number"]):
+    #     print(df[["language","person_number", "modern_length"]])
+    #     print(df["modern_length"].aggregate(lambda x: pdist(np.array(x)[np.newaxis].T)).mean())
+    #     #break
+    return
 
 
     ### Analysis distance in forms
@@ -177,3 +189,8 @@ if __name__ == "__main__":
 
 
     df[["language","modern_form", "modern_form_corr", "proto_form", "proto_form_corr", "modern_length", "proto_length", "proto_diff_length","proto_levenshtein"]].to_csv(os.path.join(OUTPUT_DIR,"metrics.csv"))
+
+
+if __name__ == "__main__":
+    main()
+    
