@@ -2,7 +2,9 @@ mesa
 argparse
 pandas
 numpy
+scipy
 seaborn
 matplotlib
 networkx
 editdistance
+unidecode # do we keep using this?
