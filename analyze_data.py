@@ -109,30 +109,11 @@ def main():
     ### Analysis length: difference modern form and protoform
     df["proto_diff_length"] = (df["modern_length"] - df["proto_length"])
     # for a in df.groupby("proto_language")
-    grouped_length = df.groupby(["proto_language", "person_number"]).mean().sort_values("proto_language")
+    # grouped_length = df.groupby(["proto_language", "person_number"]).mean().sort_values("proto_language")
     #print(grouped.head)
     #grouped.to_csv("output.csv")
-
-    ## Analysis length: pairwise difference between modern forms within language family
-    # With full groupby aggregate, we can only get one value (mean) per language family. (or maybe one value per language)
-    # We want every comparison as separate data point
-    # print(df.groupby(["proto_language", "person_number"])["modern_length"].aggregate(lambda x: pdist(np.array(x)[np.newaxis].T)))
     
-    pairwise_length_dfs = []
-    for (pl,pn), group in df.groupby(["proto_language", "person_number"]):
-        #print(group[["proto_language", "person_number", "modern_length"]])
-        pairwise_dists = group["modern_length"].aggregate(lambda x: pdist(np.array(x)[np.newaxis].T))
-        #print(pairwise_dists)
-        d = pd.DataFrame()
-        d["modern_diff_length"] = pairwise_dists
-        d["proto_language"] = pl
-        d["person_number"] = pn
-        #print(d)
-        pairwise_length_dfs.append(d)
-    
-    df_modern_pairwise = pd.concat(pairwise_length_dfs)
-
-    ### Analysis distance in forms
+    ### Analysis levenshtein distance in forms
 
     for form_type in ["modern_form", "proto_form"]:
         ## Split alternative forms based on delimiters , and /, and take first
@@ -161,7 +142,27 @@ def main():
 
     df["proto_levenshtein"] = df.apply(lambda x: normalized_levenshtein(x["modern_form_corr"], x["proto_form_corr"]), axis=1)
     # Edit dist, grouped per language family
-    grouped_proto_levenshtein = df.groupby(["person_number", "proto_language"]).mean().sort_values("proto_language")
+    # grouped_proto_levenshtein = df.groupby(["person_number", "proto_language"]).mean().sort_values("proto_language")
+
+    ## Analysis length: pairwise difference between modern forms within language family
+    # With full groupby aggregate, we can only get one value (mean) per language family. (or maybe one value per language)
+    # We want every comparison as separate data point
+    # print(df.groupby(["proto_language", "person_number"])["modern_length"].aggregate(lambda x: pdist(np.array(x)[np.newaxis].T)))
+    
+    modern_pairwise_dfs = []
+    for (pl,pn), group in df.groupby(["proto_language", "person_number"]):
+        print(group[["proto_language", "person_number", "modern_form", "modern_length"]])
+        modern_diff_length = group["modern_length"].aggregate(lambda x: pdist(np.array(x)[np.newaxis].T))
+        print(modern_diff_length)
+        d = pd.DataFrame()
+        d["modern_diff_length"] = modern_diff_length
+        d["proto_language"] = pl
+        d["person_number"] = pn
+        #print(d)
+        modern_pairwise_dfs.append(d)
+    
+    df_modern_pairwise = pd.concat(modern_pairwise_dfs)
+
 
 
     ### Create all plots 
@@ -179,7 +180,7 @@ def main():
     plt.savefig(os.path.join(OUTPUT_DIR_PROTO,f"proto_levenshtein_strip.{img_extension}"))
     plt.clf()
 
-    ## Modern pairwise distances
+    ## Modern pairwise length difference
     sns.violinplot(x="person_number", y="modern_diff_length", data=df_modern_pairwise, order=person_markers)
     plt.savefig(os.path.join(OUTPUT_DIR_MODERN,f"modern_diff_length_violin.{img_extension}"))
     plt.clf()
@@ -187,7 +188,7 @@ def main():
     plt.savefig(os.path.join(OUTPUT_DIR_MODERN,f"modern_diff_length_strip.{img_extension}"))
     plt.clf()
 
-
+    # Protolanguage, per family
     for fam, group in df.groupby("proto_language"):
         if fam not in families_above_threshold:
             continue
@@ -204,6 +205,18 @@ def main():
         plt.clf()
         sns.stripplot(x="person_number", y="proto_levenshtein", data=group)
         plt.savefig(os.path.join(OUTPUT_DIR_PROTO,f"proto_levenshtein_strip_{fam}.{img_extension}"))
+        plt.clf()
+    
+    ## Modern pairwise, per family
+    for fam, group in df_modern_pairwise.groupby("proto_language"):
+        if fam not in families_above_threshold:
+            continue
+        # Modern pairwise length difference
+        sns.violinplot(x="person_number", y="modern_diff_length", data=group, order=person_markers)
+        plt.savefig(os.path.join(OUTPUT_DIR_MODERN,f"modern_diff_length_violin_{fam}.{img_extension}"))
+        plt.clf()
+        sns.stripplot(x="person_number", y="modern_diff_length", data=group, order=person_markers)
+        plt.savefig(os.path.join(OUTPUT_DIR_MODERN,f"modern_diff_length_strip_{fam}.{img_extension}"))
         plt.clf()
 
 
