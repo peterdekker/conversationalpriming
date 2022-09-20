@@ -10,6 +10,7 @@ import shutil
 import unidecode
 import numpy as np
 from scipy.spatial.distance import pdist, squareform
+from itertools import combinations
 
 plt.rcParams['savefig.dpi'] = 300
 
@@ -153,9 +154,12 @@ def main():
     for (pl,pn), group in df.groupby(["proto_language", "person_number"]):
         print(group[["proto_language", "person_number", "modern_form", "modern_length"]])
         modern_diff_length = group["modern_length"].aggregate(lambda x: pdist(np.array(x)[np.newaxis].T))
+        modern_levenshtein = group["modern_form_corr"].aggregate(lambda x: [normalized_levenshtein(a,b) for a,b in combinations(np.array(x),2)])
         print(modern_diff_length)
+        print(modern_levenshtein)
         d = pd.DataFrame()
         d["modern_diff_length"] = modern_diff_length
+        d["modern_levenshtein"] = modern_levenshtein
         d["proto_language"] = pl
         d["person_number"] = pn
         #print(d)
@@ -188,6 +192,14 @@ def main():
     plt.savefig(os.path.join(OUTPUT_DIR_MODERN,f"modern_diff_length_strip.{img_extension}"))
     plt.clf()
 
+    ## Modern pairwise Levenshtein
+    sns.violinplot(x="person_number", y="modern_levenshtein", data=df_modern_pairwise, order=person_markers)
+    plt.savefig(os.path.join(OUTPUT_DIR_MODERN,f"modern_levenshtein_violin.{img_extension}"))
+    plt.clf()
+    sns.stripplot(x="person_number", y="modern_levenshtein", data=df_modern_pairwise, order=person_markers)
+    plt.savefig(os.path.join(OUTPUT_DIR_MODERN,f"modern_levenshtein_strip.{img_extension}"))
+    plt.clf()
+
     # Protolanguage, per family
     for fam, group in df.groupby("proto_language"):
         if fam not in families_above_threshold:
@@ -217,6 +229,13 @@ def main():
         plt.clf()
         sns.stripplot(x="person_number", y="modern_diff_length", data=group, order=person_markers)
         plt.savefig(os.path.join(OUTPUT_DIR_MODERN,f"modern_diff_length_strip_{fam}.{img_extension}"))
+        plt.clf()
+
+        sns.violinplot(x="person_number", y="modern_levenshtein", data=group, order=person_markers) # hue="proto_language"
+        plt.savefig(os.path.join(OUTPUT_DIR_MODERN,f"modern_levenshtein_violin_{fam}.{img_extension}"))
+        plt.clf()
+        sns.stripplot(x="person_number", y="modern_levenshtein", data=group, order=person_markers)
+        plt.savefig(os.path.join(OUTPUT_DIR_MODERN,f"modern_levenshtein_strip_{fam}.{img_extension}"))
         plt.clf()
 
 
