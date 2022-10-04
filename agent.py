@@ -1,4 +1,4 @@
-from mesa import Agent
+import mesa
 
 from verb import Verb
 from util import choice_prob, update_communicated
@@ -6,7 +6,7 @@ from config import RG, logging, SMOOTHING_SURPRISAL, PERSONS, INNOVATIVE_FORM
 import numpy as np
 
 
-class Agent(Agent):
+class Agent(mesa.Agent):
     def __init__(self, pos, innovating, prop_innovative_forms, model):
 
 
@@ -117,4 +117,3 @@ class Agent(Agent):
         new_total = 1.0 + boost
         # Add BOOST to this form and scale by new total, scale other forms by new total
         self.forms[person] = {f: (prob+boost)/new_total if f==form else prob/new_total for f, prob in prob_dict.items()}
-

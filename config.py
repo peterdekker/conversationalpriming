@@ -14,7 +14,7 @@ SMOOTHING_SURPRISAL = 0.01 # not needed anymore
 LAST_N_STEPS_END_GRAPH = 500
 
 IMG_FORMAT = "png"
-OUTPUT_DIR = f'output-{str(datetime.datetime.now()).replace(" ","-")}'
+OUTPUT_DIR = f'output-{str(datetime.datetime.now()).replace(" ","-").replace(":",".")}'
 
 # For evaluation script (not browser visualization)
 ITERATIONS = [5]
