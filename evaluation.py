@@ -48,10 +48,10 @@ def create_contrast_persons_graph(run_data, stats, mode, output_dir, runlabel):
     plot_contrast_persons_graph(course_df, stats_1sg_3sg_contrast, mode, output_dir, runlabel)
 
 def plots(variable_param, stats, mode, output_dir, course_df):
-    print("Plot graph 1sg-3sg.")
-    # Comparison 1sg-3sg
-    stats_1sg_3sg = [stat for stat in stats if "1sg" in stat or "3sg" in stat]
-    plot_graph(course_df, variable_param, stats_1sg_3sg, mode, output_dir, "1sg-3sg")
+    # print("Plot graph 1sg-3sg.")
+    # # Comparison 1sg-3sg
+    # stats_1sg_3sg = [stat for stat in stats if "1sg" in stat or "3sg" in stat]
+    # plot_graph(course_df, variable_param, stats_1sg_3sg, mode, output_dir, "1sg-3sg")
 
     for person in ["1sg","3sg"]: # For now, don't plot 2sg because it is the same as 1sg
         print(f"Plot graph {person}.")

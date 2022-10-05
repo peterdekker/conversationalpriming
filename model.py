@@ -19,7 +19,7 @@ class Model(Model):
     Model class
     '''
 
-    def __init__(self, n_agents, prop_innovating_agents, init_prop_innovative_innovating, init_prop_innovative_conservating, boost_conservative, boost_innovative, surprisal, entropy, repeats, friend_network, innovating_no_priming, innovating_only_boost_production, n_interactions_interlocutor, browser_visualization, use_grid, dummy):
+    def __init__(self, n_agents, prop_innovating_agents, init_prop_innovative_innovating, init_prop_innovative_conservating, boost_conservative, boost_innovative, surprisal, entropy, repeats, priming, friend_network, innovating_no_priming, innovating_only_boost_production, n_interactions_interlocutor, browser_visualization, use_grid, dummy):
         '''
         Initialize field
         '''
@@ -33,6 +33,7 @@ class Model(Model):
         assert type(surprisal) == bool
         assert type(entropy) == bool
         assert type(repeats) == bool
+        assert type(priming) == bool
         assert type(friend_network) == bool
         assert type(innovating_no_priming) == bool
         assert type(innovating_only_boost_production) == bool
@@ -52,6 +53,7 @@ class Model(Model):
         self.surprisal = surprisal
         self.entropy = entropy
         self.repeats = repeats
+        self.priming = priming
         self.friend_network = friend_network
         self.innovating_no_priming = innovating_no_priming
         self.innovating_only_boost_production = innovating_only_boost_production

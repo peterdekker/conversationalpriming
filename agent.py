@@ -71,7 +71,7 @@ class Agent(mesa.Agent):
 
         if self.model.repeats:
             person_answer = self.question_answer_mapping[person_question]
-            if person_answer == person_question and not (self.model.innovating_no_priming and self.innovating):
+            if person_answer == person_question and self.model.priming and not (self.model.innovating_no_priming and self.innovating):
                 # 3sg: instead of using own forms library, just repeat form from question
                 form_answer = form_question
             else:

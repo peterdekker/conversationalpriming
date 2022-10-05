@@ -9,7 +9,7 @@ RG = np.random.default_rng()
 INNOVATIVE_FORM = "1"
 PERSONS = ["1sg", "2sg", "3sg"]
 STEPS_UPDATE_AGENT_COLOR = 50
-AVG_WINDOW_STATS = 10
+AVG_WINDOW_STATS = 1
 SMOOTHING_SURPRISAL = 0.01 # not needed anymore
 LAST_N_STEPS_END_GRAPH = 500
 
@@ -29,6 +29,7 @@ BOOST_INNOVATIVE = 0.01
 SURPRISAL = False
 ENTROPY = False
 REPEATS = True
+PRIMING = True
 FRIEND_NETWORK = False
 INNOVATING_NO_PRIMING = False
 INNOVATING_ONLY_BOOST_PRODUCTION = False
@@ -44,6 +45,7 @@ model_params = {
     "surprisal": {"ui": Checkbox('Surprisal', value=SURPRISAL), "script": SURPRISAL},
     "entropy": {"ui": Checkbox('Entropy', value=ENTROPY), "script": ENTROPY},
     "repeats": {"ui": Checkbox('Repeats', value=REPEATS), "script": REPEATS},
+    "priming": {"ui": Checkbox('priming', value=PRIMING), "script": PRIMING},
     "friend_network": {"ui": Checkbox('Friend network', value=FRIEND_NETWORK), "script": FRIEND_NETWORK},
     "innovating_no_priming": {"ui": Checkbox('Innovating no priming', value=INNOVATING_NO_PRIMING), "script": INNOVATING_NO_PRIMING},
     "innovating_only_boost_production": {"ui": Checkbox('Innovating only boost production', value=INNOVATING_ONLY_BOOST_PRODUCTION), "script": INNOVATING_ONLY_BOOST_PRODUCTION},
@@ -65,6 +67,6 @@ evaluation_params = {
     "contrast_persons": False
 }
 
-bool_params = ["surprisal", "entropy", "repeats", "friend_network", "innovating_no_priming", "innovating_only_boost_production", "browser_visualization", "use_grid", "dummy", "contrast_persons"]
+bool_params = ["surprisal", "entropy", "repeats", "priming", "friend_network", "innovating_no_priming", "innovating_only_boost_production", "browser_visualization", "use_grid", "dummy", "contrast_persons"]
 
 string_params = ["runlabel", "plot_from_raw"]
