@@ -19,7 +19,7 @@ class Model(Model):
     Model class
     '''
 
-    def __init__(self, n_agents, prop_innovating_agents, init_prop_innovative_innovating, init_prop_innovative_conservating, boost_conservative, boost_innovative, surprisal, entropy, repeats, priming, friend_network, innovating_no_priming, innovating_only_boost_production, n_interactions_interlocutor, browser_visualization, use_grid, dummy):
+    def __init__(self, n_agents, prop_innovating_agents, init_prop_innovative_innovating, init_prop_innovative_conservating, freq_3sg, boost_conservative, boost_innovative, surprisal, entropy, repeats, priming, friend_network, innovating_no_priming, innovating_only_boost_production, n_interactions_interlocutor, browser_visualization, use_grid, dummy):
         '''
         Initialize field
         '''
@@ -27,6 +27,7 @@ class Model(Model):
         assert prop_innovating_agents >= 0 and prop_innovating_agents <= 1
         assert init_prop_innovative_innovating >= 0 and init_prop_innovative_innovating <= 1
         assert init_prop_innovative_conservating >= 0 and init_prop_innovative_conservating <= 1
+        assert freq_3sg >= 0 and freq_3sg <= 1
 
         assert boost_conservative >= 0 and boost_conservative <= 1
         assert boost_innovative >= 0 and boost_innovative <= 1
@@ -60,6 +61,7 @@ class Model(Model):
         self.n_interactions_interlocutor = int(n_interactions_interlocutor)
         self.browser_visualization = browser_visualization
         self.use_grid = use_grid
+        self.freq_3sg = freq_3sg
 
         self.schedule = RandomActivation(self)
         self.steps = 0

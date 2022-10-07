@@ -17,13 +17,14 @@ IMG_FORMAT = "png"
 OUTPUT_DIR = f'output-{str(datetime.datetime.now()).replace(" ","-").replace(":",".")}'
 
 # For evaluation script (not browser visualization)
-ITERATIONS = [5]
-STEPS = [4000]
+ITERATIONS = [20]
+STEPS = [5000]
 
 N_AGENTS = 100
 PROP_INNOVATING_AGENTS = 0.2
 INIT_PROP_INNOVATIVE_INNOVATING = 0.9
 INIT_PROP_INNOVATIVE_CONSERVATING = 0.0
+FREQ_3SG = 1/3
 BOOST_CONSERVATIVE = 0.01
 BOOST_INNOVATIVE = 0.01
 SURPRISAL = False
@@ -40,6 +41,7 @@ model_params = {
     "prop_innovating_agents": {"ui": Slider("Proportion innovating agents", PROP_INNOVATING_AGENTS, 0.0, 1.0, 0.1), "script": PROP_INNOVATING_AGENTS},
     "init_prop_innovative_innovating": {"ui": Slider("Proportion innovative forms in innovating agents", INIT_PROP_INNOVATIVE_INNOVATING, 0.0, 1.0, 0.1), "script": INIT_PROP_INNOVATIVE_INNOVATING},
     "init_prop_innovative_conservating": {"ui": Slider("Proportion innovative forms in conservating agents", INIT_PROP_INNOVATIVE_CONSERVATING, 0.0, 1.0, 0.1), "script": INIT_PROP_INNOVATIVE_CONSERVATING},
+    "freq_3sg": {"ui": Slider("Frequency 3sg", FREQ_3SG, 0.0, 1.0, 0.01), "script": FREQ_3SG},
     "boost_conservative": {"ui": Slider("Boost conservative", BOOST_CONSERVATIVE, 0.0, 1.0, 0.01), "script": BOOST_CONSERVATIVE},
     "boost_innovative": {"ui": Slider("Boost innovative", BOOST_INNOVATIVE, 0.0, 1.0, 0.01), "script": BOOST_INNOVATIVE},
     "surprisal": {"ui": Checkbox('Surprisal', value=SURPRISAL), "script": SURPRISAL},

@@ -30,6 +30,9 @@ class Agent(mesa.Agent):
         self.communicated = []
         self.prop_innovative = []
 
+        freq_1sg_2sg = (1-self.model.freq_3sg)/2
+        self.person_weights = [freq_1sg_2sg, freq_1sg_2sg, self.model.freq_3sg]
+
 
     def step(self):
         '''
@@ -52,7 +55,7 @@ class Agent(mesa.Agent):
     def create_question(self):
         # Send polar question, represented by verb: concept, person and form
         #concept = RG.choice(self.verb_concepts)
-        self.person_question = RG.choice(self.persons)
+        self.person_question = RG.choice(self.persons, p=self.person_weights)
         form_question = choice_prob(self.forms[self.person_question])
         self.boost_form(self.person_question, form_question)
         # Add to stats
