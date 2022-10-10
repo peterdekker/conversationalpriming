@@ -100,6 +100,11 @@ def main():
 
     # Find languages which have both protoform and modern form with length 0
     languages_00 = df[(df["modern_length"]==0.0) & (df["proto_length"]==0.0)][["language","proto_language"]]
+    print("Proto + modern 0:")
+    print(languages_00["language"].nunique())
+    languages_0 = df[df["proto_length"]==0.0][["language","proto_language"]]
+    print("Proto 0:")
+    print(languages_0["language"].nunique())
     df = df[~df["language"].isin(languages_00["language"])]
 
     # Show number of languages per family
@@ -152,11 +157,11 @@ def main():
     
     modern_pairwise_dfs = []
     for (pl,pn), group in df.groupby(["proto_language", "person_number"]):
-        print(group[["proto_language", "person_number", "modern_form", "modern_length"]])
+        # print(group[["proto_language", "person_number", "modern_form", "modern_length"]])
         modern_diff_length = group["modern_length"].aggregate(lambda x: pdist(np.array(x)[np.newaxis].T))
         modern_levenshtein = group["modern_form_corr"].aggregate(lambda x: [normalized_levenshtein(a,b) for a,b in combinations(np.array(x),2)])
-        print(modern_diff_length)
-        print(modern_levenshtein)
+        # print(modern_diff_length)
+        # print(modern_levenshtein)
         d = pd.DataFrame()
         d["modern_diff_length"] = modern_diff_length
         d["modern_levenshtein"] = modern_levenshtein
