@@ -4,12 +4,11 @@ import editdistance
 import seaborn as sns
 import matplotlib.pyplot as plt
 import os
-import requests
-import shutil
 # from pyclts import CLTS
 import unidecode
 import numpy as np
 from scipy.spatial.distance import pdist, squareform
+from statsmodels.formula.api import ols
 from itertools import combinations
 
 plt.rcParams['savefig.dpi'] = 300
@@ -172,6 +171,27 @@ def main():
     
     df_modern_pairwise = pd.concat(modern_pairwise_dfs)
 
+
+    ### Do statistical analyses
+
+    print("Regression proto diff length")
+    regression_proto_diff_length = ols("proto_diff_length ~ person_number + 0", data = df).fit()
+    print(regression_proto_diff_length.params)
+
+    print("Median proto Levenshtein")
+    print(df.groupby("person_number")["proto_levenshtein"].median())
+
+    print("Regression proto Levenshtein")
+    regression_proto_levenshtein = ols("proto_levenshtein ~ person_number + 0", data = df).fit()
+    print(regression_proto_levenshtein.params)
+
+    print("Regression modern diff length")
+    regression_modern_diff_length = ols("modern_diff_length ~ person_number + 0", data = df_modern_pairwise).fit()
+    print(regression_modern_diff_length.params)
+
+    print("Regression modern Levenshtein")
+    regression_modern_levenshtein = ols("modern_levenshtein ~ person_number + 0", data = df_modern_pairwise).fit()
+    print(regression_modern_levenshtein.params)
 
 
     ### Create all plots 
