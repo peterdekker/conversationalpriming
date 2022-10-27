@@ -9,6 +9,7 @@ import unidecode
 import numpy as np
 from scipy.spatial.distance import pdist, squareform
 from statsmodels.formula.api import ols
+import statsmodels.formula.api as smf
 from itertools import combinations
 
 plt.rcParams['savefig.dpi'] = 300
@@ -72,7 +73,7 @@ person_markers = ["1sg", "2sg", "3sg", "1pl", "2pl", "3pl"]
 
 def normalized_levenshtein(a,b):
     max_len = max(len(a),len(b))
-    return editdistance.eval(a,b) /max_len if max_len > 0 else 0
+    return editdistance.eval(a,b) # /max_len if max_len > 0 else 0
 
 def get_first(x):
     return x[0]
@@ -175,23 +176,23 @@ def main():
     ### Do statistical analyses
 
     print("Regression proto diff length")
-    regression_proto_diff_length = ols("proto_diff_length ~ person_number + 0", data = df).fit()
+    regression_proto_diff_length = smf.mixedlm("proto_diff_length ~ person*C(number, Treatment('sg'))", groups=df["clade1"], data = df).fit()
     print(regression_proto_diff_length.params)
-
-    print("Median proto Levenshtein")
-    print(df.groupby("person_number")["proto_levenshtein"].median())
+    print(regression_proto_diff_length.summary())
+    print()
 
     print("Regression proto Levenshtein")
-    regression_proto_levenshtein = ols("proto_levenshtein ~ person_number + 0", data = df).fit()
+    regression_proto_levenshtein = smf.mixedlm("proto_levenshtein ~ person*C(number, Treatment('sg'))", groups=df["clade1"], data = df).fit()
     print(regression_proto_levenshtein.params)
+    print(regression_proto_levenshtein.summary())
 
-    print("Regression modern diff length")
-    regression_modern_diff_length = ols("modern_diff_length ~ person_number + 0", data = df_modern_pairwise).fit()
-    print(regression_modern_diff_length.params)
+    # print("Regression modern diff length")
+    # regression_modern_diff_length = ols("modern_diff_length ~ person_number + 0", data = df_modern_pairwise).fit()
+    # print(regression_modern_diff_length.params)
 
-    print("Regression modern Levenshtein")
-    regression_modern_levenshtein = ols("modern_levenshtein ~ person_number + 0", data = df_modern_pairwise).fit()
-    print(regression_modern_levenshtein.params)
+    # print("Regression modern Levenshtein")
+    # regression_modern_levenshtein = ols("modern_levenshtein ~ person_number + 0", data = df_modern_pairwise).fit()
+    # print(regression_modern_levenshtein.params)
 
 
     ### Create all plots 
@@ -201,12 +202,24 @@ def main():
     sns.stripplot(x="person_number", y="proto_diff_length", data=df)
     plt.savefig(os.path.join(OUTPUT_DIR_PROTO,f"proto_diff_length_strip.{img_extension}"))
     plt.clf()
+    sns.boxplot(x="person_number", y="proto_diff_length", data=df)
+    plt.savefig(os.path.join(OUTPUT_DIR_PROTO,f"proto_diff_length_box.{img_extension}"))
+    plt.clf()
+    sns.boxplot(x="person", hue="number", y="proto_diff_length", data=df)
+    plt.savefig(os.path.join(OUTPUT_DIR_PROTO,f"proto_diff_length_box_person_number.{img_extension}"))
+    plt.clf()
 
     sns.violinplot(x="person_number", y="proto_levenshtein", data=df) # hue="proto_language"
     plt.savefig(os.path.join(OUTPUT_DIR_PROTO,f"proto_levenshtein_violin.{img_extension}"))
     plt.clf()
     sns.stripplot(x="person_number", y="proto_levenshtein", data=df)
     plt.savefig(os.path.join(OUTPUT_DIR_PROTO,f"proto_levenshtein_strip.{img_extension}"))
+    plt.clf()
+    sns.boxplot(x="person_number", y="proto_levenshtein", data=df)
+    plt.savefig(os.path.join(OUTPUT_DIR_PROTO,f"proto_levenshtein_box.{img_extension}"))
+    plt.clf()
+    sns.boxplot(x="person", hue="number", y="proto_levenshtein", data=df)
+    plt.savefig(os.path.join(OUTPUT_DIR_PROTO,f"proto_levenshtein_box_person_number.{img_extension}"))
     plt.clf()
 
     ## Modern pairwise length difference
