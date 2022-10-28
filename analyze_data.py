@@ -100,12 +100,15 @@ def main():
 
     # Find languages which have both protoform and modern form with length 0
     languages_00 = df[(df["modern_length"]==0.0) & (df["proto_length"]==0.0)][["language","proto_language"]]
+
     print("Proto + modern 0:")
     print(languages_00["language"].nunique())
     languages_0 = df[df["proto_length"]==0.0][["language","proto_language"]]
     print("Proto 0:")
     print(languages_0["language"].nunique())
-    df = df[~df["language"].isin(languages_00["language"])]
+
+    df = df[~df["language"].isin(languages_0["language"])] # remove all languages where protolanguage is 0
+    # TODO: replace by languages_00 to remove only languages where proto and modern form are 0
 
     # Show number of languages per family
     nunique_family = df.groupby("proto_language")["language"].nunique()
@@ -176,13 +179,13 @@ def main():
     ### Do statistical analyses
 
     print("Regression proto diff length")
-    regression_proto_diff_length = smf.mixedlm("proto_diff_length ~ person*C(number, Treatment('sg'))", groups=df["clade1"], data = df).fit()
+    regression_proto_diff_length = smf.mixedlm("proto_diff_length ~ person*C(number, Treatment('sg'))", groups=df["proto_language"], data = df).fit()
     print(regression_proto_diff_length.params)
     print(regression_proto_diff_length.summary())
     print()
 
     print("Regression proto Levenshtein")
-    regression_proto_levenshtein = smf.mixedlm("proto_levenshtein ~ person*C(number, Treatment('sg'))", groups=df["clade1"], data = df).fit()
+    regression_proto_levenshtein = smf.mixedlm("proto_levenshtein ~ person*C(number, Treatment('sg'))", groups=df["proto_language"], data = df).fit()
     print(regression_proto_levenshtein.params)
     print(regression_proto_levenshtein.summary())
 
