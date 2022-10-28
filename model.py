@@ -19,7 +19,7 @@ class Model(Model):
     Model class
     '''
 
-    def __init__(self, n_agents, prop_innovating_agents, init_prop_innovative_innovating, init_prop_innovative_conservating, freq_3sg, boost_conservative, boost_innovative, surprisal, entropy, repeats, priming, friend_network, innovating_no_priming, innovating_only_boost_production, n_interactions_interlocutor, browser_visualization, use_grid, dummy):
+    def __init__(self, n_agents, prop_innovating_agents, init_prop_innovative_innovating, init_prop_innovative_conservating, freq_3sg, boost_conservative, boost_innovative, forget_weight, surprisal, entropy, repeats, priming, friend_network, innovating_no_priming, innovating_only_boost_production, n_interactions_interlocutor, browser_visualization, use_grid):
         '''
         Initialize field
         '''
@@ -31,6 +31,7 @@ class Model(Model):
 
         assert boost_conservative >= 0 and boost_conservative <= 1
         assert boost_innovative >= 0 and boost_innovative <= 1
+        assert forget_weight >= 0 and forget_weight <= 1
         assert type(surprisal) == bool
         assert type(entropy) == bool
         assert type(repeats) == bool
@@ -41,7 +42,6 @@ class Model(Model):
         assert n_interactions_interlocutor >= 1 and n_interactions_interlocutor <= 100
         assert type(browser_visualization) == bool
         assert type(use_grid)==bool
-        assert type(dummy)==bool
 
         if (surprisal or entropy) and (init_prop_innovative_conservating == 0.0 or init_prop_innovative_innovating == 0.0):
             raise ValueError(
@@ -51,6 +51,7 @@ class Model(Model):
         self.prop_innovating_agents = prop_innovating_agents
         self.boost_conservative = boost_conservative
         self.boost_innovative = boost_innovative
+        self.forget_weight = forget_weight
         self.surprisal = surprisal
         self.entropy = entropy
         self.repeats = repeats
