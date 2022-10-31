@@ -99,16 +99,10 @@ def main():
 
 
     # Find languages which have both protoform and modern form with length 0
-    languages_00 = df[(df["modern_length"]==0.0) & (df["proto_length"]==0.0)][["language","proto_language"]]
-
-    print("Proto + modern 0:")
-    print(languages_00["language"].nunique())
+    #languages_00 = df[(df["modern_length"]==0.0) & (df["proto_length"]==0.0)][["language","proto_language"]]
     languages_0 = df[df["proto_length"]==0.0][["language","proto_language"]]
-    print("Proto 0:")
-    print(languages_0["language"].nunique())
-
     df = df[~df["language"].isin(languages_0["language"])] # remove all languages where protolanguage is 0
-    # TODO: replace by languages_00 to remove only languages where proto and modern form are 0
+    # Replace by languages_00 to remove only languages where proto and modern form are 0
 
     # Show number of languages per family
     nunique_family = df.groupby("proto_language")["language"].nunique()
@@ -177,17 +171,24 @@ def main():
 
 
     ### Do statistical analyses
+    persons_numbers = [(p,n) for n in ["sg","pl"] for p in ["first","second","third"] ]
+    matrix = pd.DataFrame(persons_numbers, columns=["person","number"])
 
     print("Regression proto diff length")
-    regression_proto_diff_length = smf.mixedlm("proto_diff_length ~ person*C(number, Treatment('sg'))", groups=df["proto_language"], data = df).fit()
-    print(regression_proto_diff_length.params)
-    print(regression_proto_diff_length.summary())
-    print()
+    mixedlm_proto_diff_length = smf.mixedlm("proto_diff_length ~ person*C(number, Treatment('sg'))", groups=df["proto_language"], data = df).fit()
+    print(mixedlm_proto_diff_length.summary())
+    #lm_proto_diff_length = ols("proto_diff_length ~ person*C(number, Treatment('sg'))", data=df).fit()
+    #matrix["predictions_lm"] = lm_proto_diff_length.predict(matrix)
+    matrix["predictions_mixedlm_proto_diff_length"] = mixedlm_proto_diff_length.predict(matrix)
 
     print("Regression proto Levenshtein")
-    regression_proto_levenshtein = smf.mixedlm("proto_levenshtein ~ person*C(number, Treatment('sg'))", groups=df["proto_language"], data = df).fit()
-    print(regression_proto_levenshtein.params)
-    print(regression_proto_levenshtein.summary())
+    mixedlm_proto_levenshtein = smf.mixedlm("proto_levenshtein ~ person*C(number, Treatment('sg'))", groups=df["proto_language"], data = df).fit()
+    print(mixedlm_proto_levenshtein.summary())
+    matrix["predictions_mixedlm_proto_levenshtein"] = mixedlm_proto_levenshtein.predict(matrix)
+
+    print(matrix)
+
+    return
 
     # print("Regression modern diff length")
     # regression_modern_diff_length = ols("modern_diff_length ~ person_number + 0", data = df_modern_pairwise).fit()
