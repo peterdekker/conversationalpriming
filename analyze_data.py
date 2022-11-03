@@ -180,6 +180,10 @@ def main():
     #lm_proto_diff_length = ols("proto_diff_length ~ person*C(number, Treatment('sg'))", data=df).fit()
     #matrix["predictions_lm"] = lm_proto_diff_length.predict(matrix)
     matrix["predictions_mixedlm_proto_diff_length"] = mixedlm_proto_diff_length.predict(matrix)
+    print(mixedlm_proto_diff_length.t_test(matrix))
+    # TODO: How to get predictions with their own standard deviations?
+    # https://tedboy.github.io/statsmodels_doc/generated/statsmodels.sandbox.regression.predstd.wls_prediction_std.html#statsmodels.sandbox.regression.predstd.wls_prediction_std
+    # Use t-test? https://stats.stackexchange.com/questions/578398/getting-confidence-interval-for-prediction-from-statsmodel-robust-linear-model
 
     print("Regression proto Levenshtein")
     mixedlm_proto_levenshtein = smf.mixedlm("proto_levenshtein ~ person*C(number, Treatment('sg'))", groups=df["proto_language"], data = df).fit()

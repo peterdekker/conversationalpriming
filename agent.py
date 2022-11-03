@@ -56,7 +56,7 @@ class Agent(mesa.Agent):
                 for person in self.persons:
                     # Simulate sampling from list, by sampling with probability of form
                     # So if 0.9 probability for token 1: 0.9 chance to forget 1
-                    sample_token = choice_prob(self.forms[person], inverse=True)
+                    sample_token = "0" # min(self.forms[person], key=self.forms[person].get) # choice_prob(self.forms[person], inverse=True)
                     self.forget_form(person, sample_token)
 
 
