@@ -8,3 +8,4 @@ matplotlib
 networkx
 editdistance
 unidecode # do we keep using this?
+rpy2

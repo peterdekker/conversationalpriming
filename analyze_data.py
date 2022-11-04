@@ -12,6 +12,13 @@ from statsmodels.formula.api import ols
 import statsmodels.formula.api as smf
 from itertools import combinations
 
+
+# import rpy2.robjects as robjects
+# import rpy2.robjects.numpy2ri
+# import rpy2.robjects.pandas2ri
+# robjects.numpy2ri.activate()
+# robjects.pandas2ri.activate()
+
 plt.rcParams['savefig.dpi'] = 300
 
 currentdir = os.path.dirname(os.path.realpath(__file__))
@@ -28,6 +35,10 @@ pd.set_option('display.max_rows', 100)
 img_extension = "png"
 
 person_markers = ["1sg", "2sg", "3sg", "1pl", "2pl", "3pl"]
+
+
+
+
 
 ######################################## Not used at the moment
 
@@ -147,11 +158,68 @@ def main():
     # Edit dist, grouped per language family
     # grouped_proto_levenshtein = df.groupby(["person_number", "proto_language"]).mean().sort_values("proto_language")
 
+    ### Do statistical analyses
+    persons_numbers = [(p,n) for n in ["sg","pl"] for p in ["first","second","third"] ]
+    pn_matrix = pd.DataFrame(persons_numbers, columns=["person","number"])
+
+    print("Regression proto diff length")
+    # mixedlm_proto_diff_length = smf.mixedlm("proto_diff_length ~ person*C(number, Treatment('sg'))", groups=df["proto_language"], data = df).fit()
+    mixedlm_proto_diff_length = smf.mixedlm("proto_diff_length ~ person_number", groups=df["proto_language"], data = df).fit()
+    print(mixedlm_proto_diff_length.summary())
+    #lm_proto_diff_length = ols("proto_diff_length ~ person*C(number, Treatment('sg'))", data=df).fit()
+    #matrix["predictions_lm"] = lm_proto_diff_length.predict(matrix)
+    pn_matrix["predictions_mixedlm_proto_diff_length"] = mixedlm_proto_diff_length.predict(pn_matrix)
+    # print(mixedlm_proto_diff_length.t_test(matrix))
+    # TODO: How to get predictions with their own standard deviations?
+    # https://tedboy.github.io/statsmodels_doc/generated/statsmodels.sandbox.regression.predstd.wls_prediction_std.html#statsmodels.sandbox.regression.predstd.wls_prediction_std
+    # Use t-test? https://stats.stackexchange.com/questions/578398/getting-confidence-interval-for-prediction-from-statsmodel-robust-linear-model
+
+    print("Regression proto Levenshtein")
+    # mixedlm_proto_levenshtein = smf.mixedlm("proto_levenshtein ~ person*C(number, Treatment('sg'))", groups=df["proto_language"], data = df).fit()
+    mixedlm_proto_levenshtein = smf.mixedlm("proto_levenshtein ~ person*C(number, Treatment('sg'))", groups=df["proto_language"], data = df).fit()
+    print(mixedlm_proto_levenshtein.summary())
+    pn_matrix["predictions_mixedlm_proto_levenshtein"] = mixedlm_proto_levenshtein.predict(pn_matrix)
+
+    print(pn_matrix)
+
+    ## Statistical analyses in R
+    # with robjects.local_context() as lc:
+    #     lc['df'] = df
+    #     lc['pnMatrix'] = pn_matrix
+
+    #     robjects.r('''
+    #             library(tidyverse)
+    #             library(lme4)
+    #             df <- mutate(df,
+    #                         number = relevel(factor(number), ref = 'sg'))
+    #             modelDiffLength <- lmer(proto_diff_length ~ person*number + (1|proto_language), df)
+    #             fixefsDiffLength <- fixef(modelDiffLength)
+    #             predictionsDiffLength <- predict(modelDiffLength, pnMatrix, re.form=NA)
+    #             modelProtoLev <- lmer(proto_levenshtein ~ person*number + (1|proto_language), df)
+    #             predictionsProtoLev <- predict(modelProtoLev, pnMatrix, re.form=NA)
+    #             fixefsProtoLev <- fixef(modelProtoLev)
+    #             ''')
+        
+    #     print(lc['modelDiffLength'])
+    #     print(lc['predictionsDiffLength'])
+    #     print(lc['modelProtoLev'])
+    #     print(lc['predictionsProtoLev'])
+
+    return
+
+    # print("Regression modern diff length")
+    # regression_modern_diff_length = ols("modern_diff_length ~ person_number + 0", data = df_modern_pairwise).fit()
+    # print(regression_modern_diff_length.params)
+
+    # print("Regression modern Levenshtein")
+    # regression_modern_levenshtein = ols("modern_levenshtein ~ person_number + 0", data = df_modern_pairwise).fit()
+    # print(regression_modern_levenshtein.params)
+
+
     ## Analysis length: pairwise difference between modern forms within language family
     # With full groupby aggregate, we can only get one value (mean) per language family. (or maybe one value per language)
     # We want every comparison as separate data point
     # print(df.groupby(["proto_language", "person_number"])["modern_length"].aggregate(lambda x: pdist(np.array(x)[np.newaxis].T)))
-    
     modern_pairwise_dfs = []
     for (pl,pn), group in df.groupby(["proto_language", "person_number"]):
         # print(group[["proto_language", "person_number", "modern_form", "modern_length"]])
@@ -168,40 +236,6 @@ def main():
         modern_pairwise_dfs.append(d)
     
     df_modern_pairwise = pd.concat(modern_pairwise_dfs)
-
-
-    ### Do statistical analyses
-    persons_numbers = [(p,n) for n in ["sg","pl"] for p in ["first","second","third"] ]
-    matrix = pd.DataFrame(persons_numbers, columns=["person","number"])
-
-    print("Regression proto diff length")
-    mixedlm_proto_diff_length = smf.mixedlm("proto_diff_length ~ person*C(number, Treatment('sg'))", groups=df["proto_language"], data = df).fit()
-    print(mixedlm_proto_diff_length.summary())
-    #lm_proto_diff_length = ols("proto_diff_length ~ person*C(number, Treatment('sg'))", data=df).fit()
-    #matrix["predictions_lm"] = lm_proto_diff_length.predict(matrix)
-    matrix["predictions_mixedlm_proto_diff_length"] = mixedlm_proto_diff_length.predict(matrix)
-    print(mixedlm_proto_diff_length.t_test(matrix))
-    # TODO: How to get predictions with their own standard deviations?
-    # https://tedboy.github.io/statsmodels_doc/generated/statsmodels.sandbox.regression.predstd.wls_prediction_std.html#statsmodels.sandbox.regression.predstd.wls_prediction_std
-    # Use t-test? https://stats.stackexchange.com/questions/578398/getting-confidence-interval-for-prediction-from-statsmodel-robust-linear-model
-
-    print("Regression proto Levenshtein")
-    mixedlm_proto_levenshtein = smf.mixedlm("proto_levenshtein ~ person*C(number, Treatment('sg'))", groups=df["proto_language"], data = df).fit()
-    print(mixedlm_proto_levenshtein.summary())
-    matrix["predictions_mixedlm_proto_levenshtein"] = mixedlm_proto_levenshtein.predict(matrix)
-
-    print(matrix)
-
-    return
-
-    # print("Regression modern diff length")
-    # regression_modern_diff_length = ols("modern_diff_length ~ person_number + 0", data = df_modern_pairwise).fit()
-    # print(regression_modern_diff_length.params)
-
-    # print("Regression modern Levenshtein")
-    # regression_modern_levenshtein = ols("modern_levenshtein ~ person_number + 0", data = df_modern_pairwise).fit()
-    # print(regression_modern_levenshtein.params)
-
 
     ### Create all plots 
     sns.violinplot(x="person_number", y="proto_diff_length", data=df) # hue="proto_language"
