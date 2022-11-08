@@ -89,6 +89,12 @@ def normalized_levenshtein(a,b):
 def get_first(x):
     return x[0]
 
+def df_stats(df, label):
+    n_entries = len(df)
+    n_languages = df["language"].nunique()
+    n_proto_languages = df["proto_language"].nunique()
+    nunique_family = df.groupby("proto_language")["language"].nunique()
+    print(f"{label}: entries: {n_entries}, languages: {n_languages}, proto_languages: {n_proto_languages}, n_unique_family: {nunique_family}.")
 
 def main():
     # load_clts()
@@ -103,17 +109,22 @@ def main():
     df = pd.read_csv("data/verbal_person-number_indexes_merged.csv")
     # print(df.columns)
     # print(df.groupby("proto_language")["language"].count())
-
+    df_stats(df, "original")
     # Filter out entries without form or protoform (removes languages without protolanguage + possibly more)
     df = df[df['modern_form'].notna()]
+    df_stats(df, "after removing modern NA")
     df = df[df['proto_form'].notna()]
+    #languages_one_protoform_na = df[df["proto_form"].isna()][["language"]]
+    #df = df[~df["language"].isin(languages_one_protoform_na["language"])]
+    df_stats(df, "after removing proto NA")
 
 
     # Find languages which have both protoform and modern form with length 0
     #languages_00 = df[(df["modern_length"]==0.0) & (df["proto_length"]==0.0)][["language","proto_language"]]
-    languages_0 = df[df["proto_length"]==0.0][["language","proto_language"]]
+    languages_0 = df[df["proto_length"]==0.0][["language"]]
     df = df[~df["language"].isin(languages_0["language"])] # remove all languages where protolanguage is 0
     # Replace by languages_00 to remove only languages where proto and modern form are 0
+    df_stats(df, "after removing languages where one protoform has length 0")
 
     # Show number of languages per family
     nunique_family = df.groupby("proto_language")["language"].nunique()
@@ -136,12 +147,15 @@ def main():
         
         ## Delete parts in brackets
         # TODO: Create alternative forms based on letters in brackets os(i)
-        brackets = df[f"{form_type}_corr"].str.contains("\(.+\)")
+        #brackets = df[f"{form_type}_corr"].str.contains("\(.+\)")
         # print(brackets.value_counts())
         df[f"{form_type}_corr"] = df[f"{form_type}_corr"].str.replace("\(.+\)", "", regex=True)
 
         ## Delete dashes
         df[f"{form_type}_corr"] = df[f"{form_type}_corr"].str.replace("-", "", regex=False)
+        ## Delete ... (non-concatenative morphology)
+        df[f"{form_type}_corr"] = df[f"{form_type}_corr"].str.replace("...", "", regex=False)
+        df[f"{form_type}_corr"] = df[f"{form_type}_corr"].str.replace("…", "", regex=False)
         ## Delete 2 (from h2)
         df[f"{form_type}_corr"] = df[f"{form_type}_corr"].str.replace("2", "", regex=False)
         ## Delete 0 (empty person marker is just represented by empty string)
@@ -150,9 +164,16 @@ def main():
         df[f"{form_type}_corr"] = df[f"{form_type}_corr"].str.replace("ø", "", regex=False)
         ## Delete *
         df[f"{form_type}_corr"] = df[f"{form_type}_corr"].str.replace("*", "", regex=False)
+        ## Delete ´ ' # (segments which are not counted in precalculated length)
+        df[f"{form_type}_corr"] = df[f"{form_type}_corr"].str.replace("[´`'#]", "", regex=True)
+        ## Delete : (lengthening vowel but no sound on its own)
+        df[f"{form_type}_corr"] = df[f"{form_type}_corr"].str.replace(":", "", regex=False)
+        
 
         # df[f"{form_type}_corr"] = df[f"{form_type}_corr"].apply(ipa_to_soundclass)
         df[f"{form_type}_corr"] = df[f"{form_type}_corr"].apply(unidecode.unidecode)
+    
+    df.to_csv("test.csv")
 
     df["proto_levenshtein"] = df.apply(lambda x: normalized_levenshtein(x["modern_form_corr"], x["proto_form_corr"]), axis=1)
     # Edit dist, grouped per language family
@@ -161,13 +182,14 @@ def main():
     ### Do statistical analyses
     persons_numbers = [(p,n) for n in ["sg","pl"] for p in ["first","second","third"] ]
     pn_matrix = pd.DataFrame(persons_numbers, columns=["person","number"])
+    
+    # Poisson mixed model: https://www.statsmodels.org/stable/generated/statsmodels.genmod.bayes_mixed_glm.PoissonBayesMixedGLM.html#statsmodels.genmod.bayes_mixed_glm.PoissonBayesMixedGLM
+    # Easier, GLM with family argument: https://www.kaggle.com/code/hongpeiyi/poisson-regression-with-statsmodels
 
     print("Regression proto diff length")
-    # mixedlm_proto_diff_length = smf.mixedlm("proto_diff_length ~ person*C(number, Treatment('sg'))", groups=df["proto_language"], data = df).fit()
-    mixedlm_proto_diff_length = smf.mixedlm("proto_diff_length ~ person_number", groups=df["proto_language"], data = df).fit()
+    mixedlm_proto_diff_length = smf.mixedlm("proto_diff_length ~ person*C(number, Treatment('sg'))", groups=df["clade3"], data = df).fit()
+    #mixedlm_proto_diff_length = smf.mixedlm("proto_diff_length ~ person_number", groups=df["proto_language"], data = df).fit()
     print(mixedlm_proto_diff_length.summary())
-    #lm_proto_diff_length = ols("proto_diff_length ~ person*C(number, Treatment('sg'))", data=df).fit()
-    #matrix["predictions_lm"] = lm_proto_diff_length.predict(matrix)
     pn_matrix["predictions_mixedlm_proto_diff_length"] = mixedlm_proto_diff_length.predict(pn_matrix)
     # print(mixedlm_proto_diff_length.t_test(matrix))
     # TODO: How to get predictions with their own standard deviations?
@@ -175,12 +197,19 @@ def main():
     # Use t-test? https://stats.stackexchange.com/questions/578398/getting-confidence-interval-for-prediction-from-statsmodel-robust-linear-model
 
     print("Regression proto Levenshtein")
-    # mixedlm_proto_levenshtein = smf.mixedlm("proto_levenshtein ~ person*C(number, Treatment('sg'))", groups=df["proto_language"], data = df).fit()
-    mixedlm_proto_levenshtein = smf.mixedlm("proto_levenshtein ~ person*C(number, Treatment('sg'))", groups=df["proto_language"], data = df).fit()
+    mixedlm_proto_levenshtein = smf.mixedlm("proto_levenshtein ~ person*C(number, Treatment('sg'))", groups=df["clade3"], data = df).fit()
     print(mixedlm_proto_levenshtein.summary())
     pn_matrix["predictions_mixedlm_proto_levenshtein"] = mixedlm_proto_levenshtein.predict(pn_matrix)
 
     print(pn_matrix)
+
+    print("Regression proto diff length, joint person-number")
+    mixedlm_proto_diff_length_pn_joint = smf.mixedlm("proto_diff_length ~ person_number + 0 ", groups=df["clade3"], data = df).fit()
+    print(mixedlm_proto_diff_length_pn_joint.params)
+
+    print("Regression proto Levenshtein, joint person-number")
+    mixedlm_proto_levenshtein_pn_joint = smf.mixedlm("proto_levenshtein ~ person_number + 0", groups=df["clade3"], data = df).fit()
+    print(mixedlm_proto_levenshtein_pn_joint.params)
 
     ## Statistical analyses in R
     # with robjects.local_context() as lc:
@@ -192,10 +221,10 @@ def main():
     #             library(lme4)
     #             df <- mutate(df,
     #                         number = relevel(factor(number), ref = 'sg'))
-    #             modelDiffLength <- lmer(proto_diff_length ~ person*number + (1|proto_language), df)
+    #             modelDiffLength <- lmer(proto_diff_length ~ person*number + (1|clade3), df)
     #             fixefsDiffLength <- fixef(modelDiffLength)
     #             predictionsDiffLength <- predict(modelDiffLength, pnMatrix, re.form=NA)
-    #             modelProtoLev <- lmer(proto_levenshtein ~ person*number + (1|proto_language), df)
+    #             modelProtoLev <- lmer(proto_levenshtein ~ person*number + (1|clade3), df)
     #             predictionsProtoLev <- predict(modelProtoLev, pnMatrix, re.form=NA)
     #             fixefsProtoLev <- fixef(modelProtoLev)
     #             ''')
@@ -204,7 +233,6 @@ def main():
     #     print(lc['predictionsDiffLength'])
     #     print(lc['modelProtoLev'])
     #     print(lc['predictionsProtoLev'])
-
     return
 
     # print("Regression modern diff length")
