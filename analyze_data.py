@@ -230,6 +230,7 @@ def main():
                 plot(predictionsProtoDiffLength)+
                 ggtitle("Mixed effect model difference proto and modern length")+
                 labs(y = "proto length - modern length")
+                ggsave("{OUTPUT_DIR_PROTO}/predictions_proto_diff_length.png", bg = "white")
                 ggsave("{OUTPUT_DIR_PROTO}/predictions_proto_diff_length.pdf", bg = "white")
 
                 modelProtoDiffLengthMerged <- lmer(proto_diff_length ~ person_merged*number + (1|clade3), data=df)
@@ -238,7 +239,13 @@ def main():
                 plot(predictionsProtoDiffLengthMerged)+
                 ggtitle("Mixed effect model difference proto and modern length merged")+
                 labs(y = "proto length - modern length")
+                ggsave("{OUTPUT_DIR_PROTO}/predictions_proto_diff_length merged.png", bg = "white")
                 ggsave("{OUTPUT_DIR_PROTO}/predictions_proto_diff_length merged.pdf", bg = "white")
+
+                # ANOVA test: diff length
+                modelProtoDiffLengthMergedML <- lmer(proto_diff_length ~ person_merged*number + (1|clade3), data=df, REML=FALSE)
+                modelProtoDiffLengthMergedNoPerson <- lmer(proto_diff_length ~ number + (1|clade3), data=df, REML=FALSE)
+                anovaDiffLengthMerged <- anova(modelProtoDiffLengthMergedNoPerson, modelProtoDiffLengthMergedML, test = 'Chisq')
 
                 modelProtoLev <- lmer(proto_levenshtein ~ person*number + (1|clade3), data=df)
                 modelProtoLevSum <- summary(modelProtoLev)
@@ -246,6 +253,7 @@ def main():
                 plot(predictionsProtoLev)+
                 ggtitle("Mixed effect model Levenshtein distance proto and modern length")+
                 labs(y = "Levenshtein distance")
+                ggsave("{OUTPUT_DIR_PROTO}/predictions_proto_levenshtein.png", bg = "white")
                 ggsave("{OUTPUT_DIR_PROTO}/predictions_proto_levenshtein.pdf", bg = "white")
 
                 modelProtoLevMerged <- lmer(proto_levenshtein ~ person_merged*number + (1|clade3), data=df)
@@ -254,7 +262,13 @@ def main():
                 plot(predictionsProtoLevMerged)+
                 ggtitle("Mixed effect model Levenshtein distance proto and modern length merged")+
                 labs(y = "Levenshtein distance")
+                ggsave("{OUTPUT_DIR_PROTO}/predictions_proto_levenshtein_merged.png", bg = "white")
                 ggsave("{OUTPUT_DIR_PROTO}/predictions_proto_levenshtein_merged.pdf", bg = "white")
+
+                # ANOVA test: proto lev
+                modelProtoLevMergedML <- lmer(proto_levenshtein ~ person_merged*number + (1|clade3), data=df, REML=FALSE)
+                modelProtoLevMergedNoPerson <- lmer(proto_levenshtein ~ number + (1|clade3), data=df, REML=FALSE)
+                anovaLevMerged <- anova(modelProtoLevMergedNoPerson, modelProtoLevMergedML, test = 'Chisq')
                 ''')
         
         print(" - Proto diff length")
@@ -265,6 +279,9 @@ def main():
         print(lc['modelProtoDiffLengthMergedSum'])
         print(lc['predictionsProtoDiffLengthMerged'])
 
+        print(" - Anova diff length merged")
+        print(lc["anovaDiffLengthMerged"])
+
         print(" - Proto Levenshtein")
         print(lc['modelProtoLevSum'])
         print(lc['predictionsProtoLev'])
@@ -272,6 +289,9 @@ def main():
         print(" - Proto Levenshtein merged")
         print(lc['modelProtoLevMergedSum'])
         print(lc['predictionsProtoLevMerged'])
+
+        print (" - Anova lev merged")
+        print(lc['anovaLevMerged'])
 
     return
 
