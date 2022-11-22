@@ -13,7 +13,7 @@ AVG_WINDOW_STATS = 1
 SMOOTHING_SURPRISAL = 0.01 # not needed anymore
 LAST_N_STEPS_END_GRAPH = 500
 
-IMG_FORMAT = "png"
+IMG_FORMATS = ["png", "pdf"]
 OUTPUT_DIR = f'output-{str(datetime.datetime.now()).replace(" ","-").replace(":",".")}'
 
 # For evaluation script (not browser visualization)
@@ -24,7 +24,7 @@ N_AGENTS = 100
 PROP_INNOVATING_AGENTS = 0.2
 INIT_PROP_INNOVATIVE_INNOVATING = 0.9
 INIT_PROP_INNOVATIVE_CONSERVATING = 0.0
-FREQ_3SG = 0.6 # 1/3
+FREQ_3SG = 0.6
 
 BOOST_CONSERVATIVE = 0.01
 BOOST_INNOVATIVE = 0.01
@@ -33,7 +33,7 @@ FORGET_WEIGHT = 0.00
 SURPRISAL = False
 ENTROPY = False
 REPEATS = True
-PRIMING = False
+PRIMING = True
 FRIEND_NETWORK = False
 INNOVATING_NO_PRIMING = False
 INNOVATING_ONLY_BOOST_PRODUCTION = False
