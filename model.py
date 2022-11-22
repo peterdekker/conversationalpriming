@@ -67,6 +67,10 @@ class Model(Model):
         self.schedule = RandomActivation(self)
         self.steps = 0
 
+        # Diagnostic variables
+        self.n_total_boosts = 0
+        self.n_total_forgets = 0
+
         # Contains utterances of last step emptied after prop_innovative calculation at end of step
         self.communicated = defaultdict(list)
         self.n_communicated = defaultdict(lambda: [0])
@@ -172,3 +176,5 @@ class Model(Model):
             self, self.persons, self.speaker_types, self.prop_innovative)
 
         self.steps += 1
+        # if self.steps==1000:
+        #     print(f"forgets: {self.n_total_forgets}. boosts: {self.n_total_boosts}. forgets/boosts: {self.n_total_forgets/self.n_total_boosts}")

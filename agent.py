@@ -126,6 +126,9 @@ class Agent(mesa.Agent):
         new_total = 1.0 + boost
         # Add BOOST to this form and scale by new total, scale other forms by new total
         self.forms[person] = {f: (prob+boost)/new_total if f==form else prob/new_total for f, prob in prob_dict.items()}
+
+        # Counter for diagnostic purposes
+        self.model.n_total_boosts += 1
     
     def forget_form(self, person, form):
         prob_dict = self.forms[person]
@@ -138,3 +141,4 @@ class Agent(mesa.Agent):
         # Add BOOST to this form and scale by new total, scale other forms by new total
         self.forms[person] = {f: (prob+boost)/new_total if f==other_form else prob/new_total for f, prob in prob_dict.items()}
         # print(self.forms[person])
+        self.model.n_total_forgets+=1
