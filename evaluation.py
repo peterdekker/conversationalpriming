@@ -96,7 +96,7 @@ def plot_contrast_persons_graph(course_df, stats, mode, output_dir, label):
     sns.lineplot(data=df_melted, x="timesteps", y="proportion innovative forms", hue="person", style="agent type")
 
     # Label is usually person (e.g. 1sg)
-    [plt.savefig(os.path.join(output_dir, f"{label}-{mode}.{IMG_FORMAT}"), format=img_format, dpi=300) for img_format in IMG_FORMATS]
+    [plt.savefig(os.path.join(output_dir, f"{label}-{mode}.{img_format}"), format=img_format, dpi=300) for img_format in IMG_FORMATS]
     plt.clf()
 
 def evaluate_model(fixed_params, variable_params, iterations, steps):
