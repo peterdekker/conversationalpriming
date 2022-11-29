@@ -11,10 +11,9 @@ import os
 import unidecode
 import numpy as np
 from scipy.spatial.distance import pdist, squareform
-from statsmodels.formula.api import ols
-import statsmodels.formula.api as smf
+# from statsmodels.formula.api import ols
+# import statsmodels.formula.api as smf
 from itertools import combinations
-
 
 import rpy2.robjects as robjects
 import rpy2.robjects.numpy2ri
@@ -33,6 +32,11 @@ CLTS_PATH = os.path.join(currentdir, "clts-2.1.0")
 OUTPUT_DIR = "output_data"
 OUTPUT_DIR_PROTO = os.path.join(OUTPUT_DIR, "proto")
 OUTPUT_DIR_MODERN = os.path.join(OUTPUT_DIR, "modern")
+
+# User-settable param:
+# Include languages (and thus whole families) where one of the protoforms is zero
+INCLUDE_LANGUAGES_PROTO_0 = True
+proto_0_label = "_proto0" if INCLUDE_LANGUAGES_PROTO_0 else ""
 
 pd.set_option('display.max_rows', 100)
 img_extension = "png"
@@ -83,11 +87,13 @@ person_markers = ["1sg", "2sg", "3sg", "1pl", "2pl", "3pl"]
 #     #     print(f"{ipa_string} ||| {ipa_string_spaced} ||| {asjp_string_spaced} ||| {asjp_string}")
 #     return "".join(asjp_string)
 
+
+# def normalized_levenshtein(a,b):
+#     max_len = max(len(a),len(b))
+#     return editdistance.eval(a,b) / max_len if max_len > 0 else 0
+
 ##########################################
 
-def normalized_levenshtein(a,b):
-    max_len = max(len(a),len(b))
-    return editdistance.eval(a,b) / max_len if max_len > 0 else 0
 
 def get_first(x):
     return x[0]
@@ -122,11 +128,11 @@ def main():
 
 
     # Find languages which have both protoform and modern form with length 0
-    #languages_00 = df[(df["modern_length"]==0.0) & (df["proto_length"]==0.0)][["language","proto_language"]]
-    languages_0 = df[df["proto_length"]==0.0][["language"]]
-    df = df[~df["language"].isin(languages_0["language"])] # remove all languages where protolanguage is 0
-    # Replace by languages_00 to remove only languages where proto and modern form are 0
-    stats_df(df, "after removing languages where one protoform has length 0")
+    if not INCLUDE_LANGUAGES_PROTO_0:
+        #languages_00 = df[(df["modern_length"]==0.0) & (df["proto_length"]==0.0)][["language","proto_language"]]
+        languages_proto0 = df[df["proto_length"]==0.0][["language"]]
+        df = df[~df["language"].isin(languages_proto0["language"])] # remove all languages where protolanguage is 0
+        stats_df(df, "after removing languages where one protoform has length 0")
 
     # Show number of languages per family
     nunique_family = df.groupby("proto_language")["language"].nunique()
@@ -231,8 +237,8 @@ def main():
                 plot(predictionsProtoDiffLength)+
                 ggtitle("Mixed effect model difference proto and modern length")+
                 labs(y = "proto length - modern length")
-                ggsave("{OUTPUT_DIR_PROTO}/predictions_proto_diff_length.png", bg = "white")
-                ggsave("{OUTPUT_DIR_PROTO}/predictions_proto_diff_length.pdf", bg = "white")
+                ggsave("{OUTPUT_DIR_PROTO}/predictions_proto_diff_length{proto_0_label}.png", bg = "white")
+                ggsave("{OUTPUT_DIR_PROTO}/predictions_proto_diff_length{proto_0_label}.pdf", bg = "white")
 
                 modelProtoDiffLengthMerged <- lmer(proto_diff_length ~ person_merged*number + (1|clade3), data=df)
                 modelProtoDiffLengthMergedSum <- summary(modelProtoDiffLengthMerged)
@@ -240,8 +246,8 @@ def main():
                 plot(predictionsProtoDiffLengthMerged)+
                 ggtitle("Mixed effect model difference proto and modern length merged")+
                 labs(y = "proto length - modern length")
-                ggsave("{OUTPUT_DIR_PROTO}/predictions_proto_diff_length merged.png", bg = "white")
-                ggsave("{OUTPUT_DIR_PROTO}/predictions_proto_diff_length merged.pdf", bg = "white")
+                ggsave("{OUTPUT_DIR_PROTO}/predictions_proto_diff_length merged{proto_0_label}.png", bg = "white")
+                ggsave("{OUTPUT_DIR_PROTO}/predictions_proto_diff_length merged{proto_0_label}.pdf", bg = "white")
 
                 # ANOVA test: diff length
                 modelProtoDiffLengthMergedML <- lmer(proto_diff_length ~ person_merged*number + (1|clade3), data=df, REML=FALSE)
@@ -254,8 +260,8 @@ def main():
                 plot(predictionsProtoLev)+
                 ggtitle("Mixed effect model Levenshtein distance proto and modern length")+
                 labs(y = "Levenshtein distance")
-                ggsave("{OUTPUT_DIR_PROTO}/predictions_proto_levenshtein.png", bg = "white")
-                ggsave("{OUTPUT_DIR_PROTO}/predictions_proto_levenshtein.pdf", bg = "white")
+                ggsave("{OUTPUT_DIR_PROTO}/predictions_proto_levenshtein{proto_0_label}.png", bg = "white")
+                ggsave("{OUTPUT_DIR_PROTO}/predictions_proto_levenshtein{proto_0_label}.pdf", bg = "white")
 
                 modelProtoLevMerged <- lmer(proto_levenshtein ~ person_merged*number + (1|clade3), data=df)
                 modelProtoLevMergedSum <- summary(modelProtoLevMerged)
@@ -263,8 +269,8 @@ def main():
                 plot(predictionsProtoLevMerged)+
                 ggtitle("Mixed effect model Levenshtein distance proto and modern length merged")+
                 labs(y = "Levenshtein distance")
-                ggsave("{OUTPUT_DIR_PROTO}/predictions_proto_levenshtein_merged.png", bg = "white")
-                ggsave("{OUTPUT_DIR_PROTO}/predictions_proto_levenshtein_merged.pdf", bg = "white")
+                ggsave("{OUTPUT_DIR_PROTO}/predictions_proto_levenshtein_merged{proto_0_label}.png", bg = "white")
+                ggsave("{OUTPUT_DIR_PROTO}/predictions_proto_levenshtein_merged{proto_0_label}.pdf", bg = "white")
 
                 # ANOVA test: proto lev
                 modelProtoLevMergedML <- lmer(proto_levenshtein ~ person_merged*number + (1|clade3), data=df, REML=FALSE)
