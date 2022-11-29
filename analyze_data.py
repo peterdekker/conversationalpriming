@@ -178,6 +178,7 @@ def main():
     df["proto_levenshtein"] = df.apply(lambda x: editdistance.eval(x["modern_form_corr"], x["proto_form_corr"]), axis=1)
 
     df["person_merged"] = df["person"].apply(lambda p: "third" if p=="third" else "firstsecond")
+
     # Edit dist, grouped per language family
     # grouped_proto_levenshtein = df.groupby(["person_number", "proto_language"]).mean().sort_values("proto_language")
 
