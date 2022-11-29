@@ -3,8 +3,11 @@ import os
 
 from config import RG, INNOVATIVE_FORM, AVG_WINDOW_STATS
 
-def choice_prob(prob_dict):
-    return RG.choice([*prob_dict], p=[*prob_dict.values()])
+def choice_prob(prob_dict, inverse=False):
+    probs = [*prob_dict.values()]
+    if inverse:
+        probs = [1-p for p in probs]
+    return RG.choice([*prob_dict], p=probs)
 
 def mymean(stats_list):
     return np.mean(stats_list) if len(stats_list)>0 else 0

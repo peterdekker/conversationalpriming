@@ -13,7 +13,7 @@ AVG_WINDOW_STATS = 1
 SMOOTHING_SURPRISAL = 0.01 # not needed anymore
 LAST_N_STEPS_END_GRAPH = 500
 
-IMG_FORMAT = "png"
+IMG_FORMATS = ["png", "pdf"]
 OUTPUT_DIR = f'output-{str(datetime.datetime.now()).replace(" ","-").replace(":",".")}'
 
 # For evaluation script (not browser visualization)
@@ -25,8 +25,11 @@ PROP_INNOVATING_AGENTS = 0.2
 INIT_PROP_INNOVATIVE_INNOVATING = 0.9
 INIT_PROP_INNOVATIVE_CONSERVATING = 0.0
 FREQ_3SG = 1/3
+
 BOOST_CONSERVATIVE = 0.01
 BOOST_INNOVATIVE = 0.01
+FORGET_WEIGHT = 0.00
+
 SURPRISAL = False
 ENTROPY = False
 REPEATS = True
@@ -44,6 +47,7 @@ model_params = {
     "freq_3sg": {"ui": Slider("Frequency 3sg", FREQ_3SG, 0.0, 1.0, 0.01), "script": FREQ_3SG},
     "boost_conservative": {"ui": Slider("Boost conservative", BOOST_CONSERVATIVE, 0.0, 1.0, 0.01), "script": BOOST_CONSERVATIVE},
     "boost_innovative": {"ui": Slider("Boost innovative", BOOST_INNOVATIVE, 0.0, 1.0, 0.01), "script": BOOST_INNOVATIVE},
+    "forget_weight": {"ui": Slider("Forget weight", FORGET_WEIGHT, 0.0, 1.0, 0.01), "script": FORGET_WEIGHT},
     "surprisal": {"ui": Checkbox('Surprisal', value=SURPRISAL), "script": SURPRISAL},
     "entropy": {"ui": Checkbox('Entropy', value=ENTROPY), "script": ENTROPY},
     "repeats": {"ui": Checkbox('Repeats', value=REPEATS), "script": REPEATS},
@@ -54,7 +58,6 @@ model_params = {
     "n_interactions_interlocutor": {"ui": Slider("# interactions per interlocutor", N_INTERACTIONS_INTERLOCUTOR, 1, 100, 1), "script": N_INTERACTIONS_INTERLOCUTOR},
     "browser_visualization": {"ui": True, "script": False},
     "use_grid": {"ui": False, "script": False},
-    "dummy": {"ui": False, "script": False},
 }
 
 model_params_ui = {k:v["ui"] for k,v in model_params.items()}
@@ -69,6 +72,6 @@ evaluation_params = {
     "contrast_persons": False
 }
 
-bool_params = ["surprisal", "entropy", "repeats", "priming", "friend_network", "innovating_no_priming", "innovating_only_boost_production", "browser_visualization", "use_grid", "dummy", "contrast_persons"]
+bool_params = ["surprisal", "entropy", "repeats", "priming", "friend_network", "innovating_no_priming", "innovating_only_boost_production", "browser_visualization", "use_grid",  "contrast_persons"]
 
 string_params = ["runlabel", "plot_from_raw"]

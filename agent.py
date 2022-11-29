@@ -12,7 +12,6 @@ class Agent(mesa.Agent):
 
         super().__init__(pos, model)
 
-        # Only set pos explicitly in random mixing grid model. Not in network model.
         self.pos = pos
         self.innovating = innovating
         # TODO: later possibly add corpus probabilities
@@ -50,11 +49,18 @@ class Agent(mesa.Agent):
             answer = listener.receive_question_reply(question)
             if answer is not None:
                 self.receive_answer(answer)
+            
+            # After every interaction, forget random token
+            # Forget one form for every person. This makes frequency assymetry between persons relevant.
+            if self.model.forget_weight > 0.0:
+                for person in self.persons:
+                    # Simulate sampling from list, by sampling with probability of form
+                    # So if 0.9 probability for token 1: 0.9 chance to forget 1
+                    sample_token = min(self.forms[person], key=self.forms[person].get) # choice_prob(self.forms[person], inverse=True) # 
+                    self.forget_form(person, sample_token)
 
 
     def create_question(self):
-        # Send polar question, represented by verb: concept, person and form
-        #concept = RG.choice(self.verb_concepts)
         self.person_question = RG.choice(self.persons, p=self.person_weights)
         form_question = choice_prob(self.forms[self.person_question])
         self.boost_form(self.person_question, form_question)
@@ -120,3 +126,19 @@ class Agent(mesa.Agent):
         new_total = 1.0 + boost
         # Add BOOST to this form and scale by new total, scale other forms by new total
         self.forms[person] = {f: (prob+boost)/new_total if f==form else prob/new_total for f, prob in prob_dict.items()}
+
+        # Counter for diagnostic purposes
+        self.model.n_total_boosts += 1
+    
+    def forget_form(self, person, form):
+        prob_dict = self.forms[person]
+        boost = self.model.forget_weight
+        new_total = 1.0 + boost
+        # Forget this form by boosting other form
+        other_form = "1" if form=="0" else "0"
+        # print(f"Perform forget for {form} by boosting {other_form}")
+        # print(self.forms[person])
+        # Add BOOST to this form and scale by new total, scale other forms by new total
+        self.forms[person] = {f: (prob+boost)/new_total if f==other_form else prob/new_total for f, prob in prob_dict.items()}
+        # print(self.forms[person])
+        self.model.n_total_forgets+=1

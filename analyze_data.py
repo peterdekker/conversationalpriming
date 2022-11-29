@@ -1,4 +1,7 @@
 
+# analyze_data.py: Standalone script to perform statistical analysis of length change in data of Serzant & Moroz (2022).
+# See README for more information on installation and expected input data.
+
 import pandas as pd
 import editdistance
 import seaborn as sns
@@ -9,7 +12,15 @@ import unidecode
 import numpy as np
 from scipy.spatial.distance import pdist, squareform
 from statsmodels.formula.api import ols
+import statsmodels.formula.api as smf
 from itertools import combinations
+
+
+import rpy2.robjects as robjects
+import rpy2.robjects.numpy2ri
+import rpy2.robjects.pandas2ri
+robjects.numpy2ri.activate()
+robjects.pandas2ri.activate()
 
 plt.rcParams['savefig.dpi'] = 300
 
@@ -27,6 +38,10 @@ pd.set_option('display.max_rows', 100)
 img_extension = "png"
 
 person_markers = ["1sg", "2sg", "3sg", "1pl", "2pl", "3pl"]
+
+
+
+
 
 ######################################## Not used at the moment
 
@@ -72,11 +87,17 @@ person_markers = ["1sg", "2sg", "3sg", "1pl", "2pl", "3pl"]
 
 def normalized_levenshtein(a,b):
     max_len = max(len(a),len(b))
-    return editdistance.eval(a,b) /max_len if max_len > 0 else 0
+    return editdistance.eval(a,b) / max_len if max_len > 0 else 0
 
 def get_first(x):
     return x[0]
 
+def stats_df(df, label):
+    n_entries = len(df)
+    n_languages = df["language"].nunique()
+    n_proto_languages = df["proto_language"].nunique()
+    # nunique_family = df.groupby("proto_language")["language"].nunique()
+    print(f"{label}: entries: {n_entries}, languages: {n_languages}, proto_languages: {n_proto_languages}")
 
 def main():
     # load_clts()
@@ -89,22 +110,23 @@ def main():
         os.makedirs(OUTPUT_DIR_MODERN)
 
     df = pd.read_csv("data/verbal_person-number_indexes_merged.csv")
-    # print(df.columns)
-    # print(df.groupby("proto_language")["language"].count())
-
+    df = df.drop(columns=["source", "comment", "proto_source", "proto_comments", "changed_GM"])
+    stats_df(df, "original")
     # Filter out entries without form or protoform (removes languages without protolanguage + possibly more)
     df = df[df['modern_form'].notna()]
+    stats_df(df, "after removing modern NA")
     df = df[df['proto_form'].notna()]
+    #languages_one_protoform_na = df[df["proto_form"].isna()][["language"]]
+    #df = df[~df["language"].isin(languages_one_protoform_na["language"])]
+    stats_df(df, "after removing proto NA")
 
 
     # Find languages which have both protoform and modern form with length 0
-    languages_00 = df[(df["modern_length"]==0.0) & (df["proto_length"]==0.0)][["language","proto_language"]]
-    print("Proto + modern 0:")
-    print(languages_00["language"].nunique())
-    languages_0 = df[df["proto_length"]==0.0][["language","proto_language"]]
-    print("Proto 0:")
-    print(languages_0["language"].nunique())
-    df = df[~df["language"].isin(languages_00["language"])]
+    #languages_00 = df[(df["modern_length"]==0.0) & (df["proto_length"]==0.0)][["language","proto_language"]]
+    languages_0 = df[df["proto_length"]==0.0][["language"]]
+    df = df[~df["language"].isin(languages_0["language"])] # remove all languages where protolanguage is 0
+    # Replace by languages_00 to remove only languages where proto and modern form are 0
+    stats_df(df, "after removing languages where one protoform has length 0")
 
     # Show number of languages per family
     nunique_family = df.groupby("proto_language")["language"].nunique()
@@ -127,12 +149,15 @@ def main():
         
         ## Delete parts in brackets
         # TODO: Create alternative forms based on letters in brackets os(i)
-        brackets = df[f"{form_type}_corr"].str.contains("\(.+\)")
+        #brackets = df[f"{form_type}_corr"].str.contains("\(.+\)")
         # print(brackets.value_counts())
         df[f"{form_type}_corr"] = df[f"{form_type}_corr"].str.replace("\(.+\)", "", regex=True)
 
         ## Delete dashes
         df[f"{form_type}_corr"] = df[f"{form_type}_corr"].str.replace("-", "", regex=False)
+        ## Delete ... (non-concatenative morphology)
+        df[f"{form_type}_corr"] = df[f"{form_type}_corr"].str.replace("...", "", regex=False)
+        df[f"{form_type}_corr"] = df[f"{form_type}_corr"].str.replace("…", "", regex=False)
         ## Delete 2 (from h2)
         df[f"{form_type}_corr"] = df[f"{form_type}_corr"].str.replace("2", "", regex=False)
         ## Delete 0 (empty person marker is just represented by empty string)
@@ -141,19 +166,140 @@ def main():
         df[f"{form_type}_corr"] = df[f"{form_type}_corr"].str.replace("ø", "", regex=False)
         ## Delete *
         df[f"{form_type}_corr"] = df[f"{form_type}_corr"].str.replace("*", "", regex=False)
+        ## Delete ´ ' # (segments which are not counted in precalculated length)
+        df[f"{form_type}_corr"] = df[f"{form_type}_corr"].str.replace("[´`'#]", "", regex=True)
+        ## Delete : (lengthening vowel but no sound on its own)
+        df[f"{form_type}_corr"] = df[f"{form_type}_corr"].str.replace(":", "", regex=False)
+        
 
         # df[f"{form_type}_corr"] = df[f"{form_type}_corr"].apply(ipa_to_soundclass)
         df[f"{form_type}_corr"] = df[f"{form_type}_corr"].apply(unidecode.unidecode)
 
-    df["proto_levenshtein"] = df.apply(lambda x: normalized_levenshtein(x["modern_form_corr"], x["proto_form_corr"]), axis=1)
+    df["proto_levenshtein"] = df.apply(lambda x: editdistance.eval(x["modern_form_corr"], x["proto_form_corr"]), axis=1)
+
+    df["person_merged"] = df["person"].apply(lambda p: "third" if p=="third" else "firstsecond")
+
     # Edit dist, grouped per language family
     # grouped_proto_levenshtein = df.groupby(["person_number", "proto_language"]).mean().sort_values("proto_language")
+
+    ### Do statistical analyses
+    # persons_numbers = [(p,n) for n in ["sg","pl"] for p in ["first","second","third"] ]
+    # pn_matrix = pd.DataFrame(persons_numbers, columns=["person","number"])
+    
+    # # Poisson mixed model: https://www.statsmodels.org/stable/generated/statsmodels.genmod.bayes_mixed_glm.PoissonBayesMixedGLM.html#statsmodels.genmod.bayes_mixed_glm.PoissonBayesMixedGLM
+    # # Easier, GLM with family argument: https://www.kaggle.com/code/hongpeiyi/poisson-regression-with-statsmodels
+
+    # print("Regression proto diff length")
+    # mixedlm_proto_diff_length = smf.mixedlm("proto_diff_length ~ person*C(number, Treatment('sg'))", groups=df["clade3"], data = df).fit()
+    # #mixedlm_proto_diff_length = smf.mixedlm("proto_diff_length ~ person_number", groups=df["proto_language"], data = df).fit()
+    # print(mixedlm_proto_diff_length.summary())
+    # pn_matrix["predictions_mixedlm_proto_diff_length"] = mixedlm_proto_diff_length.predict(pn_matrix)
+    # # print(mixedlm_proto_diff_length.t_test(matrix))
+    # # TODO: How to get predictions with their own standard deviations?
+    # # https://tedboy.github.io/statsmodels_doc/generated/statsmodels.sandbox.regression.predstd.wls_prediction_std.html#statsmodels.sandbox.regression.predstd.wls_prediction_std
+    # # Use t-test? https://stats.stackexchange.com/questions/578398/getting-confidence-interval-for-prediction-from-statsmodel-robust-linear-model
+
+    # print("Regression proto Levenshtein")
+    # mixedlm_proto_levenshtein = smf.mixedlm("proto_levenshtein ~ person*C(number, Treatment('sg'))", groups=df["clade3"], data = df).fit()
+    # print(mixedlm_proto_levenshtein.summary())
+    # pn_matrix["predictions_mixedlm_proto_levenshtein"] = mixedlm_proto_levenshtein.predict(pn_matrix)
+
+    # print(pn_matrix)
+
+    # print("Regression proto diff length, joint person-number")
+    # mixedlm_proto_diff_length_pn_joint = smf.mixedlm("proto_diff_length ~ person_number + 0 ", groups=df["clade3"], data = df).fit()
+    # print(mixedlm_proto_diff_length_pn_joint.summary())
+
+    # print("Regression proto Levenshtein, joint person-number")
+    # mixedlm_proto_levenshtein_pn_joint = smf.mixedlm("proto_levenshtein ~ person_number + 0", groups=df["clade3"], data = df).fit()
+    # print(mixedlm_proto_levenshtein_pn_joint.summary())
+    #df["proto_diff_length"] = np.abs(df["proto_diff_length"])
+    ## Statistical analyses in R
+    with robjects.local_context() as lc:
+        lc['df'] = df
+
+        robjects.r(f'''
+                library(tidyverse)
+                library(lme4)
+                library(ggeffects)
+                df <- mutate(df,
+                            number = relevel(factor(number), ref = 'sg'))
+
+                modelProtoDiffLength <- lmer(proto_diff_length ~ person*number + (1|clade3), data=df)
+                modelProtoDiffLengthSum <- summary(modelProtoDiffLength)
+                predictionsProtoDiffLength <- ggpredict(model=modelProtoDiffLength, terms=c('person','number'))
+                plot(predictionsProtoDiffLength)+
+                ggtitle("Mixed effect model difference proto and modern length")+
+                labs(y = "proto length - modern length")
+                ggsave("{OUTPUT_DIR_PROTO}/predictions_proto_diff_length.png", bg = "white")
+                ggsave("{OUTPUT_DIR_PROTO}/predictions_proto_diff_length.pdf", bg = "white")
+
+                modelProtoDiffLengthMerged <- lmer(proto_diff_length ~ person_merged*number + (1|clade3), data=df)
+                modelProtoDiffLengthMergedSum <- summary(modelProtoDiffLengthMerged)
+                predictionsProtoDiffLengthMerged <- ggpredict(model=modelProtoDiffLengthMerged, terms=c('person_merged','number'))
+                plot(predictionsProtoDiffLengthMerged)+
+                ggtitle("Mixed effect model difference proto and modern length merged")+
+                labs(y = "proto length - modern length")
+                ggsave("{OUTPUT_DIR_PROTO}/predictions_proto_diff_length merged.png", bg = "white")
+                ggsave("{OUTPUT_DIR_PROTO}/predictions_proto_diff_length merged.pdf", bg = "white")
+
+                # ANOVA test: diff length
+                modelProtoDiffLengthMergedML <- lmer(proto_diff_length ~ person_merged*number + (1|clade3), data=df, REML=FALSE)
+                modelProtoDiffLengthMergedNoPerson <- lmer(proto_diff_length ~ number + (1|clade3), data=df, REML=FALSE)
+                anovaDiffLengthMerged <- anova(modelProtoDiffLengthMergedNoPerson, modelProtoDiffLengthMergedML, test = 'Chisq')
+
+                modelProtoLev <- lmer(proto_levenshtein ~ person*number + (1|clade3), data=df)
+                modelProtoLevSum <- summary(modelProtoLev)
+                predictionsProtoLev <- ggpredict(model=modelProtoLev, terms=c('person','number'))
+                plot(predictionsProtoLev)+
+                ggtitle("Mixed effect model Levenshtein distance proto and modern length")+
+                labs(y = "Levenshtein distance")
+                ggsave("{OUTPUT_DIR_PROTO}/predictions_proto_levenshtein.png", bg = "white")
+                ggsave("{OUTPUT_DIR_PROTO}/predictions_proto_levenshtein.pdf", bg = "white")
+
+                modelProtoLevMerged <- lmer(proto_levenshtein ~ person_merged*number + (1|clade3), data=df)
+                modelProtoLevMergedSum <- summary(modelProtoLevMerged)
+                predictionsProtoLevMerged <- ggpredict(model=modelProtoLevMerged, terms=c('person_merged','number'))
+                plot(predictionsProtoLevMerged)+
+                ggtitle("Mixed effect model Levenshtein distance proto and modern length merged")+
+                labs(y = "Levenshtein distance")
+                ggsave("{OUTPUT_DIR_PROTO}/predictions_proto_levenshtein_merged.png", bg = "white")
+                ggsave("{OUTPUT_DIR_PROTO}/predictions_proto_levenshtein_merged.pdf", bg = "white")
+
+                # ANOVA test: proto lev
+                modelProtoLevMergedML <- lmer(proto_levenshtein ~ person_merged*number + (1|clade3), data=df, REML=FALSE)
+                modelProtoLevMergedNoPerson <- lmer(proto_levenshtein ~ number + (1|clade3), data=df, REML=FALSE)
+                anovaLevMerged <- anova(modelProtoLevMergedNoPerson, modelProtoLevMergedML, test = 'Chisq')
+                ''')
+        
+        print(" - Proto diff length")
+        print(lc['modelProtoDiffLengthSum'])
+        print(lc['predictionsProtoDiffLength'])
+
+        print(" - Proto diff length merged")
+        print(lc['modelProtoDiffLengthMergedSum'])
+        print(lc['predictionsProtoDiffLengthMerged'])
+
+        print(" - Anova diff length merged")
+        print(lc["anovaDiffLengthMerged"])
+
+        print(" - Proto Levenshtein")
+        print(lc['modelProtoLevSum'])
+        print(lc['predictionsProtoLev'])
+
+        print(" - Proto Levenshtein merged")
+        print(lc['modelProtoLevMergedSum'])
+        print(lc['predictionsProtoLevMerged'])
+
+        print (" - Anova lev merged")
+        print(lc['anovaLevMerged'])
+
+    return
 
     ## Analysis length: pairwise difference between modern forms within language family
     # With full groupby aggregate, we can only get one value (mean) per language family. (or maybe one value per language)
     # We want every comparison as separate data point
     # print(df.groupby(["proto_language", "person_number"])["modern_length"].aggregate(lambda x: pdist(np.array(x)[np.newaxis].T)))
-    
     modern_pairwise_dfs = []
     for (pl,pn), group in df.groupby(["proto_language", "person_number"]):
         # print(group[["proto_language", "person_number", "modern_form", "modern_length"]])
@@ -171,29 +317,6 @@ def main():
     
     df_modern_pairwise = pd.concat(modern_pairwise_dfs)
 
-
-    ### Do statistical analyses
-
-    print("Regression proto diff length")
-    regression_proto_diff_length = ols("proto_diff_length ~ person_number + 0", data = df).fit()
-    print(regression_proto_diff_length.params)
-
-    print("Median proto Levenshtein")
-    print(df.groupby("person_number")["proto_levenshtein"].median())
-
-    print("Regression proto Levenshtein")
-    regression_proto_levenshtein = ols("proto_levenshtein ~ person_number + 0", data = df).fit()
-    print(regression_proto_levenshtein.params)
-
-    print("Regression modern diff length")
-    regression_modern_diff_length = ols("modern_diff_length ~ person_number + 0", data = df_modern_pairwise).fit()
-    print(regression_modern_diff_length.params)
-
-    print("Regression modern Levenshtein")
-    regression_modern_levenshtein = ols("modern_levenshtein ~ person_number + 0", data = df_modern_pairwise).fit()
-    print(regression_modern_levenshtein.params)
-
-
     ### Create all plots 
     sns.violinplot(x="person_number", y="proto_diff_length", data=df) # hue="proto_language"
     plt.savefig(os.path.join(OUTPUT_DIR_PROTO,f"proto_diff_length_violin.{img_extension}"))
@@ -201,12 +324,24 @@ def main():
     sns.stripplot(x="person_number", y="proto_diff_length", data=df)
     plt.savefig(os.path.join(OUTPUT_DIR_PROTO,f"proto_diff_length_strip.{img_extension}"))
     plt.clf()
+    sns.boxplot(x="person_number", y="proto_diff_length", data=df)
+    plt.savefig(os.path.join(OUTPUT_DIR_PROTO,f"proto_diff_length_box.{img_extension}"))
+    plt.clf()
+    sns.boxplot(x="person", hue="number", y="proto_diff_length", data=df)
+    plt.savefig(os.path.join(OUTPUT_DIR_PROTO,f"proto_diff_length_box_person_number.{img_extension}"))
+    plt.clf()
 
     sns.violinplot(x="person_number", y="proto_levenshtein", data=df) # hue="proto_language"
     plt.savefig(os.path.join(OUTPUT_DIR_PROTO,f"proto_levenshtein_violin.{img_extension}"))
     plt.clf()
     sns.stripplot(x="person_number", y="proto_levenshtein", data=df)
     plt.savefig(os.path.join(OUTPUT_DIR_PROTO,f"proto_levenshtein_strip.{img_extension}"))
+    plt.clf()
+    sns.boxplot(x="person_number", y="proto_levenshtein", data=df)
+    plt.savefig(os.path.join(OUTPUT_DIR_PROTO,f"proto_levenshtein_box.{img_extension}"))
+    plt.clf()
+    sns.boxplot(x="person", hue="number", y="proto_levenshtein", data=df)
+    plt.savefig(os.path.join(OUTPUT_DIR_PROTO,f"proto_levenshtein_box_person_number.{img_extension}"))
     plt.clf()
 
     ## Modern pairwise length difference

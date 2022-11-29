@@ -8,7 +8,7 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 
 from model import Model
-from config import model_params_script, evaluation_params, bool_params, string_params, OUTPUT_DIR, IMG_FORMAT, LAST_N_STEPS_END_GRAPH, PERSONS
+from config import model_params_script, evaluation_params, bool_params, string_params, OUTPUT_DIR, IMG_FORMATS, LAST_N_STEPS_END_GRAPH, PERSONS
 
 communicated_stats = ["prop_innovative_1sg_innovating_avg", "prop_innovative_1sg_conservating_avg", "prop_innovative_1sg_total_avg", "prop_innovative_2sg_innovating_avg", "prop_innovative_2sg_conservating_avg", "prop_innovative_2sg_total_avg", "prop_innovative_3sg_innovating_avg", "prop_innovative_3sg_conservating_avg", "prop_innovative_3sg_total_avg"]
 internal_stats = ["prop_innovative_1sg_innovating_internal", "prop_innovative_1sg_conservating_internal", "prop_innovative_1sg_total_internal", "prop_innovative_2sg_innovating_internal", "prop_innovative_2sg_conservating_internal", "prop_innovative_2sg_total_internal", "prop_innovative_3sg_innovating_internal", "prop_innovative_3sg_conservating_internal", "prop_innovative_3sg_total_internal"]
@@ -77,11 +77,15 @@ def get_course_df(run_data, variable_param, stats, mode, output_dir):
 
 
 def plot_graph(course_df, variable_param, stats, mode, output_dir, label):
-    df_melted = course_df.melt(id_vars=["timesteps",variable_param], value_vars = stats, value_name = "proportion innovative forms", var_name="statistic")
-    sns.lineplot(data=df_melted, x="timesteps", y="proportion innovative forms", hue="statistic", style=variable_param)
+    stats_renamed = {stat: stat.replace("_", " ") for stat in stats}
+    course_df = course_df.rename(columns=stats_renamed)
+    variable_param_spaced = variable_param.replace("_"," ")
+    course_df = course_df.rename(columns={variable_param: variable_param_spaced})
+    df_melted = course_df.melt(id_vars=["timesteps",variable_param_spaced], value_vars = stats_renamed.values(), value_name = "proportion innovative forms", var_name="statistic")
+    sns.lineplot(data=df_melted, x="timesteps", y="proportion innovative forms", hue="statistic", style=variable_param_spaced)
 
     # Label is usually person (e.g. 1sg)
-    plt.savefig(os.path.join(output_dir, f"{variable_param}-{label}-{mode}.{IMG_FORMAT}"), format=IMG_FORMAT, dpi=300)
+    [plt.savefig(os.path.join(output_dir, f"{variable_param}-{label}-{mode}.{img_format}"), format=img_format, dpi=300) for img_format in IMG_FORMATS]
     plt.clf()
 
 def plot_contrast_persons_graph(course_df, stats, mode, output_dir, label):
@@ -92,7 +96,7 @@ def plot_contrast_persons_graph(course_df, stats, mode, output_dir, label):
     sns.lineplot(data=df_melted, x="timesteps", y="proportion innovative forms", hue="person", style="agent type")
 
     # Label is usually person (e.g. 1sg)
-    plt.savefig(os.path.join(output_dir, f"{label}-{mode}.{IMG_FORMAT}"), format=IMG_FORMAT, dpi=300)
+    [plt.savefig(os.path.join(output_dir, f"{label}-{mode}.{img_format}"), format=img_format, dpi=300) for img_format in IMG_FORMATS]
     plt.clf()
 
 def evaluate_model(fixed_params, variable_params, iterations, steps):

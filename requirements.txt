@@ -11,3 +11,5 @@ unidecode # do we keep using this?
 
 # For statistical analysis
 statsmodels
+rpy2
+
