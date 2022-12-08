@@ -36,7 +36,7 @@ OUTPUT_DIR_MODERN = os.path.join(OUTPUT_DIR, "modern")
 # User-settable param:
 # Include languages (and thus whole families) where one of the protoforms is zero
 INCLUDE_LANGUAGES_PROTO_0 = True
-proto_0_label = "_proto0" if INCLUDE_LANGUAGES_PROTO_0 else ""
+proto0_label = "_proto0" if INCLUDE_LANGUAGES_PROTO_0 else ""
 
 pd.set_option('display.max_rows', 100)
 img_extension = "png"
@@ -88,9 +88,12 @@ person_markers = ["1sg", "2sg", "3sg", "1pl", "2pl", "3pl"]
 #     return "".join(asjp_string)
 
 
-# def normalized_levenshtein(a,b):
-#     max_len = max(len(a),len(b))
-#     return editdistance.eval(a,b) / max_len if max_len > 0 else 0
+def normalized_levenshtein(modern,proto):
+    mean_len = np.mean([len(modern),len(proto)])
+    #proto_len = len(proto)
+    raw_dist = editdistance.eval(modern, proto)
+    return raw_dist / mean_len if mean_len > 0 else 0
+
 
 ##########################################
 
@@ -181,7 +184,7 @@ def main():
         # df[f"{form_type}_corr"] = df[f"{form_type}_corr"].apply(ipa_to_soundclass)
         df[f"{form_type}_corr"] = df[f"{form_type}_corr"].apply(unidecode.unidecode)
 
-    df["proto_levenshtein"] = df.apply(lambda x: editdistance.eval(x["modern_form_corr"], x["proto_form_corr"]), axis=1)
+    df["proto_levenshtein"] = df.apply(lambda x: normalized_levenshtein(x["modern_form_corr"], x["proto_form_corr"]), axis=1)
 
     df["person_merged"] = df["person"].apply(lambda p: "third" if p=="third" else "firstsecond")
 
@@ -237,8 +240,8 @@ def main():
                 plot(predictionsProtoDiffLength)+
                 ggtitle("Mixed effect model difference proto and modern length")+
                 labs(y = "proto length - modern length")
-                ggsave("{OUTPUT_DIR_PROTO}/predictions_proto_diff_length{proto_0_label}.png", bg = "white")
-                ggsave("{OUTPUT_DIR_PROTO}/predictions_proto_diff_length{proto_0_label}.pdf", bg = "white")
+                ggsave("{OUTPUT_DIR_PROTO}/predictions_proto_diff_length{proto0_label}.png", bg = "white")
+                ggsave("{OUTPUT_DIR_PROTO}/predictions_proto_diff_length{proto0_label}.pdf", bg = "white")
 
                 modelProtoDiffLengthMerged <- lmer(proto_diff_length ~ person_merged*number + (1|clade3), data=df)
                 modelProtoDiffLengthMergedSum <- summary(modelProtoDiffLengthMerged)
@@ -246,8 +249,8 @@ def main():
                 plot(predictionsProtoDiffLengthMerged)+
                 ggtitle("Mixed effect model difference proto and modern length merged")+
                 labs(y = "proto length - modern length")
-                ggsave("{OUTPUT_DIR_PROTO}/predictions_proto_diff_length merged{proto_0_label}.png", bg = "white")
-                ggsave("{OUTPUT_DIR_PROTO}/predictions_proto_diff_length merged{proto_0_label}.pdf", bg = "white")
+                ggsave("{OUTPUT_DIR_PROTO}/predictions_proto_diff_length merged{proto0_label}.png", bg = "white")
+                ggsave("{OUTPUT_DIR_PROTO}/predictions_proto_diff_length merged{proto0_label}.pdf", bg = "white")
 
                 # ANOVA test: diff length
                 modelProtoDiffLengthMergedML <- lmer(proto_diff_length ~ person_merged*number + (1|clade3), data=df, REML=FALSE)
@@ -260,8 +263,8 @@ def main():
                 plot(predictionsProtoLev)+
                 ggtitle("Mixed effect model Levenshtein distance proto and modern length")+
                 labs(y = "Levenshtein distance")
-                ggsave("{OUTPUT_DIR_PROTO}/predictions_proto_levenshtein{proto_0_label}.png", bg = "white")
-                ggsave("{OUTPUT_DIR_PROTO}/predictions_proto_levenshtein{proto_0_label}.pdf", bg = "white")
+                ggsave("{OUTPUT_DIR_PROTO}/predictions_proto_levenshtein{proto0_label}.png", bg = "white")
+                ggsave("{OUTPUT_DIR_PROTO}/predictions_proto_levenshtein{proto0_label}.pdf", bg = "white")
 
                 modelProtoLevMerged <- lmer(proto_levenshtein ~ person_merged*number + (1|clade3), data=df)
                 modelProtoLevMergedSum <- summary(modelProtoLevMerged)
@@ -269,8 +272,8 @@ def main():
                 plot(predictionsProtoLevMerged)+
                 ggtitle("Mixed effect model Levenshtein distance proto and modern length merged")+
                 labs(y = "Levenshtein distance")
-                ggsave("{OUTPUT_DIR_PROTO}/predictions_proto_levenshtein_merged{proto_0_label}.png", bg = "white")
-                ggsave("{OUTPUT_DIR_PROTO}/predictions_proto_levenshtein_merged{proto_0_label}.pdf", bg = "white")
+                ggsave("{OUTPUT_DIR_PROTO}/predictions_proto_levenshtein_merged{proto0_label}.png", bg = "white")
+                ggsave("{OUTPUT_DIR_PROTO}/predictions_proto_levenshtein_merged{proto0_label}.pdf", bg = "white")
 
                 # ANOVA test: proto lev
                 modelProtoLevMergedML <- lmer(proto_levenshtein ~ person_merged*number + (1|clade3), data=df, REML=FALSE)
@@ -300,7 +303,6 @@ def main():
         print (" - Anova lev merged")
         print(lc['anovaLevMerged'])
 
-    return
 
     ## Analysis length: pairwise difference between modern forms within language family
     # With full groupby aggregate, we can only get one value (mean) per language family. (or maybe one value per language)
@@ -325,84 +327,84 @@ def main():
 
     ### Create all plots 
     sns.violinplot(x="person_number", y="proto_diff_length", data=df) # hue="proto_language"
-    plt.savefig(os.path.join(OUTPUT_DIR_PROTO,f"proto_diff_length_violin.{img_extension}"))
+    plt.savefig(os.path.join(OUTPUT_DIR_PROTO,f"proto_diff_length_violin{proto0_label}.{img_extension}"))
     plt.clf()
     sns.stripplot(x="person_number", y="proto_diff_length", data=df)
-    plt.savefig(os.path.join(OUTPUT_DIR_PROTO,f"proto_diff_length_strip.{img_extension}"))
+    plt.savefig(os.path.join(OUTPUT_DIR_PROTO,f"proto_diff_length_strip{proto0_label}.{img_extension}"))
     plt.clf()
     sns.boxplot(x="person_number", y="proto_diff_length", data=df)
-    plt.savefig(os.path.join(OUTPUT_DIR_PROTO,f"proto_diff_length_box.{img_extension}"))
+    plt.savefig(os.path.join(OUTPUT_DIR_PROTO,f"proto_diff_length_box{proto0_label}.{img_extension}"))
     plt.clf()
     sns.boxplot(x="person", hue="number", y="proto_diff_length", data=df)
-    plt.savefig(os.path.join(OUTPUT_DIR_PROTO,f"proto_diff_length_box_person_number.{img_extension}"))
+    plt.savefig(os.path.join(OUTPUT_DIR_PROTO,f"proto_diff_length_box_person_number{proto0_label}.{img_extension}"))
     plt.clf()
 
     sns.violinplot(x="person_number", y="proto_levenshtein", data=df) # hue="proto_language"
-    plt.savefig(os.path.join(OUTPUT_DIR_PROTO,f"proto_levenshtein_violin.{img_extension}"))
+    plt.savefig(os.path.join(OUTPUT_DIR_PROTO,f"proto_levenshtein_violin{proto0_label}.{img_extension}"))
     plt.clf()
     sns.stripplot(x="person_number", y="proto_levenshtein", data=df)
-    plt.savefig(os.path.join(OUTPUT_DIR_PROTO,f"proto_levenshtein_strip.{img_extension}"))
+    plt.savefig(os.path.join(OUTPUT_DIR_PROTO,f"proto_levenshtein_strip{proto0_label}.{img_extension}"))
     plt.clf()
     sns.boxplot(x="person_number", y="proto_levenshtein", data=df)
-    plt.savefig(os.path.join(OUTPUT_DIR_PROTO,f"proto_levenshtein_box.{img_extension}"))
+    plt.savefig(os.path.join(OUTPUT_DIR_PROTO,f"proto_levenshtein_box{proto0_label}.{img_extension}"))
     plt.clf()
     sns.boxplot(x="person", hue="number", y="proto_levenshtein", data=df)
-    plt.savefig(os.path.join(OUTPUT_DIR_PROTO,f"proto_levenshtein_box_person_number.{img_extension}"))
+    plt.savefig(os.path.join(OUTPUT_DIR_PROTO,f"proto_levenshtein_box_person_number{proto0_label}.{img_extension}"))
     plt.clf()
 
-    ## Modern pairwise length difference
-    sns.violinplot(x="person_number", y="modern_diff_length", data=df_modern_pairwise, order=person_markers)
-    plt.savefig(os.path.join(OUTPUT_DIR_MODERN,f"modern_diff_length_violin.{img_extension}"))
-    plt.clf()
-    sns.stripplot(x="person_number", y="modern_diff_length", data=df_modern_pairwise, order=person_markers)
-    plt.savefig(os.path.join(OUTPUT_DIR_MODERN,f"modern_diff_length_strip.{img_extension}"))
-    plt.clf()
+    # ## Modern pairwise length difference
+    # sns.violinplot(x="person_number", y="modern_diff_length", data=df_modern_pairwise, order=person_markers)
+    # plt.savefig(os.path.join(OUTPUT_DIR_MODERN,f"modern_diff_length_violin.{img_extension}"))
+    # plt.clf()
+    # sns.stripplot(x="person_number", y="modern_diff_length", data=df_modern_pairwise, order=person_markers)
+    # plt.savefig(os.path.join(OUTPUT_DIR_MODERN,f"modern_diff_length_strip.{img_extension}"))
+    # plt.clf()
 
-    ## Modern pairwise Levenshtein
-    sns.violinplot(x="person_number", y="modern_levenshtein", data=df_modern_pairwise, order=person_markers)
-    plt.savefig(os.path.join(OUTPUT_DIR_MODERN,f"modern_levenshtein_violin.{img_extension}"))
-    plt.clf()
-    sns.stripplot(x="person_number", y="modern_levenshtein", data=df_modern_pairwise, order=person_markers)
-    plt.savefig(os.path.join(OUTPUT_DIR_MODERN,f"modern_levenshtein_strip.{img_extension}"))
-    plt.clf()
+    # ## Modern pairwise Levenshtein
+    # sns.violinplot(x="person_number", y="modern_levenshtein", data=df_modern_pairwise, order=person_markers)
+    # plt.savefig(os.path.join(OUTPUT_DIR_MODERN,f"modern_levenshtein_violin.{img_extension}"))
+    # plt.clf()
+    # sns.stripplot(x="person_number", y="modern_levenshtein", data=df_modern_pairwise, order=person_markers)
+    # plt.savefig(os.path.join(OUTPUT_DIR_MODERN,f"modern_levenshtein_strip.{img_extension}"))
+    # plt.clf()
 
-    # Protolanguage, per family
-    for fam, group in df.groupby("proto_language"):
-        if fam not in families_above_threshold:
-            continue
+    # # Protolanguage, per family
+    # for fam, group in df.groupby("proto_language"):
+    #     if fam not in families_above_threshold:
+    #         continue
 
-        sns.violinplot(x="person_number", y="proto_diff_length", data=group) # hue="proto_language"
-        plt.savefig(os.path.join(OUTPUT_DIR_PROTO,f"proto_diff_length_violin_{fam}.{img_extension}"))
-        plt.clf()
-        sns.stripplot(x="person_number", y="proto_diff_length",data=group)
-        plt.savefig(os.path.join(OUTPUT_DIR_PROTO,f"proto_diff_length_strip_{fam}.{img_extension}"))
-        plt.clf()
+    #     sns.violinplot(x="person_number", y="proto_diff_length", data=group) # hue="proto_language"
+    #     plt.savefig(os.path.join(OUTPUT_DIR_PROTO,f"proto_diff_length_violin_{fam}.{img_extension}"))
+    #     plt.clf()
+    #     sns.stripplot(x="person_number", y="proto_diff_length",data=group)
+    #     plt.savefig(os.path.join(OUTPUT_DIR_PROTO,f"proto_diff_length_strip_{fam}.{img_extension}"))
+    #     plt.clf()
 
-        sns.violinplot(x="person_number", y="proto_levenshtein", data=group) # hue="proto_language"
-        plt.savefig(os.path.join(OUTPUT_DIR_PROTO,f"proto_levenshtein_violin_{fam}.{img_extension}"))
-        plt.clf()
-        sns.stripplot(x="person_number", y="proto_levenshtein", data=group)
-        plt.savefig(os.path.join(OUTPUT_DIR_PROTO,f"proto_levenshtein_strip_{fam}.{img_extension}"))
-        plt.clf()
+    #     sns.violinplot(x="person_number", y="proto_levenshtein", data=group) # hue="proto_language"
+    #     plt.savefig(os.path.join(OUTPUT_DIR_PROTO,f"proto_levenshtein_violin_{fam}.{img_extension}"))
+    #     plt.clf()
+    #     sns.stripplot(x="person_number", y="proto_levenshtein", data=group)
+    #     plt.savefig(os.path.join(OUTPUT_DIR_PROTO,f"proto_levenshtein_strip_{fam}.{img_extension}"))
+    #     plt.clf()
     
-    ## Modern pairwise, per family
-    for fam, group in df_modern_pairwise.groupby("proto_language"):
-        if fam not in families_above_threshold:
-            continue
-        # Modern pairwise length difference
-        sns.violinplot(x="person_number", y="modern_diff_length", data=group, order=person_markers)
-        plt.savefig(os.path.join(OUTPUT_DIR_MODERN,f"modern_diff_length_violin_{fam}.{img_extension}"))
-        plt.clf()
-        sns.stripplot(x="person_number", y="modern_diff_length", data=group, order=person_markers)
-        plt.savefig(os.path.join(OUTPUT_DIR_MODERN,f"modern_diff_length_strip_{fam}.{img_extension}"))
-        plt.clf()
+    # ## Modern pairwise, per family
+    # for fam, group in df_modern_pairwise.groupby("proto_language"):
+    #     if fam not in families_above_threshold:
+    #         continue
+    #     # Modern pairwise length difference
+    #     sns.violinplot(x="person_number", y="modern_diff_length", data=group, order=person_markers)
+    #     plt.savefig(os.path.join(OUTPUT_DIR_MODERN,f"modern_diff_length_violin_{fam}.{img_extension}"))
+    #     plt.clf()
+    #     sns.stripplot(x="person_number", y="modern_diff_length", data=group, order=person_markers)
+    #     plt.savefig(os.path.join(OUTPUT_DIR_MODERN,f"modern_diff_length_strip_{fam}.{img_extension}"))
+    #     plt.clf()
 
-        sns.violinplot(x="person_number", y="modern_levenshtein", data=group, order=person_markers) # hue="proto_language"
-        plt.savefig(os.path.join(OUTPUT_DIR_MODERN,f"modern_levenshtein_violin_{fam}.{img_extension}"))
-        plt.clf()
-        sns.stripplot(x="person_number", y="modern_levenshtein", data=group, order=person_markers)
-        plt.savefig(os.path.join(OUTPUT_DIR_MODERN,f"modern_levenshtein_strip_{fam}.{img_extension}"))
-        plt.clf()
+    #     sns.violinplot(x="person_number", y="modern_levenshtein", data=group, order=person_markers) # hue="proto_language"
+    #     plt.savefig(os.path.join(OUTPUT_DIR_MODERN,f"modern_levenshtein_violin_{fam}.{img_extension}"))
+    #     plt.clf()
+    #     sns.stripplot(x="person_number", y="modern_levenshtein", data=group, order=person_markers)
+    #     plt.savefig(os.path.join(OUTPUT_DIR_MODERN,f"modern_levenshtein_strip_{fam}.{img_extension}"))
+    #     plt.clf()
 
 
 
