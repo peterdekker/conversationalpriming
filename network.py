@@ -72,73 +72,73 @@ def experiment_barbell():
     check_clustering_degree(barbell)
 
 
-def create_innovative_agents(n_agents, p_innovating):
+def create_innovative_agents(n_agents, p_innovator):
     agent_types = np.random.choice([False, True], size=n_agents, p=[
-                                   1-p_innovating, p_innovating])
+                                   1-p_innovator, p_innovator])
     agents = range(len(agent_types))
     return agent_types, agents
 
 
-def experiment_friend_of_friend(n_agents, p_innovating, stranger_connect_prob, conservating_friend_of_friend_connect_prob,
-                                innovating_friend_of_friend_connect_prob, n_iterations=1, dodraw=True):
-    agent_types, agents = create_innovative_agents(n_agents, p_innovating)
-    g = create_network_friend_of_friend(stranger_connect_prob, conservating_friend_of_friend_connect_prob,
-                                        innovating_friend_of_friend_connect_prob, n_iterations, agent_types, agents)
+def experiment_friend_of_friend(n_agents, p_innovator, stranger_connect_prob, conservator_friend_of_friend_connect_prob,
+                                innovator_friend_of_friend_connect_prob, n_iterations=1, dodraw=True):
+    agent_types, agents = create_innovative_agents(n_agents, p_innovator)
+    g = create_network_friend_of_friend(stranger_connect_prob, conservator_friend_of_friend_connect_prob,
+                                        innovator_friend_of_friend_connect_prob, n_iterations, agent_types, agents)
     clustering_coeffs = nx.clustering(g)
-    ids_innovating = [id for id, attrs in g.nodes(
-        data=True) if attrs["innovating"] == True]
-    ids_conservating = [id for id, attrs in g.nodes(
-        data=True) if attrs["innovating"] == False]
-    clustering_innovating_mean = np.mean(
-        [clustering_coeffs[id] for id in ids_innovating])
-    clustering_conservating_mean = np.mean(
-        [clustering_coeffs[id] for id in ids_conservating])
+    ids_innovator = [id for id, attrs in g.nodes(
+        data=True) if attrs["innovator"] == True]
+    ids_conservator = [id for id, attrs in g.nodes(
+        data=True) if attrs["innovator"] == False]
+    clustering_innovator_mean = np.mean(
+        [clustering_coeffs[id] for id in ids_innovator])
+    clustering_conservator_mean = np.mean(
+        [clustering_coeffs[id] for id in ids_conservator])
     print(
-        f"Mean clustering coefficient, innovating: {clustering_innovating_mean}, conservating: {clustering_conservating_mean}")
+        f"Mean clustering coefficient, innovator: {clustering_innovator_mean}, conservator: {clustering_conservator_mean}")
 
-    degree_innovating_mean = np.mean([g.degree[id] for id in ids_innovating])
-    degree_conservating_mean = np.mean(
-        [g.degree[id] for id in ids_conservating])
+    degree_innovator_mean = np.mean([g.degree[id] for id in ids_innovator])
+    degree_conservator_mean = np.mean(
+        [g.degree[id] for id in ids_conservator])
     print(
-        f"Degree, innovating: {degree_innovating_mean}, conservating: {degree_conservating_mean}")
+        f"Degree, innovator: {degree_innovator_mean}, conservator: {degree_conservator_mean}")
     if dodraw:
         draw(g)
 
 
-def experiment_friend_of_friend_fixed_degree(n_agents, p_innovating, stranger_connect_prob, conservating_friend_of_friend_connect_prob,
-                                             innovating_friend_of_friend_connect_prob, max_degree, dodraw=True):
-    agent_types, agents = create_innovative_agents(n_agents, p_innovating)
+def experiment_friend_of_friend_fixed_degree(n_agents, p_innovator, stranger_connect_prob, conservator_friend_of_friend_connect_prob,
+                                             innovator_friend_of_friend_connect_prob, max_degree, dodraw=True):
+    agent_types, agents = create_innovative_agents(n_agents, p_innovator)
     g = create_network_friend_of_friend_fixed_degree(
-        stranger_connect_prob, conservating_friend_of_friend_connect_prob, innovating_friend_of_friend_connect_prob, max_degree, agent_types, agents)
+        stranger_connect_prob, conservator_friend_of_friend_connect_prob, innovator_friend_of_friend_connect_prob, max_degree, agent_types, agents)
     clustering_coeffs = nx.clustering(g)
-    ids_innovating = [id for id, attrs in g.nodes(
-        data=True) if attrs["innovating"] == True]
-    ids_conservating = [id for id, attrs in g.nodes(
-        data=True) if attrs["innovating"] == False]
-    clustering_innovating_mean = np.mean(
-        [clustering_coeffs[id] for id in ids_innovating])
-    clustering_conservating_mean = np.mean(
-        [clustering_coeffs[id] for id in ids_conservating])
+    ids_innovator = [id for id, attrs in g.nodes(
+        data=True) if attrs["innovator"] == True]
+    ids_conservator = [id for id, attrs in g.nodes(
+        data=True) if attrs["innovator"] == False]
+    clustering_innovator_mean = np.mean(
+        [clustering_coeffs[id] for id in ids_innovator])
+    clustering_conservator_mean = np.mean(
+        [clustering_coeffs[id] for id in ids_conservator])
     # print(
-    #     f"Mean clustering coefficient, innovating: {clustering_innovating_mean}, conservating: {clustering_conservating_mean}")
+    #     f"Mean clustering coefficient, innovator: {clustering_innovator_mean}, conservator: {clustering_conservator_mean}")
 
-    degree_innovating_mean = np.mean([g.degree[id] for id in ids_innovating])
-    degree_conservating_mean = np.mean(
-        [g.degree[id] for id in ids_conservating])
+    degree_innovator_mean = np.mean([g.degree[id] for id in ids_innovator])
+    degree_conservator_mean = np.mean(
+        [g.degree[id] for id in ids_conservator])
     # print(
-    #     f"Degree, innovating: {degree_innovating_mean}, conservating: {degree_conservating_mean}")
+    #     f"Degree, innovator: {degree_innovator_mean}, conservator: {degree_conservator_mean}")
     if dodraw:
         #draw(g)
         pos = nx.kamada_kawai_layout(g)
         nodes=g.nodes()
-        colors = ids_innovating = ["green" if attrs["innovating"] == True else "grey" for id, attrs in g.nodes(data=True)]
+        colors = ids_innovator = ["green" if attrs["innovator"] == True else "grey" for id, attrs in g.nodes(data=True)]
         ec = nx.draw_networkx_edges(g, pos, alpha=0.2)
         nc = nx.draw_networkx_nodes(g, pos, nodelist=nodes, node_color=colors, 
                                     node_size=100)
         plt.savefig("friendoffriend.png",dpi=300)
-    record =  {"n_agents": n_agents, "stranger_connect_prob": stranger_connect_prob, "conservating_friend_of_friend_connect_prob": conservating_friend_of_friend_connect_prob,
-            "innovating_friend_of_friend_connect_prob": innovating_friend_of_friend_connect_prob, "max_degree": max_degree,
-            "cl_inn": clustering_innovating_mean, "cl_con": clustering_conservating_mean, "deg_inn": degree_innovating_mean, "deg_conn": degree_conservating_mean}
+    record =  {"n_agents": n_agents, "stranger_connect_prob": stranger_connect_prob, "conservator_friend_of_friend_connect_prob": conservator_friend_of_friend_connect_prob,
+            "innovator_friend_of_friend_connect_prob": innovator_friend_of_friend_connect_prob, "max_degree": max_degree,
+            "cl_inn": clustering_innovator_mean, "cl_con": clustering_conservator_mean, "deg_inn": degree_innovator_mean, "deg_conn": degree_conservator_mean}
     print(record)
     return record
 
@@ -148,16 +148,16 @@ def explore_params_fof_fixed():
     for n_agents in [100, 200]:
         for max_degree in [5,10]:
             for stranger_connect_prob in np.linspace(0.1, 1, 10):
-                for innovating_friend_of_friend_connect_prob in np.linspace(0.1, 1, 10):
-                    for conservating_friend_of_friend_connect_prob in np.linspace(0.1, 1, 10):
-                        if stranger_connect_prob <= innovating_friend_of_friend_connect_prob and innovating_friend_of_friend_connect_prob <= conservating_friend_of_friend_connect_prob:
+                for innovator_friend_of_friend_connect_prob in np.linspace(0.1, 1, 10):
+                    for conservator_friend_of_friend_connect_prob in np.linspace(0.1, 1, 10):
+                        if stranger_connect_prob <= innovator_friend_of_friend_connect_prob and innovator_friend_of_friend_connect_prob <= conservator_friend_of_friend_connect_prob:
                             for i in range(10):
-                                result = experiment_friend_of_friend_fixed_degree(n_agents=n_agents, p_innovating=0.2, stranger_connect_prob=stranger_connect_prob, conservating_friend_of_friend_connect_prob=conservating_friend_of_friend_connect_prob,
-                                                                        innovating_friend_of_friend_connect_prob=innovating_friend_of_friend_connect_prob, max_degree=max_degree, dodraw=False)
+                                result = experiment_friend_of_friend_fixed_degree(n_agents=n_agents, p_innovator=0.2, stranger_connect_prob=stranger_connect_prob, conservator_friend_of_friend_connect_prob=conservator_friend_of_friend_connect_prob,
+                                                                        innovator_friend_of_friend_connect_prob=innovator_friend_of_friend_connect_prob, max_degree=max_degree, dodraw=False)
                                 records.append(result)
     df = pd.DataFrame.from_records(records)
     # Mean over 10 runs
-    dfm = df.groupby(["n_agents", "stranger_connect_prob", "conservating_friend_of_friend_connect_prob", "innovating_friend_of_friend_connect_prob","max_degree"]).mean()
+    dfm = df.groupby(["n_agents", "stranger_connect_prob", "conservator_friend_of_friend_connect_prob", "innovator_friend_of_friend_connect_prob","max_degree"]).mean()
     dfm["cl_diff"] = dfm["cl_con"] - dfm["cl_inn"]
     for _, g in dfm.sort_values("cl_diff",ascending=False).groupby("n_agents"):
         print(g)
@@ -165,12 +165,12 @@ def explore_params_fof_fixed():
                         
 
 
-def create_network_friend_of_friend(stranger_connect_prob, conservating_friend_of_friend_connect_prob, innovating_friend_of_friend_connect_prob, n_iterations, agent_types, agents):
+def create_network_friend_of_friend(stranger_connect_prob, conservator_friend_of_friend_connect_prob, innovator_friend_of_friend_connect_prob, n_iterations, agent_types, agents):
     g = nx.Graph()
     for a in agents:
-        g.add_node(a, innovating=agent_types[a])
+        g.add_node(a, innovator=agent_types[a])
     pairs = list(combinations(agents, 2))
-    # TODO: Make sure innovating and conservating agents have same degree
+    # TODO: Make sure innovator and conservator agents have same degree
     # TODO: Shuffle combinations list?
     for it in range(n_iterations):
         # print(f"Iteration: {it}")
@@ -189,12 +189,12 @@ def create_network_friend_of_friend(stranger_connect_prob, conservating_friend_o
                 # If there is a neighbor in common
                 # print(f"- Common neighbors: {common_neighbors}")
                 # Use innovative prob if one of the nodes is innovative
-                if g.nodes[i]["innovating"] == 1 or g.nodes[j]["innovating"] == 1:
+                if g.nodes[i]["innovator"] == 1 or g.nodes[j]["innovator"] == 1:
                     # print(f"- One of the nodes {i,j} is innovative")
-                    connect_prob = innovating_friend_of_friend_connect_prob
+                    connect_prob = innovator_friend_of_friend_connect_prob
                 else:
                     # print(f"- None of the nodes {i,j} is innovative")
-                    connect_prob = conservating_friend_of_friend_connect_prob
+                    connect_prob = conservator_friend_of_friend_connect_prob
             if random.random() < connect_prob:
                 # print(f"- Add edge {i,j}")
                 g.add_edge(i, j)
@@ -206,11 +206,11 @@ def get_agents_not_max_degree(g, max_degree):
     return agents_not_max
 
 
-def create_network_friend_of_friend_fixed_degree(stranger_connect_prob, conservating_friend_of_friend_connect_prob, innovating_friend_of_friend_connect_prob, max_degree, agent_types, agents):
+def create_network_friend_of_friend_fixed_degree(stranger_connect_prob, conservator_friend_of_friend_connect_prob, innovator_friend_of_friend_connect_prob, max_degree, agent_types, agents):
     max_retries = 100
     g = nx.Graph()
     for a in agents:
-        g.add_node(a, innovating=agent_types[a])
+        g.add_node(a, innovator=agent_types[a])
     agents_not_full = get_agents_not_max_degree(g, max_degree)
     n_agents_not_full_iterations = []
     n_agents_not_full_prev = -1
@@ -245,12 +245,12 @@ def create_network_friend_of_friend_fixed_degree(stranger_connect_prob, conserva
                     # If there is a neighbor in common
                     # print(f"- Common neighbors: {common_neighbors}")
                     # Use innovative prob if one of the nodes is innovative
-                    if g.nodes[i]["innovating"] == 1 or g.nodes[j]["innovating"] == 1:
+                    if g.nodes[i]["innovator"] == 1 or g.nodes[j]["innovator"] == 1:
                         # print(f"- One of the nodes {i,j} is innovative")
-                        connect_prob = innovating_friend_of_friend_connect_prob
+                        connect_prob = innovator_friend_of_friend_connect_prob
                     else:
                         # print(f"- None of the nodes {i,j} is innovative")
-                        connect_prob = conservating_friend_of_friend_connect_prob
+                        connect_prob = conservator_friend_of_friend_connect_prob
                 if random.random() < connect_prob:
                     # print(f"- Add edge {i,j}")
                     g.add_edge(i, j)
@@ -263,7 +263,7 @@ def create_network_friend_of_friend_fixed_degree(stranger_connect_prob, conserva
 def create_network_complete(n_agents, agent_types):
     graph = nx.complete_graph(n_agents)
     agent_types_dict = dict(enumerate(agent_types))
-    nx.set_node_attributes(graph, agent_types_dict, name="innovating")
+    nx.set_node_attributes(graph, agent_types_dict, name="innovator")
     return graph
 
 
@@ -273,8 +273,8 @@ if __name__ == "__main__":
     #explore_params_fof_fixed()
 
     print("Fixed:")
-    experiment_friend_of_friend_fixed_degree(n_agents=100, p_innovating=0.2, stranger_connect_prob=0.3, conservating_friend_of_friend_connect_prob=1.0,
-                                             innovating_friend_of_friend_connect_prob=0.3, max_degree=10)
+    experiment_friend_of_friend_fixed_degree(n_agents=100, p_innovator=0.2, stranger_connect_prob=0.3, conservator_friend_of_friend_connect_prob=1.0,
+                                             innovator_friend_of_friend_connect_prob=0.3, max_degree=10)
     # print("Non-fixed:")
-    # experiment_friend_of_friend(n_agents=100, p_innovating=0.2, stranger_connect_prob=0.1, conservating_friend_of_friend_connect_prob=0.5,
-    #                                 innovating_friend_of_friend_connect_prob=0.2, n_iterations=1)
+    # experiment_friend_of_friend(n_agents=100, p_innovator=0.2, stranger_connect_prob=0.1, conservator_friend_of_friend_connect_prob=0.5,
+    #                                 innovator_friend_of_friend_connect_prob=0.2, n_iterations=1)

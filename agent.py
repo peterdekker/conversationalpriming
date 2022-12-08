@@ -7,13 +7,13 @@ import numpy as np
 
 
 class Agent(mesa.Agent):
-    def __init__(self, pos, innovating, prop_innovative_forms, model):
+    def __init__(self, pos, innovator, prop_innovative_forms, model):
 
 
         super().__init__(pos, model)
 
         self.pos = pos
-        self.innovating = innovating
+        self.innovator = innovator
         # TODO: later possibly add corpus probabilities
         # TODO: Move initialization outside agent?
         #self.verb_concepts = ["a"]
@@ -65,7 +65,7 @@ class Agent(mesa.Agent):
         form_question = choice_prob(self.forms[self.person_question])
         self.boost_form(self.person_question, form_question)
         # Add to stats
-        update_communicated(form_question, self.person_question, self.innovating, self.model, self)
+        update_communicated(form_question, self.person_question, self.innovator, self.model, self)
         
 
         signal_question = Verb(person=self.person_question, form=form_question)
@@ -75,12 +75,12 @@ class Agent(mesa.Agent):
 
     def receive_question_reply(self, signal):
         person_question, form_question = signal.get_content()
-        if not (self.model.innovating_only_boost_production and self.innovating):
+        if not (self.model.innovator_only_boost_production and self.innovator):
             self.boost_form(person_question, form_question)
 
         if self.model.repeats:
             person_answer = self.question_answer_mapping[person_question]
-            if person_answer == person_question and self.model.priming and not (self.model.innovating_no_priming and self.innovating):
+            if person_answer == person_question and self.model.conv_priming and not (self.model.innovator_no_conv_priming and self.innovator):
                 # 3sg: instead of using own forms library, just repeat form from question
                 form_answer = form_question
             else:
@@ -88,7 +88,7 @@ class Agent(mesa.Agent):
                 form_answer = choice_prob(self.forms[person_answer])
             self.boost_form(person_answer, form_answer)
             # Add to stats
-            update_communicated(form_answer, person_answer, self.innovating, self.model, self)
+            update_communicated(form_answer, person_answer, self.innovator, self.model, self)
 
             signal_answer = Verb(person=person_answer, form=form_answer)
         else:
@@ -98,14 +98,14 @@ class Agent(mesa.Agent):
     
     def receive_answer(self, signal):
         person_answer, form_answer = signal.get_content()
-        if not (self.model.innovating_only_boost_production and self.innovating):
+        if not (self.model.innovator_only_boost_production and self.innovator):
             self.boost_form(person_answer, form_answer)
 
         # Reset internal person question variable
         self.person_question = None
     
     def boost_form(self, person, form):
-        # if (self.innovating and form != INNOVATIVE_FORM):
+        # if (self.innovator and form != INNOVATIVE_FORM):
         #     return
         SURPRISAL_THRESHOLD = 1000000
         prob_dict = self.forms[person]

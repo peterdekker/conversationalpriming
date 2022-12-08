@@ -10,9 +10,9 @@ import matplotlib.pyplot as plt
 from model import Model
 from config import model_params_script, evaluation_params, bool_params, string_params, OUTPUT_DIR, IMG_FORMATS, LAST_N_STEPS_END_GRAPH, PERSONS
 
-communicated_stats = ["prop_innovative_1sg_innovating_avg", "prop_innovative_1sg_conservating_avg", "prop_innovative_1sg_total_avg", "prop_innovative_2sg_innovating_avg", "prop_innovative_2sg_conservating_avg", "prop_innovative_2sg_total_avg", "prop_innovative_3sg_innovating_avg", "prop_innovative_3sg_conservating_avg", "prop_innovative_3sg_total_avg"]
-internal_stats = ["prop_innovative_1sg_innovating_internal", "prop_innovative_1sg_conservating_internal", "prop_innovative_1sg_total_internal", "prop_innovative_2sg_innovating_internal", "prop_innovative_2sg_conservating_internal", "prop_innovative_2sg_total_internal", "prop_innovative_3sg_innovating_internal", "prop_innovative_3sg_conservating_internal", "prop_innovative_3sg_total_internal"]
-dominant_stats = ["prop_1sg_conservating_dominant", "prop_2sg_conservating_dominant", "prop_3sg_conservating_dominant", "prop_1sg_innovating_dominant", "prop_2sg_innovating_dominant", "prop_3sg_innovating_dominant", "prop_1sg_total_dominant", "prop_2sg_total_dominant", "prop_3sg_total_dominant"]
+communicated_stats = ["prop_innovative_1sg_innovator_avg", "prop_innovative_1sg_conservator_avg", "prop_innovative_1sg_total_avg", "prop_innovative_2sg_innovator_avg", "prop_innovative_2sg_conservator_avg", "prop_innovative_2sg_total_avg", "prop_innovative_3sg_innovator_avg", "prop_innovative_3sg_conservator_avg", "prop_innovative_3sg_total_avg"]
+internal_stats = ["prop_innovative_1sg_innovator_internal", "prop_innovative_1sg_conservator_internal", "prop_innovative_1sg_total_internal", "prop_innovative_2sg_innovator_internal", "prop_innovative_2sg_conservator_internal", "prop_innovative_2sg_total_internal", "prop_innovative_3sg_innovator_internal", "prop_innovative_3sg_conservator_internal", "prop_innovative_3sg_total_internal"]
+dominant_stats = ["prop_1sg_conservator_dominant", "prop_2sg_conservator_dominant", "prop_3sg_conservator_dominant", "prop_1sg_innovator_dominant", "prop_2sg_innovator_dominant", "prop_3sg_innovator_dominant", "prop_1sg_total_dominant", "prop_2sg_total_dominant", "prop_3sg_total_dominant"]
 
 def str2bool(v):
     if isinstance(v, bool):
@@ -90,7 +90,7 @@ def plot_graph(course_df, variable_param, stats, mode, output_dir, label):
 
 def plot_contrast_persons_graph(course_df, stats, mode, output_dir, label):
     df_melted = course_df.melt(id_vars=["timesteps"], value_vars = stats, value_name = "proportion innovative forms", var_name="statistic")
-    # These splits assume names like: prop_innovative_1sg_innovating_avg
+    # These splits assume names like: prop_innovative_1sg_innovator_avg
     df_melted["person"] = df_melted["statistic"].str.split("_").apply(lambda x: x[2])
     df_melted["agent type"] = df_melted["statistic"].str.split("_").apply(lambda x: x[3])
     sns.lineplot(data=df_melted, x="timesteps", y="proportion innovative forms", hue="person", style="agent type")

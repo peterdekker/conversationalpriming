@@ -14,7 +14,7 @@ def draw(agent):
     '''
     if agent is None:
         return
-    if agent.innovating:
+    if agent.innovator:
         portrayal = {"Shape": "rect", "w": 0.5, "h": 0.5, "Filled": "true", "Layer": 0}
     else:
         portrayal = {"Shape": "circle", "r": 0.5, "Filled": "true", "Layer": 0}
@@ -52,20 +52,20 @@ canvas_element = NetworkModule(network_portrayal, 500, 500)
 # canvas_element = CanvasGrid(draw, HEIGHT, WIDTH, 500, 500)
 
 
-communicated_1sg_chart = ChartModule([{"Label": "prop_innovative_1sg_innovating_avg", "Color": "Green"}, {"Label": "prop_innovative_1sg_conservating_avg", "Color": "Black"}, {"Label": "prop_innovative_1sg_total_avg", "Color": "Blue"}])
-# communicated_2sg_chart = ChartModule([{"Label": "prop_innovative_2sg_innovating_avg", "Color": "Green"}, {"Label": "prop_innovative_2sg_conservating_avg", "Color": "Black"}, {"Label": "prop_innovative_2sg_total_avg", "Color": "Blue"}])
-communicated_3sg_chart = ChartModule([{"Label": "prop_innovative_3sg_innovating_avg", "Color": "Green"}, {"Label": "prop_innovative_3sg_conservating_avg", "Color": "Black"}, {"Label": "prop_innovative_3sg_total_avg", "Color": "Blue"}])
+communicated_1sg_chart = ChartModule([{"Label": "prop_innovative_1sg_innovator_avg", "Color": "Green"}, {"Label": "prop_innovative_1sg_conservator_avg", "Color": "Black"}, {"Label": "prop_innovative_1sg_total_avg", "Color": "Blue"}])
+# communicated_2sg_chart = ChartModule([{"Label": "prop_innovative_2sg_innovator_avg", "Color": "Green"}, {"Label": "prop_innovative_2sg_conservator_avg", "Color": "Black"}, {"Label": "prop_innovative_2sg_total_avg", "Color": "Blue"}])
+communicated_3sg_chart = ChartModule([{"Label": "prop_innovative_3sg_innovator_avg", "Color": "Green"}, {"Label": "prop_innovative_3sg_conservator_avg", "Color": "Black"}, {"Label": "prop_innovative_3sg_total_avg", "Color": "Blue"}])
 
-internal_1sg_chart = ChartModule([{"Label": "prop_innovative_1sg_innovating_internal", "Color": "Green"}, {"Label": "prop_innovative_1sg_conservating_internal", "Color": "Black"}, {"Label": "prop_innovative_1sg_total_internal", "Color": "Blue"}])
-# internal_2sg_chart = ChartModule([{"Label": "prop_innovative_2sg_innovating_internal", "Color": "Green"}, {"Label": "prop_innovative_2sg_conservating_internal", "Color": "Black"}, {"Label": "prop_innovative_2sg_total_internal", "Color": "Blue"}])
-internal_3sg_chart = ChartModule([{"Label": "prop_innovative_3sg_innovating_internal", "Color": "Green"}, {"Label": "prop_innovative_3sg_conservating_internal", "Color": "Black"}, {"Label": "prop_innovative_3sg_total_internal", "Color": "Blue"}])
+internal_1sg_chart = ChartModule([{"Label": "prop_innovative_1sg_innovator_internal", "Color": "Green"}, {"Label": "prop_innovative_1sg_conservator_internal", "Color": "Black"}, {"Label": "prop_innovative_1sg_total_internal", "Color": "Blue"}])
+# internal_2sg_chart = ChartModule([{"Label": "prop_innovative_2sg_innovator_internal", "Color": "Green"}, {"Label": "prop_innovative_2sg_conservator_internal", "Color": "Black"}, {"Label": "prop_innovative_2sg_total_internal", "Color": "Blue"}])
+internal_3sg_chart = ChartModule([{"Label": "prop_innovative_3sg_innovator_internal", "Color": "Green"}, {"Label": "prop_innovative_3sg_conservator_internal", "Color": "Black"}, {"Label": "prop_innovative_3sg_total_internal", "Color": "Blue"}])
 
-dominant_1sg_chart = ChartModule([{"Label": "prop_1sg_innovating_dominant", "Color": "Green"}, {"Label": "prop_1sg_conservating_dominant", "Color": "Black"}, {"Label": "prop_1sg_total_dominant", "Color": "Blue"}])
-# dominant_2sg_chart = ChartModule([{"Label": "prop_2sg_innovating_dominant", "Color": "Green"}, {"Label": "prop_2sg_conservating_dominant", "Color": "Black"}, {"Label": "prop_2sg_total_dominant", "Color": "Blue"}])
-dominant_3sg_chart = ChartModule([{"Label": "prop_3sg_innovating_dominant", "Color": "Green"}, {"Label": "prop_3sg_conservating_dominant", "Color": "Black"}, {"Label": "prop_3sg_total_dominant", "Color": "Blue"}])
+dominant_1sg_chart = ChartModule([{"Label": "prop_1sg_innovator_dominant", "Color": "Green"}, {"Label": "prop_1sg_conservator_dominant", "Color": "Black"}, {"Label": "prop_1sg_total_dominant", "Color": "Blue"}])
+# dominant_2sg_chart = ChartModule([{"Label": "prop_2sg_innovator_dominant", "Color": "Green"}, {"Label": "prop_2sg_conservator_dominant", "Color": "Black"}, {"Label": "prop_2sg_total_dominant", "Color": "Blue"}])
+dominant_3sg_chart = ChartModule([{"Label": "prop_3sg_innovator_dominant", "Color": "Green"}, {"Label": "prop_3sg_conservator_dominant", "Color": "Black"}, {"Label": "prop_3sg_total_dominant", "Color": "Blue"}])
 
 n_communicated_chart = ChartModule([{"Label": "n_communicated_1sg", "Color": "Red"}, {"Label": "n_communicated_2sg", "Color": "Blue"},{"Label": "n_communicated_3sg", "Color": "Yellow"}])
 
 server = ModularServer(Model,
                        [canvas_element, communicated_1sg_chart, communicated_3sg_chart, internal_1sg_chart, internal_3sg_chart, dominant_1sg_chart, dominant_3sg_chart],
-                       "Conversational priming", model_params_ui)
+                       "Conversational conv_priming", model_params_ui)
