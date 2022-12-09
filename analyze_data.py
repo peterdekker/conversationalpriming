@@ -16,7 +16,7 @@ from scipy.spatial.distance import pdist, squareform
 from itertools import combinations
 
 import rpy2.robjects as robjects
-import rpy2.robjects.numpy2ri
+# import rpy2.robjects.numpy2ri
 import rpy2.robjects.pandas2ri
 robjects.numpy2ri.activate()
 robjects.pandas2ri.activate()
@@ -35,11 +35,13 @@ OUTPUT_DIR_MODERN = os.path.join(OUTPUT_DIR, "modern")
 
 # User-settable param:
 # Include languages (and thus whole families) where one of the protoforms is zero
-INCLUDE_LANGUAGES_PROTO_0 = True
+INCLUDE_LANGUAGES_PROTO_0 = False
+NORMALIZATION = "mean"
 proto0_label = "_proto0" if INCLUDE_LANGUAGES_PROTO_0 else ""
+norm_label = f"_{NORMALIZATION}"
 
 pd.set_option('display.max_rows', 100)
-img_extension = "png"
+img_extension_pyplots = "png"
 
 person_markers = ["1sg", "2sg", "3sg", "1pl", "2pl", "3pl"]
 
@@ -88,11 +90,15 @@ person_markers = ["1sg", "2sg", "3sg", "1pl", "2pl", "3pl"]
 #     return "".join(asjp_string)
 
 
-def normalized_levenshtein(modern,proto):
-    mean_len = np.mean([len(modern),len(proto)])
-    #proto_len = len(proto)
+def normalized_levenshtein(modern,proto, norm):
+    if norm == "mean":
+        norm_len = np.mean([len(modern),len(proto)])
+    elif norm == "max":
+        norm_len = max(len(modern), len(proto))
+    else:
+        raise ValueError("norm should be one of 'mean' or 'max'.")
     raw_dist = editdistance.eval(modern, proto)
-    return raw_dist / mean_len if mean_len > 0 else 0
+    return raw_dist / norm_len if norm_len > 0 else 0
 
 
 ##########################################
@@ -128,6 +134,12 @@ def main():
     #languages_one_protoform_na = df[df["proto_form"].isna()][["language"]]
     #df = df[~df["language"].isin(languages_one_protoform_na["language"])]
     stats_df(df, "after removing proto NA")
+
+    proto_lengths = df.groupby(["proto_language","person_number"]).first()["proto_length"]
+    proto_lengths.to_csv("proto_lengths_fam.csv")
+    proto_lengths_zero = proto_lengths[proto_lengths == 0.0]
+    # proto_lengths_zero = proto_lengths[proto_lengths["proto_length"] == 0.0]
+    proto_lengths_zero.to_csv("proto_lengths_fam_zero.csv")
 
 
     # Find languages which have both protoform and modern form with length 0
@@ -184,7 +196,7 @@ def main():
         # df[f"{form_type}_corr"] = df[f"{form_type}_corr"].apply(ipa_to_soundclass)
         df[f"{form_type}_corr"] = df[f"{form_type}_corr"].apply(unidecode.unidecode)
 
-    df["proto_levenshtein"] = df.apply(lambda x: normalized_levenshtein(x["modern_form_corr"], x["proto_form_corr"]), axis=1)
+    df["proto_levenshtein"] = df.apply(lambda x: normalized_levenshtein(x["modern_form_corr"], x["proto_form_corr"], NORMALIZATION), axis=1)
 
     df["person_merged"] = df["person"].apply(lambda p: "third" if p=="third" else "firstsecond")
 
@@ -263,8 +275,8 @@ def main():
                 plot(predictionsProtoLev)+
                 ggtitle("Mixed effect model Levenshtein distance proto and modern length")+
                 labs(y = "Levenshtein distance")
-                ggsave("{OUTPUT_DIR_PROTO}/predictions_proto_levenshtein{proto0_label}.png", bg = "white")
-                ggsave("{OUTPUT_DIR_PROTO}/predictions_proto_levenshtein{proto0_label}.pdf", bg = "white")
+                ggsave("{OUTPUT_DIR_PROTO}/predictions_proto_levenshtein{proto0_label}{norm_label}.png", bg = "white")
+                ggsave("{OUTPUT_DIR_PROTO}/predictions_proto_levenshtein{proto0_label}{norm_label}.pdf", bg = "white")
 
                 modelProtoLevMerged <- lmer(proto_levenshtein ~ person_merged*number + (1|clade3), data=df)
                 modelProtoLevMergedSum <- summary(modelProtoLevMerged)
@@ -272,8 +284,8 @@ def main():
                 plot(predictionsProtoLevMerged)+
                 ggtitle("Mixed effect model Levenshtein distance proto and modern length merged")+
                 labs(y = "Levenshtein distance")
-                ggsave("{OUTPUT_DIR_PROTO}/predictions_proto_levenshtein_merged{proto0_label}.png", bg = "white")
-                ggsave("{OUTPUT_DIR_PROTO}/predictions_proto_levenshtein_merged{proto0_label}.pdf", bg = "white")
+                ggsave("{OUTPUT_DIR_PROTO}/predictions_proto_levenshtein_merged{proto0_label}{norm_label}.png", bg = "white")
+                ggsave("{OUTPUT_DIR_PROTO}/predictions_proto_levenshtein_merged{proto0_label}{norm_label}.pdf", bg = "white")
 
                 # ANOVA test: proto lev
                 modelProtoLevMergedML <- lmer(proto_levenshtein ~ person_merged*number + (1|clade3), data=df, REML=FALSE)
@@ -312,7 +324,7 @@ def main():
     for (pl,pn), group in df.groupby(["proto_language", "person_number"]):
         # print(group[["proto_language", "person_number", "modern_form", "modern_length"]])
         modern_diff_length = group["modern_length"].aggregate(lambda x: pdist(np.array(x)[np.newaxis].T))
-        modern_levenshtein = group["modern_form_corr"].aggregate(lambda x: [normalized_levenshtein(a,b) for a,b in combinations(np.array(x),2)])
+        modern_levenshtein = group["modern_form_corr"].aggregate(lambda x: [normalized_levenshtein(a,b, NORMALIZATION) for a,b in combinations(np.array(x),2)])
         # print(modern_diff_length)
         # print(modern_levenshtein)
         d = pd.DataFrame()
@@ -327,29 +339,29 @@ def main():
 
     ### Create all plots 
     sns.violinplot(x="person_number", y="proto_diff_length", data=df) # hue="proto_language"
-    plt.savefig(os.path.join(OUTPUT_DIR_PROTO,f"proto_diff_length_violin{proto0_label}.{img_extension}"))
+    plt.savefig(os.path.join(OUTPUT_DIR_PROTO,f"proto_diff_length_violin{proto0_label}.{img_extension_pyplots}"))
     plt.clf()
     sns.stripplot(x="person_number", y="proto_diff_length", data=df)
-    plt.savefig(os.path.join(OUTPUT_DIR_PROTO,f"proto_diff_length_strip{proto0_label}.{img_extension}"))
+    plt.savefig(os.path.join(OUTPUT_DIR_PROTO,f"proto_diff_length_strip{proto0_label}.{img_extension_pyplots}"))
     plt.clf()
     sns.boxplot(x="person_number", y="proto_diff_length", data=df)
-    plt.savefig(os.path.join(OUTPUT_DIR_PROTO,f"proto_diff_length_box{proto0_label}.{img_extension}"))
+    plt.savefig(os.path.join(OUTPUT_DIR_PROTO,f"proto_diff_length_box{proto0_label}.{img_extension_pyplots}"))
     plt.clf()
     sns.boxplot(x="person", hue="number", y="proto_diff_length", data=df)
-    plt.savefig(os.path.join(OUTPUT_DIR_PROTO,f"proto_diff_length_box_person_number{proto0_label}.{img_extension}"))
+    plt.savefig(os.path.join(OUTPUT_DIR_PROTO,f"proto_diff_length_box_person_number{proto0_label}.{img_extension_pyplots}"))
     plt.clf()
 
     sns.violinplot(x="person_number", y="proto_levenshtein", data=df) # hue="proto_language"
-    plt.savefig(os.path.join(OUTPUT_DIR_PROTO,f"proto_levenshtein_violin{proto0_label}.{img_extension}"))
+    plt.savefig(os.path.join(OUTPUT_DIR_PROTO,f"proto_levenshtein_violin{proto0_label}{norm_label}.{img_extension_pyplots}"))
     plt.clf()
     sns.stripplot(x="person_number", y="proto_levenshtein", data=df)
-    plt.savefig(os.path.join(OUTPUT_DIR_PROTO,f"proto_levenshtein_strip{proto0_label}.{img_extension}"))
+    plt.savefig(os.path.join(OUTPUT_DIR_PROTO,f"proto_levenshtein_strip{proto0_label}{norm_label}.{img_extension_pyplots}"))
     plt.clf()
     sns.boxplot(x="person_number", y="proto_levenshtein", data=df)
-    plt.savefig(os.path.join(OUTPUT_DIR_PROTO,f"proto_levenshtein_box{proto0_label}.{img_extension}"))
+    plt.savefig(os.path.join(OUTPUT_DIR_PROTO,f"proto_levenshtein_box{proto0_label}{norm_label}.{img_extension_pyplots}"))
     plt.clf()
     sns.boxplot(x="person", hue="number", y="proto_levenshtein", data=df)
-    plt.savefig(os.path.join(OUTPUT_DIR_PROTO,f"proto_levenshtein_box_person_number{proto0_label}.{img_extension}"))
+    plt.savefig(os.path.join(OUTPUT_DIR_PROTO,f"proto_levenshtein_box_person_number{proto0_label}{norm_label}.{img_extension_pyplots}"))
     plt.clf()
 
     # ## Modern pairwise length difference
