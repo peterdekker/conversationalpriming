@@ -23,7 +23,7 @@ STEPS = [5000]
 N_AGENTS = 100
 PROP_INNOVATOR_AGENTS = 0.2
 INIT_PROP_INNOVATIVE_INNOVATOR = 0.9
-INIT_PROP_INNOVATIVE_CONSERVATOR = 0.0
+INIT_PROP_INNOVATIVE_CONSERVATOR = 0.00
 FREQ_3SG = 1/3
 
 BOOST_CONSERVATIVE = 0.01
@@ -33,9 +33,9 @@ FORGET_WEIGHT = 0.00
 SURPRISAL = False
 ENTROPY = False
 REPEATS = True
-CONV_PRIMING = True
+CONVERSATIONAL_PRIMING = True
 FRIEND_NETWORK = False
-INNOVATOR_NO_CONV_PRIMING = False
+INNOVATOR_NO_CONVERSATIONAL_PRIMING = False
 INNOVATOR_ONLY_BOOST_PRODUCTION = False
 N_INTERACTIONS_INTERLOCUTOR = 1
 
@@ -51,9 +51,9 @@ model_params = {
     "surprisal": {"ui": Checkbox('Surprisal', value=SURPRISAL), "script": SURPRISAL},
     "entropy": {"ui": Checkbox('Entropy', value=ENTROPY), "script": ENTROPY},
     "repeats": {"ui": Checkbox('Repeats', value=REPEATS), "script": REPEATS},
-    "conv_priming": {"ui": Checkbox('conv_priming', value=CONV_PRIMING), "script": CONV_PRIMING},
+    "conversational_priming": {"ui": Checkbox('conversational_priming', value=CONVERSATIONAL_PRIMING), "script": CONVERSATIONAL_PRIMING},
     "friend_network": {"ui": Checkbox('Friend network', value=FRIEND_NETWORK), "script": FRIEND_NETWORK},
-    "innovator_no_conv_priming": {"ui": Checkbox('Innovator no conv_priming', value=INNOVATOR_NO_CONV_PRIMING), "script": INNOVATOR_NO_CONV_PRIMING},
+    "innovator_no_conversational_priming": {"ui": Checkbox('Innovator no conversational_priming', value=INNOVATOR_NO_CONVERSATIONAL_PRIMING), "script": INNOVATOR_NO_CONVERSATIONAL_PRIMING},
     "innovator_only_boost_production": {"ui": Checkbox('Innovator only boost production', value=INNOVATOR_ONLY_BOOST_PRODUCTION), "script": INNOVATOR_ONLY_BOOST_PRODUCTION},
     "n_interactions_interlocutor": {"ui": Slider("# interactions per interlocutor", N_INTERACTIONS_INTERLOCUTOR, 1, 100, 1), "script": N_INTERACTIONS_INTERLOCUTOR},
     "browser_visualization": {"ui": True, "script": False},
@@ -72,6 +72,6 @@ evaluation_params = {
     "contrast_persons": False
 }
 
-bool_params = ["surprisal", "entropy", "repeats", "conv_priming", "friend_network", "innovator_no_conv_priming", "innovator_only_boost_production", "browser_visualization", "use_grid",  "contrast_persons"]
+bool_params = ["surprisal", "entropy", "repeats", "conversational_priming", "friend_network", "innovator_no_conversational_priming", "innovator_only_boost_production", "browser_visualization", "use_grid",  "contrast_persons"]
 
 string_params = ["runlabel", "plot_from_raw"]

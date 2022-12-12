@@ -19,7 +19,7 @@ class Model(Model):
     Model class
     '''
 
-    def __init__(self, n_agents, prop_innovator_agents, init_prop_innovative_innovator, init_prop_innovative_conservator, freq_3sg, boost_conservative, boost_innovative, forget_weight, surprisal, entropy, repeats, conv_priming, friend_network, innovator_no_conv_priming, innovator_only_boost_production, n_interactions_interlocutor, browser_visualization, use_grid):
+    def __init__(self, n_agents, prop_innovator_agents, init_prop_innovative_innovator, init_prop_innovative_conservator, freq_3sg, boost_conservative, boost_innovative, forget_weight, surprisal, entropy, repeats, conversational_priming, friend_network, innovator_no_conversational_priming, innovator_only_boost_production, n_interactions_interlocutor, browser_visualization, use_grid):
         '''
         Initialize field
         '''
@@ -35,9 +35,9 @@ class Model(Model):
         assert type(surprisal) == bool
         assert type(entropy) == bool
         assert type(repeats) == bool
-        assert type(conv_priming) == bool
+        assert type(conversational_priming) == bool
         assert type(friend_network) == bool
-        assert type(innovator_no_conv_priming) == bool
+        assert type(innovator_no_conversational_priming) == bool
         assert type(innovator_only_boost_production) == bool
         assert n_interactions_interlocutor >= 1 and n_interactions_interlocutor <= 100
         assert type(browser_visualization) == bool
@@ -55,9 +55,9 @@ class Model(Model):
         self.surprisal = surprisal
         self.entropy = entropy
         self.repeats = repeats
-        self.conv_priming = conv_priming
+        self.conversational_priming = conversational_priming
         self.friend_network = friend_network
-        self.innovator_no_conv_priming = innovator_no_conv_priming
+        self.innovator_no_conversational_priming = innovator_no_conversational_priming
         self.innovator_only_boost_production = innovator_only_boost_production
         self.n_interactions_interlocutor = int(n_interactions_interlocutor)
         self.browser_visualization = browser_visualization

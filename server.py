@@ -68,4 +68,4 @@ n_communicated_chart = ChartModule([{"Label": "n_communicated_1sg", "Color": "Re
 
 server = ModularServer(Model,
                        [canvas_element, communicated_1sg_chart, communicated_3sg_chart, internal_1sg_chart, internal_3sg_chart, dominant_1sg_chart, dominant_3sg_chart],
-                       "Conversational conv_priming", model_params_ui)
+                       "Conversational priming", model_params_ui)
