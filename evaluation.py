@@ -214,8 +214,8 @@ def main():
                 create_graph(run_data, var_param,
                                     stats=communicated_stats, mode="communicated", output_dir=output_dir_custom)
                 
-                create_graph(run_data, var_param,
-                                    stats=internal_stats, mode="internal", output_dir=output_dir_custom)
+                # create_graph(run_data, var_param,
+                #                     stats=internal_stats, mode="internal", output_dir=output_dir_custom)
         
 
 
