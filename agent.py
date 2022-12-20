@@ -2,7 +2,7 @@ import mesa
 
 from verb import Verb
 from util import choice_prob, update_communicated
-from config import RG, logging, SMOOTHING_SURPRISAL, PERSONS, INNOVATIVE_FORM
+from config import RG, logging, PERSONS, INNOVATIVE_FORM
 import numpy as np
 
 
