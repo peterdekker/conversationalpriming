@@ -36,7 +36,7 @@ OUTPUT_DIR_MODERN = os.path.join(OUTPUT_DIR, "modern")
 # User-settable param:
 # Include languages (and thus whole families) where one of the protoforms is zero
 INCLUDE_LANGUAGES_PROTO_0 = False
-NORMALIZATION = "mean"
+NORMALIZATION = "none" #"mean"
 proto0_label = "_proto0" if INCLUDE_LANGUAGES_PROTO_0 else ""
 norm_label = f"_{NORMALIZATION}"
 
@@ -95,6 +95,8 @@ def normalized_levenshtein(modern,proto, norm):
         norm_len = np.mean([len(modern),len(proto)])
     elif norm == "max":
         norm_len = max(len(modern), len(proto))
+    elif norm=="none":
+        norm_len = 1
     else:
         raise ValueError("norm should be one of 'mean' or 'max'.")
     raw_dist = editdistance.eval(modern, proto)
