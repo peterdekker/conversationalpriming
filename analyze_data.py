@@ -36,7 +36,7 @@ OUTPUT_DIR_MODERN = os.path.join(OUTPUT_DIR, "modern")
 # User-settable param:
 # Include languages (and thus whole families) where one of the protoforms is zero
 INCLUDE_LANGUAGES_PROTO_0 = False
-NORMALIZATION = "mean"
+NORMALIZATION = "sqrt"
 proto0_label = "_proto0" if INCLUDE_LANGUAGES_PROTO_0 else ""
 norm_label = f"_{NORMALIZATION}"
 
@@ -91,15 +91,17 @@ person_markers = ["1sg", "2sg", "3sg", "1pl", "2pl", "3pl"]
 
 
 def normalized_levenshtein(modern,proto, norm):
+    raw_dist = editdistance.eval(modern, proto)
     if norm == "mean":
         norm_len = np.mean([len(modern),len(proto)])
     elif norm == "max":
         norm_len = max(len(modern), len(proto))
+    elif norm=="sqrt":
+        norm_len = np.sqrt(np.mean([len(modern),len(proto)]))
     elif norm=="none":
         norm_len = 1
     else:
         raise ValueError("norm should be one of 'mean' or 'max'.")
-    raw_dist = editdistance.eval(modern, proto)
     return raw_dist / norm_len if norm_len > 0 else 0
 
 
@@ -212,31 +214,32 @@ def main():
                 library(tidyverse)
                 library(lme4)
                 library(ggeffects)
+                library(afex)
                 df <- mutate(df,
                             number = relevel(factor(number), ref = 'sg'))
 
-                modelProtoDiffLength <- lmer(proto_diff_length ~ person*number + (1|clade3), data=df)
-                modelProtoDiffLengthSum <- summary(modelProtoDiffLength)
-                predictionsProtoDiffLength <- ggpredict(model=modelProtoDiffLength, terms=c('person','number'))
-                plot(predictionsProtoDiffLength)+
-                ggtitle("Mixed effect model difference proto and modern length")+
-                labs(y = "proto length - modern length")
-                ggsave("{OUTPUT_DIR_PROTO}/predictions_proto_diff_length{proto0_label}.png", bg = "white")
-                ggsave("{OUTPUT_DIR_PROTO}/predictions_proto_diff_length{proto0_label}.pdf", bg = "white")
+                # modelProtoDiffLength <- lmer(proto_diff_length ~ person*number + (1|clade3), data=df)
+                # modelProtoDiffLengthSum <- summary(modelProtoDiffLength)
+                # predictionsProtoDiffLength <- ggpredict(model=modelProtoDiffLength, terms=c('person','number'))
+                # plot(predictionsProtoDiffLength)+
+                # ggtitle("Mixed effect model difference proto and modern length")+
+                # labs(y = "proto length - modern length")
+                # ggsave("{OUTPUT_DIR_PROTO}/predictions_proto_diff_length{proto0_label}.png", bg = "white")
+                # ggsave("{OUTPUT_DIR_PROTO}/predictions_proto_diff_length{proto0_label}.pdf", bg = "white")
 
-                modelProtoDiffLengthMerged <- lmer(proto_diff_length ~ person_merged*number + (1|clade3), data=df)
-                modelProtoDiffLengthMergedSum <- summary(modelProtoDiffLengthMerged)
-                predictionsProtoDiffLengthMerged <- ggpredict(model=modelProtoDiffLengthMerged, terms=c('person_merged','number'))
-                plot(predictionsProtoDiffLengthMerged)+
-                ggtitle("Mixed effect model difference proto and modern length merged")+
-                labs(y = "proto length - modern length")
-                ggsave("{OUTPUT_DIR_PROTO}/predictions_proto_diff_length merged{proto0_label}.png", bg = "white")
-                ggsave("{OUTPUT_DIR_PROTO}/predictions_proto_diff_length merged{proto0_label}.pdf", bg = "white")
+                # modelProtoDiffLengthMerged <- lmer(proto_diff_length ~ person_merged*number + (1|clade3), data=df)
+                # modelProtoDiffLengthMergedSum <- summary(modelProtoDiffLengthMerged)
+                # predictionsProtoDiffLengthMerged <- ggpredict(model=modelProtoDiffLengthMerged, terms=c('person_merged','number'))
+                # plot(predictionsProtoDiffLengthMerged)+
+                # ggtitle("Mixed effect model difference proto and modern length merged")+
+                # labs(y = "proto length - modern length")
+                # ggsave("{OUTPUT_DIR_PROTO}/predictions_proto_diff_length merged{proto0_label}.png", bg = "white")
+                # ggsave("{OUTPUT_DIR_PROTO}/predictions_proto_diff_length merged{proto0_label}.pdf", bg = "white")
 
-                # ANOVA test: diff length
-                modelProtoDiffLengthMergedML <- lmer(proto_diff_length ~ person_merged*number + (1|clade3), data=df, REML=FALSE)
-                modelProtoDiffLengthMergedNoPerson <- lmer(proto_diff_length ~ number + (1|clade3), data=df, REML=FALSE)
-                anovaDiffLengthMerged <- anova(modelProtoDiffLengthMergedNoPerson, modelProtoDiffLengthMergedML, test = 'Chisq')
+                # # ANOVA test: diff length
+                # modelProtoDiffLengthMergedML <- lmer(proto_diff_length ~ person_merged*number + (1|clade3), data=df, REML=FALSE)
+                # modelProtoDiffLengthMergedNoPerson <- lmer(proto_diff_length ~ number + (1|clade3), data=df, REML=FALSE)
+                # anovaDiffLengthMerged <- anova(modelProtoDiffLengthMergedNoPerson, modelProtoDiffLengthMergedML, test = 'Chisq')
 
                 modelProtoLev <- lmer(proto_levenshtein ~ person*number + (1|clade3), data=df)
                 modelProtoLevSum <- summary(modelProtoLev)
@@ -247,42 +250,34 @@ def main():
                 ggsave("{OUTPUT_DIR_PROTO}/predictions_proto_levenshtein{proto0_label}{norm_label}.png", bg = "white")
                 ggsave("{OUTPUT_DIR_PROTO}/predictions_proto_levenshtein{proto0_label}{norm_label}.pdf", bg = "white")
 
-                modelProtoLevMerged <- lmer(proto_levenshtein ~ person_merged*number + (1|clade3), data=df)
-                modelProtoLevMergedSum <- summary(modelProtoLevMerged)
-                predictionsProtoLevMerged <- ggpredict(model=modelProtoLevMerged, terms=c('person_merged','number'))
-                plot(predictionsProtoLevMerged)+
-                ggtitle("Mixed effect model Levenshtein distance proto and modern length merged")+
-                labs(y = "Levenshtein distance")
-                ggsave("{OUTPUT_DIR_PROTO}/predictions_proto_levenshtein_merged{proto0_label}{norm_label}.png", bg = "white")
-                ggsave("{OUTPUT_DIR_PROTO}/predictions_proto_levenshtein_merged{proto0_label}{norm_label}.pdf", bg = "white")
+                # ANOVA test
+                # modelProtoLevML <- lmer(proto_levenshtein ~ person*number + (1|clade3), data=df, REML=FALSE)
+                # modelProtoLevMLSum <- summary(modelProtoLevML)
+                # modelProtoLevNoPerson <- lmer(proto_levenshtein ~ number + (1|clade3), data=df, REML=FALSE)
+                # anovaLev <- anova(modelProtoLevNoPerson, modelProtoLevML, test = 'Chisq')
+                anovaLevAfex <- mixed(proto_levenshtein ~ person*number + (1|clade3), data=df, method='LRT')
 
-                # ANOVA test: proto lev
-                modelProtoLevMergedML <- lmer(proto_levenshtein ~ person_merged*number + (1|clade3), data=df, REML=FALSE)
-                modelProtoLevMergedNoPerson <- lmer(proto_levenshtein ~ number + (1|clade3), data=df, REML=FALSE)
-                anovaLevMerged <- anova(modelProtoLevMergedNoPerson, modelProtoLevMergedML, test = 'Chisq')
+                # modelProtoLevMerged <- lmer(proto_levenshtein ~ person_merged*number + (1|clade3), data=df)
+                # modelProtoLevMergedSum <- summary(modelProtoLevMerged)
+                # predictionsProtoLevMerged <- ggpredict(model=modelProtoLevMerged, terms=c('person_merged','number'))
+                # plot(predictionsProtoLevMerged)+
+                # ggtitle("Mixed effect model Levenshtein distance proto and modern length merged")+
+                # labs(y = "Levenshtein distance")
+                # ggsave("{OUTPUT_DIR_PROTO}/predictions_proto_levenshtein_merged{proto0_label}{norm_label}.png", bg = "white")
+                # ggsave("{OUTPUT_DIR_PROTO}/predictions_proto_levenshtein_merged{proto0_label}{norm_label}.pdf", bg = "white")
+                # ANOVA test: proto lev merged
+                # modelProtoLevMergedML <- lmer(proto_levenshtein ~ person_merged*number + (1|clade3), data=df, REML=FALSE)
+                # modelProtoLevMergedNoPerson <- lmer(proto_levenshtein ~ number + (1|clade3), data=df, REML=FALSE)
+                # anovaLevMerged <- anova(modelProtoLevMergedNoPerson, modelProtoLevMergedML, test = 'Chisq')
                 ''')
-        
-        print(" - Proto diff length")
-        print(lc['modelProtoDiffLengthSum'])
-        print(lc['predictionsProtoDiffLength'])
-
-        print(" - Proto diff length merged")
-        print(lc['modelProtoDiffLengthMergedSum'])
-        print(lc['predictionsProtoDiffLengthMerged'])
-
-        print(" - Anova diff length merged")
-        print(lc["anovaDiffLengthMerged"])
 
         print(" - Proto Levenshtein")
         print(lc['modelProtoLevSum'])
         print(lc['predictionsProtoLev'])
 
-        print(" - Proto Levenshtein merged")
-        print(lc['modelProtoLevMergedSum'])
-        print(lc['predictionsProtoLevMerged'])
 
-        print (" - Anova lev merged")
-        print(lc['anovaLevMerged'])
+        print(" - Anova afex")
+        print(lc['anovaLevAfex'])
 
 
     ## Analysis length: pairwise difference between modern forms within language family

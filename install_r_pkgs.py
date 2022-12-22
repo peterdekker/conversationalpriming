@@ -1,4 +1,4 @@
-packnames = ('lme4','tidyverse', 'ggeffects') #, 'lmerTest', 'emmeans', "geepack")
+packnames = ('lme4','tidyverse', 'ggeffects', 'afex') #, 'lmerTest', 'emmeans', "geepack")
 from rpy2.robjects.packages import importr
 from rpy2.robjects.vectors import StrVector
 utils = importr("utils")
