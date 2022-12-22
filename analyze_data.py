@@ -36,7 +36,7 @@ OUTPUT_DIR_MODERN = os.path.join(OUTPUT_DIR, "modern")
 # User-settable param:
 # Include languages (and thus whole families) where one of the protoforms is zero
 INCLUDE_LANGUAGES_PROTO_0 = False
-NORMALIZATION = "none" #"mean"
+NORMALIZATION = "mean"
 proto0_label = "_proto0" if INCLUDE_LANGUAGES_PROTO_0 else ""
 norm_label = f"_{NORMALIZATION}"
 
@@ -137,11 +137,14 @@ def main():
     #df = df[~df["language"].isin(languages_one_protoform_na["language"])]
     stats_df(df, "after removing proto NA")
 
+    # Creating tables with zero forms, to aid discussion in paper
     proto_lengths = df.groupby(["proto_language","person_number"]).first()["proto_length"]
     proto_lengths.to_csv("proto_lengths_fam.csv")
     proto_lengths_zero = proto_lengths[proto_lengths == 0.0]
     # proto_lengths_zero = proto_lengths[proto_lengths["proto_length"] == 0.0]
     proto_lengths_zero.to_csv("proto_lengths_fam_zero.csv")
+    modern_reflexes_proto_lengths_zero = pd.merge(df, proto_lengths_zero, on=["proto_language", "person_number"])
+    modern_reflexes_proto_lengths_zero.to_csv("modern_reflexes_proto_zero.csv")
 
 
     # Find languages which have both protoform and modern form with length 0
@@ -154,7 +157,6 @@ def main():
     # Show number of languages per family
     nunique_family = df.groupby("proto_language")["language"].nunique()
     # print(nunique_family)
-    families_above_threshold = nunique_family[nunique_family >= 10]
 
     ### Analysis length: difference modern form and protoform
     df["proto_diff_length"] = (df["modern_length"] - df["proto_length"])
@@ -202,41 +204,6 @@ def main():
 
     df["person_merged"] = df["person"].apply(lambda p: "third" if p=="third" else "firstsecond")
 
-    # Edit dist, grouped per language family
-    # grouped_proto_levenshtein = df.groupby(["person_number", "proto_language"]).mean().sort_values("proto_language")
-
-    ### Do statistical analyses
-    # persons_numbers = [(p,n) for n in ["sg","pl"] for p in ["first","second","third"] ]
-    # pn_matrix = pd.DataFrame(persons_numbers, columns=["person","number"])
-    
-    # # Poisson mixed model: https://www.statsmodels.org/stable/generated/statsmodels.genmod.bayes_mixed_glm.PoissonBayesMixedGLM.html#statsmodels.genmod.bayes_mixed_glm.PoissonBayesMixedGLM
-    # # Easier, GLM with family argument: https://www.kaggle.com/code/hongpeiyi/poisson-regression-with-statsmodels
-
-    # print("Regression proto diff length")
-    # mixedlm_proto_diff_length = smf.mixedlm("proto_diff_length ~ person*C(number, Treatment('sg'))", groups=df["clade3"], data = df).fit()
-    # #mixedlm_proto_diff_length = smf.mixedlm("proto_diff_length ~ person_number", groups=df["proto_language"], data = df).fit()
-    # print(mixedlm_proto_diff_length.summary())
-    # pn_matrix["predictions_mixedlm_proto_diff_length"] = mixedlm_proto_diff_length.predict(pn_matrix)
-    # # print(mixedlm_proto_diff_length.t_test(matrix))
-    # # TODO: How to get predictions with their own standard deviations?
-    # # https://tedboy.github.io/statsmodels_doc/generated/statsmodels.sandbox.regression.predstd.wls_prediction_std.html#statsmodels.sandbox.regression.predstd.wls_prediction_std
-    # # Use t-test? https://stats.stackexchange.com/questions/578398/getting-confidence-interval-for-prediction-from-statsmodel-robust-linear-model
-
-    # print("Regression proto Levenshtein")
-    # mixedlm_proto_levenshtein = smf.mixedlm("proto_levenshtein ~ person*C(number, Treatment('sg'))", groups=df["clade3"], data = df).fit()
-    # print(mixedlm_proto_levenshtein.summary())
-    # pn_matrix["predictions_mixedlm_proto_levenshtein"] = mixedlm_proto_levenshtein.predict(pn_matrix)
-
-    # print(pn_matrix)
-
-    # print("Regression proto diff length, joint person-number")
-    # mixedlm_proto_diff_length_pn_joint = smf.mixedlm("proto_diff_length ~ person_number + 0 ", groups=df["clade3"], data = df).fit()
-    # print(mixedlm_proto_diff_length_pn_joint.summary())
-
-    # print("Regression proto Levenshtein, joint person-number")
-    # mixedlm_proto_levenshtein_pn_joint = smf.mixedlm("proto_levenshtein ~ person_number + 0", groups=df["clade3"], data = df).fit()
-    # print(mixedlm_proto_levenshtein_pn_joint.summary())
-    #df["proto_diff_length"] = np.abs(df["proto_diff_length"])
     ## Statistical analyses in R
     with robjects.local_context() as lc:
         lc['df'] = df
