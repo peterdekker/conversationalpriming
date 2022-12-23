@@ -36,7 +36,7 @@ OUTPUT_DIR_MODERN = os.path.join(OUTPUT_DIR, "modern")
 # User-settable param:
 # Include languages (and thus whole families) where one of the protoforms is zero
 INCLUDE_LANGUAGES_PROTO_0 = False
-NORMALIZATION = "sqrt"
+NORMALIZATION = "none"
 proto0_label = "_proto0" if INCLUDE_LANGUAGES_PROTO_0 else ""
 norm_label = f"_{NORMALIZATION}"
 
