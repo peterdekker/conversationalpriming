@@ -10,13 +10,13 @@ import os
 # from pyclts import CLTS
 import unidecode
 import numpy as np
-from scipy.spatial.distance import pdist, squareform
+#from scipy.spatial.distance import pdist, squareform
 # from statsmodels.formula.api import ols
 # import statsmodels.formula.api as smf
 from itertools import combinations
 
 import rpy2.robjects as robjects
-# import rpy2.robjects.numpy2ri
+import rpy2.robjects.numpy2ri
 import rpy2.robjects.pandas2ri
 robjects.numpy2ri.activate()
 robjects.pandas2ri.activate()
