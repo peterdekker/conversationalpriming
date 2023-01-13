@@ -47,49 +47,6 @@ person_markers = ["1sg", "2sg", "3sg", "1pl", "2pl", "3pl"]
 
 
 
-
-
-######################################## Not used at the moment
-
-# def download_if_needed(archive_path, archive_url, file_path, label):
-#     if not os.path.exists(file_path):
-#         # Create parent dirs
-#         #p = pathlib.Path(file_path)
-#         #p.parent.mkdir(parents=True, exist_ok=True)
-#         with open(archive_path, 'wb') as f:
-#             print(f"Downloading {label} from {archive_url}")
-#             try:
-#                 r = requests.get(archive_url, allow_redirects=True)
-#             except requests.exceptions.RequestException as e:  # This is the correct syntax
-#                 raise SystemExit(e)
-#             # Write downloaded content to file
-#             f.write(r.content)
-#             if archive_path.endswith(".tar.gz"):
-#                 print("Unpacking archive.")
-#                 shutil.unpack_archive(archive_path, currentdir)
-
-# def load_clts():
-#     # Download CLTS
-#     download_if_needed(CLTS_ARCHIVE_PATH, CLTS_ARCHIVE_URL, CLTS_PATH, "CLTS")
-
-
-# def ipa_to_soundclass(ipa_string):
-#     asjp_string = []
-#     for char_ipa in ipa_string:
-#         char_asjp = clts.bipa.translate(char_ipa, asjp)
-#         # Only add ASJP char if original char was recognized. Otherwise add original
-#         if char_asjp == "?":
-#             asjp_string.append(char_ipa)
-#         else:
-#             asjp_string.append(char_asjp)
-#     # ipa_string_spaced = " ".join(ipa_string)
-#     # asjp_string_spaced = clts.bipa.translate(ipa_string_spaced, asjp)
-#     # asjp_string = asjp_string_spaced.replace(" ", "")
-#     # if "?" in asjp_string:
-#     #     print(f"{ipa_string} ||| {ipa_string_spaced} ||| {asjp_string_spaced} ||| {asjp_string}")
-#     return "".join(asjp_string)
-
-
 def normalized_levenshtein(modern,proto, norm):
     raw_dist = editdistance.eval(modern, proto)
     if norm == "mean":
@@ -119,9 +76,6 @@ def stats_df(df, label):
     print(f"{label}: entries: {n_entries}, languages: {n_languages}, proto_languages: {n_proto_languages}")
 
 def main():
-    # load_clts()
-    # clts = CLTS(f"{currentdir}/clts-2.1.0")
-    # asjp = clts.soundclass("asjp")
 
     if not os.path.exists(OUTPUT_DIR_PROTO):
         os.makedirs(OUTPUT_DIR_PROTO)
@@ -129,6 +83,8 @@ def main():
         os.makedirs(OUTPUT_DIR_MODERN)
 
     df = pd.read_csv("data/verbal_person-number_indexes_merged.csv")
+    # Create an excerpt of Serzant & Moroz (2022) data, for the supplementary material
+    df[["language", "proto_language", "person_number", "person", "number", "modern_form", "proto_form", "clade3"]].head(18).to_latex("excerpt_serzantmoroz2022.tex")
     df = df.drop(columns=["source", "comment", "proto_source", "proto_comments", "changed_GM"])
     stats_df(df, "original")
     # Filter out entries without form or protoform (removes languages without protolanguage + possibly more)
@@ -282,38 +238,38 @@ def main():
 
     ## Analysis length: pairwise difference between modern forms within language family
     # With full groupby aggregate, we can only get one value (mean) per language family. (or maybe one value per language)
-    # We want every comparison as separate data point
-    # print(df.groupby(["proto_language", "person_number"])["modern_length"].aggregate(lambda x: pdist(np.array(x)[np.newaxis].T)))
-    modern_pairwise_dfs = []
-    for (pl,pn), group in df.groupby(["proto_language", "person_number"]):
-        # print(group[["proto_language", "person_number", "modern_form", "modern_length"]])
-        modern_diff_length = group["modern_length"].aggregate(lambda x: pdist(np.array(x)[np.newaxis].T))
-        modern_levenshtein = group["modern_form_corr"].aggregate(lambda x: [normalized_levenshtein(a,b, NORMALIZATION) for a,b in combinations(np.array(x),2)])
-        # print(modern_diff_length)
-        # print(modern_levenshtein)
-        d = pd.DataFrame()
-        d["modern_diff_length"] = modern_diff_length
-        d["modern_levenshtein"] = modern_levenshtein
-        d["proto_language"] = pl
-        d["person_number"] = pn
-        #print(d)
-        modern_pairwise_dfs.append(d)
+    # # We want every comparison as separate data point
+    # # print(df.groupby(["proto_language", "person_number"])["modern_length"].aggregate(lambda x: pdist(np.array(x)[np.newaxis].T)))
+    # modern_pairwise_dfs = []
+    # for (pl,pn), group in df.groupby(["proto_language", "person_number"]):
+    #     # print(group[["proto_language", "person_number", "modern_form", "modern_length"]])
+    #     modern_diff_length = group["modern_length"].aggregate(lambda x: pdist(np.array(x)[np.newaxis].T))
+    #     modern_levenshtein = group["modern_form_corr"].aggregate(lambda x: [normalized_levenshtein(a,b, NORMALIZATION) for a,b in combinations(np.array(x),2)])
+    #     # print(modern_diff_length)
+    #     # print(modern_levenshtein)
+    #     d = pd.DataFrame()
+    #     d["modern_diff_length"] = modern_diff_length
+    #     d["modern_levenshtein"] = modern_levenshtein
+    #     d["proto_language"] = pl
+    #     d["person_number"] = pn
+    #     #print(d)
+    #     modern_pairwise_dfs.append(d)
     
-    df_modern_pairwise = pd.concat(modern_pairwise_dfs)
+    # df_modern_pairwise = pd.concat(modern_pairwise_dfs)
 
     ### Create all plots 
-    sns.violinplot(x="person_number", y="proto_diff_length", data=df) # hue="proto_language"
-    plt.savefig(os.path.join(OUTPUT_DIR_PROTO,f"proto_diff_length_violin{proto0_label}.{img_extension_pyplots}"))
-    plt.clf()
-    sns.stripplot(x="person_number", y="proto_diff_length", data=df)
-    plt.savefig(os.path.join(OUTPUT_DIR_PROTO,f"proto_diff_length_strip{proto0_label}.{img_extension_pyplots}"))
-    plt.clf()
-    sns.boxplot(x="person_number", y="proto_diff_length", data=df)
-    plt.savefig(os.path.join(OUTPUT_DIR_PROTO,f"proto_diff_length_box{proto0_label}.{img_extension_pyplots}"))
-    plt.clf()
-    sns.boxplot(x="person", hue="number", y="proto_diff_length", data=df)
-    plt.savefig(os.path.join(OUTPUT_DIR_PROTO,f"proto_diff_length_box_person_number{proto0_label}.{img_extension_pyplots}"))
-    plt.clf()
+    # sns.violinplot(x="person_number", y="proto_diff_length", data=df) # hue="proto_language"
+    # plt.savefig(os.path.join(OUTPUT_DIR_PROTO,f"proto_diff_length_violin{proto0_label}.{img_extension_pyplots}"))
+    # plt.clf()
+    # sns.stripplot(x="person_number", y="proto_diff_length", data=df)
+    # plt.savefig(os.path.join(OUTPUT_DIR_PROTO,f"proto_diff_length_strip{proto0_label}.{img_extension_pyplots}"))
+    # plt.clf()
+    # sns.boxplot(x="person_number", y="proto_diff_length", data=df)
+    # plt.savefig(os.path.join(OUTPUT_DIR_PROTO,f"proto_diff_length_box{proto0_label}.{img_extension_pyplots}"))
+    # plt.clf()
+    # sns.boxplot(x="person", hue="number", y="proto_diff_length", data=df)
+    # plt.savefig(os.path.join(OUTPUT_DIR_PROTO,f"proto_diff_length_box_person_number{proto0_label}.{img_extension_pyplots}"))
+    # plt.clf()
 
     sns.violinplot(x="person_number", y="proto_levenshtein", data=df) # hue="proto_language"
     plt.savefig(os.path.join(OUTPUT_DIR_PROTO,f"proto_levenshtein_violin{proto0_label}{norm_label}.{img_extension_pyplots}"))
@@ -384,7 +340,7 @@ def main():
 
 
 
-    df[["language","modern_form", "modern_form_corr", "proto_form", "proto_form_corr", "modern_length", "proto_length", "proto_diff_length","proto_levenshtein"]].to_csv(os.path.join(OUTPUT_DIR,"metrics.csv"))
+    #df[["language","modern_form", "modern_form_corr", "proto_form", "proto_form_corr", "modern_length", "proto_length", "proto_diff_length","proto_levenshtein"]].to_csv(os.path.join(OUTPUT_DIR,"metrics.csv"))
 
 
 if __name__ == "__main__":
