@@ -7,10 +7,10 @@ import networkx as nx
 
 from collections import defaultdict
 
-from agent import Agent
-from config import RG, STEPS_UPDATE_AGENT_COLOR
-from network import create_innovative_agents, create_network_friend_of_friend_fixed_degree, create_network_complete
-import util
+from agents.agent import Agent
+from agents.config import RG, STEPS_UPDATE_AGENT_COLOR
+from agents.network import create_innovative_agents, create_network_friend_of_friend_fixed_degree, create_network_complete
+import agents.util as util
 
 import numpy as np
 

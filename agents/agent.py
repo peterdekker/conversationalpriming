@@ -1,8 +1,8 @@
 import mesa
 
-from verb import Verb
-from util import choice_prob, update_communicated
-from config import RG, logging, PERSONS, INNOVATIVE_FORM
+from agents.verb import Verb
+from agents.util import choice_prob, update_communicated
+from agents.config import RG, logging, PERSONS, INNOVATIVE_FORM
 import numpy as np
 
 

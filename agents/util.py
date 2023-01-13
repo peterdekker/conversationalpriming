@@ -1,7 +1,7 @@
 import numpy as np
 import os
 
-from config import RG, INNOVATIVE_FORM, AVG_WINDOW_STATS
+from agents.config import RG, INNOVATIVE_FORM, AVG_WINDOW_STATS
 
 def choice_prob(prob_dict, inverse=False):
     probs = [*prob_dict.values()]

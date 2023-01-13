@@ -3,12 +3,12 @@ import pandas as pd
 import numpy as np
 from mesa.batchrunner import BatchRunner, batch_run
 import os
-import util
 import seaborn as sns
 import matplotlib.pyplot as plt
 
-from model import Model
-from config import model_params_script, evaluation_params, bool_params, string_params, OUTPUT_DIR, IMG_FORMATS, LAST_N_STEPS_END_GRAPH, PERSONS
+from agents.model import Model
+from agents.config import model_params_script, evaluation_params, bool_params, string_params, OUTPUT_DIR, IMG_FORMATS
+import agents.util as util
 
 communicated_stats = ["prop_innovative_1sg_innovator_avg", "prop_innovative_1sg_conservator_avg", "prop_innovative_1sg_total_avg", "prop_innovative_2sg_innovator_avg", "prop_innovative_2sg_conservator_avg", "prop_innovative_2sg_total_avg", "prop_innovative_3sg_innovator_avg", "prop_innovative_3sg_conservator_avg", "prop_innovative_3sg_total_avg"]
 internal_stats = ["prop_innovative_1sg_innovator_internal", "prop_innovative_1sg_conservator_internal", "prop_innovative_1sg_total_internal", "prop_innovative_2sg_innovator_internal", "prop_innovative_2sg_conservator_internal", "prop_innovative_2sg_total_internal", "prop_innovative_3sg_innovator_internal", "prop_innovative_3sg_conservator_internal", "prop_innovative_3sg_total_internal"]
