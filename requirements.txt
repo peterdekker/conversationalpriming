@@ -2,14 +2,13 @@ mesa
 argparse
 pandas
 numpy
-scipy
 seaborn
 matplotlib
 networkx
-editdistance
-unidecode # do we keep using this?
 
-# For statistical analysis
+# Only for statistical analysis
 statsmodels
 rpy2
-
+editdistance
+unidecode
+# scipy

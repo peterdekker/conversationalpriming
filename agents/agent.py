@@ -50,7 +50,7 @@ class Agent(mesa.Agent):
             if answer is not None:
                 self.receive_answer(answer)
             
-            # After every interaction, forget random token
+            # After every interaction, forget token
             # Forget one form for every person. This makes frequency assymetry between persons relevant.
             if self.model.forget_weight > 0.0:
                 for person in self.persons:
