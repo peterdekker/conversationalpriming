@@ -16,7 +16,7 @@ IMG_FORMATS = ["png", "pdf"]
 OUTPUT_DIR = f'output-{str(datetime.datetime.now()).replace(" ","-").replace(":",".")}'
 
 # For evaluation script (not browser visualization)
-ITERATIONS = [20]
+ITERATIONS = [50]
 STEPS = [5000]
 
 N_AGENTS = 100
