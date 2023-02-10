@@ -178,7 +178,7 @@ def main():
                 # modelProtoDiffLengthSum <- summary(modelProtoDiffLength)
                 # predictionsProtoDiffLength <- ggpredict(model=modelProtoDiffLength, terms=c('person','number'))
                 # plot(predictionsProtoDiffLength)+
-                # ggtitle("Mixed effect model difference proto and modern length")+
+                # ggtitle("Mixed model difference proto and modern length")+
                 # labs(y = "proto length - modern length")
                 # ggsave("{OUTPUT_DIR_PROTO}/predictions_proto_diff_length{proto0_label}.png", bg = "white")
                 # ggsave("{OUTPUT_DIR_PROTO}/predictions_proto_diff_length{proto0_label}.pdf", bg = "white")
@@ -187,7 +187,7 @@ def main():
                 # modelProtoDiffLengthMergedSum <- summary(modelProtoDiffLengthMerged)
                 # predictionsProtoDiffLengthMerged <- ggpredict(model=modelProtoDiffLengthMerged, terms=c('person_merged','number'))
                 # plot(predictionsProtoDiffLengthMerged)+
-                # ggtitle("Mixed effect model difference proto and modern length merged")+
+                # ggtitle("Mixed model difference proto and modern length merged")+
                 # labs(y = "proto length - modern length")
                 # ggsave("{OUTPUT_DIR_PROTO}/predictions_proto_diff_length merged{proto0_label}.png", bg = "white")
                 # ggsave("{OUTPUT_DIR_PROTO}/predictions_proto_diff_length merged{proto0_label}.pdf", bg = "white")
@@ -201,7 +201,7 @@ def main():
                 modelProtoLevSum <- summary(modelProtoLev)
                 predictionsProtoLev <- ggpredict(model=modelProtoLev, terms=c('person','number'))
                 plot(predictionsProtoLev)+
-                ggtitle("Mixed effect model Levenshtein distance proto and modern length")+
+                ggtitle("Mixed model Levenshtein distance proto and modern length")+
                 labs(y = "Levenshtein distance")
                 ggsave("{OUTPUT_DIR_PROTO}/predictions_proto_levenshtein{proto0_label}{norm_label}.png", bg = "white")
                 ggsave("{OUTPUT_DIR_PROTO}/predictions_proto_levenshtein{proto0_label}{norm_label}.pdf", bg = "white")
@@ -217,7 +217,7 @@ def main():
                 # modelProtoLevMergedSum <- summary(modelProtoLevMerged)
                 # predictionsProtoLevMerged <- ggpredict(model=modelProtoLevMerged, terms=c('person_merged','number'))
                 # plot(predictionsProtoLevMerged)+
-                # ggtitle("Mixed effect model Levenshtein distance proto and modern length merged")+
+                # ggtitle("Mixed model Levenshtein distance proto and modern length merged")+
                 # labs(y = "Levenshtein distance")
                 # ggsave("{OUTPUT_DIR_PROTO}/predictions_proto_levenshtein_merged{proto0_label}{norm_label}.png", bg = "white")
                 # ggsave("{OUTPUT_DIR_PROTO}/predictions_proto_levenshtein_merged{proto0_label}{norm_label}.pdf", bg = "white")
