@@ -21,9 +21,9 @@ def compute_prop_innovative_1sg_conservator_avg(model):
     last_stats = model.prop_innovative["1sg",False][:-AVG_WINDOW_STATS]
     return mymean(last_stats)
 
-def compute_prop_innovative_2sg_conservator_avg(model):
-    last_stats = model.prop_innovative["2sg",False][:-AVG_WINDOW_STATS]
-    return mymean(last_stats)
+# def compute_prop_innovative_2sg_conservator_avg(model):
+#     last_stats = model.prop_innovative["2sg",False][:-AVG_WINDOW_STATS]
+#     return mymean(last_stats)
 
 def compute_prop_innovative_3sg_conservator_avg(model):
     last_stats = model.prop_innovative["3sg",False][:-AVG_WINDOW_STATS]
@@ -33,9 +33,9 @@ def compute_prop_innovative_1sg_innovator_avg(model):
     last_stats = model.prop_innovative["1sg",True][:-AVG_WINDOW_STATS]
     return mymean(last_stats)
 
-def compute_prop_innovative_2sg_innovator_avg(model):
-    last_stats = model.prop_innovative["2sg",True][:-AVG_WINDOW_STATS]
-    return mymean(last_stats)
+# def compute_prop_innovative_2sg_innovator_avg(model):
+#     last_stats = model.prop_innovative["2sg",True][:-AVG_WINDOW_STATS]
+#     return mymean(last_stats)
 
 def compute_prop_innovative_3sg_innovator_avg(model):
     last_stats = model.prop_innovative["3sg",True][:-AVG_WINDOW_STATS]
@@ -45,9 +45,9 @@ def compute_prop_innovative_1sg_total_avg(model):
     last_stats = model.prop_innovative["1sg",None][:-AVG_WINDOW_STATS]
     return mymean(last_stats)
 
-def compute_prop_innovative_2sg_total_avg(model):
-    last_stats = model.prop_innovative["2sg",None][:-AVG_WINDOW_STATS]
-    return mymean(last_stats)
+# def compute_prop_innovative_2sg_total_avg(model):
+#     last_stats = model.prop_innovative["2sg",None][:-AVG_WINDOW_STATS]
+#     return mymean(last_stats)
 
 def compute_prop_innovative_3sg_total_avg(model):
     last_stats = model.prop_innovative["3sg",None][:-AVG_WINDOW_STATS]
@@ -72,8 +72,8 @@ def compute_internal(agents, person, innovator):
 def compute_prop_innovative_1sg_conservator_internal(model):
     return compute_internal(model.agents, "1sg", False)
 
-def compute_prop_innovative_2sg_conservator_internal(model):
-    return compute_internal(model.agents, "2sg", False)
+# def compute_prop_innovative_2sg_conservator_internal(model):
+#     return compute_internal(model.agents, "2sg", False)
 
 def compute_prop_innovative_3sg_conservator_internal(model):
     return compute_internal(model.agents, "3sg", False)
@@ -81,8 +81,8 @@ def compute_prop_innovative_3sg_conservator_internal(model):
 def compute_prop_innovative_1sg_innovator_internal(model):
     return compute_internal(model.agents, "1sg", True)
 
-def compute_prop_innovative_2sg_innovator_internal(model):
-    return compute_internal(model.agents, "2sg", True)
+# def compute_prop_innovative_2sg_innovator_internal(model):
+#     return compute_internal(model.agents, "2sg", True)
 
 def compute_prop_innovative_3sg_innovator_internal(model):
     return compute_internal(model.agents, "3sg", True)
@@ -90,8 +90,8 @@ def compute_prop_innovative_3sg_innovator_internal(model):
 def compute_prop_innovative_1sg_total_internal(model):
     return compute_internal(model.agents, "1sg", None)
 
-def compute_prop_innovative_2sg_total_internal(model):
-    return compute_internal(model.agents, "2sg", None)
+# def compute_prop_innovative_2sg_total_internal(model):
+#     return compute_internal(model.agents, "2sg", None)
 
 def compute_prop_innovative_3sg_total_internal(model):
     return compute_internal(model.agents, "3sg", None)
@@ -130,9 +130,9 @@ def compute_n_communicated_1sg_avg(model):
     last_stats = model.n_communicated["1sg"][:-AVG_WINDOW_STATS]
     return mymean(last_stats)
 
-def compute_n_communicated_2sg_avg(model):
-    last_stats = model.n_communicated["2sg"][:-AVG_WINDOW_STATS]
-    return mymean(last_stats)
+# def compute_n_communicated_2sg_avg(model):
+#     last_stats = model.n_communicated["2sg"][:-AVG_WINDOW_STATS]
+#     return mymean(last_stats)
 
 def compute_n_communicated_3sg_avg(model):
     last_stats = model.n_communicated["3sg"][:-AVG_WINDOW_STATS]

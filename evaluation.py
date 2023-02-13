@@ -10,8 +10,8 @@ from agents.model import Model
 from agents.config import model_params_script, evaluation_params, bool_params, string_params, OUTPUT_DIR, IMG_FORMATS
 import agents.util as util
 
-communicated_stats = ["prop_innovative_1sg_innovator_avg", "prop_innovative_1sg_conservator_avg", "prop_innovative_1sg_total_avg", "prop_innovative_2sg_innovator_avg", "prop_innovative_2sg_conservator_avg", "prop_innovative_2sg_total_avg", "prop_innovative_3sg_innovator_avg", "prop_innovative_3sg_conservator_avg", "prop_innovative_3sg_total_avg"]
-internal_stats = ["prop_innovative_1sg_innovator_internal", "prop_innovative_1sg_conservator_internal", "prop_innovative_1sg_total_internal", "prop_innovative_2sg_innovator_internal", "prop_innovative_2sg_conservator_internal", "prop_innovative_2sg_total_internal", "prop_innovative_3sg_innovator_internal", "prop_innovative_3sg_conservator_internal", "prop_innovative_3sg_total_internal"]
+communicated_stats = ["prop_innovative_1sg_innovator_avg", "prop_innovative_1sg_conservator_avg", "prop_innovative_1sg_total_avg", "prop_innovative_3sg_innovator_avg", "prop_innovative_3sg_conservator_avg", "prop_innovative_3sg_total_avg"]
+internal_stats = ["prop_innovative_1sg_innovator_internal", "prop_innovative_1sg_conservator_internal", "prop_innovative_1sg_total_internal", "prop_innovative_3sg_innovator_internal", "prop_innovative_3sg_conservator_internal", "prop_innovative_3sg_total_internal"]
 # dominant_stats = ["prop_1sg_conservator_dominant", "prop_2sg_conservator_dominant", "prop_3sg_conservator_dominant", "prop_1sg_innovator_dominant", "prop_2sg_innovator_dominant", "prop_3sg_innovator_dominant", "prop_1sg_total_dominant", "prop_2sg_total_dominant", "prop_3sg_total_dominant"]
 
 def str2bool(v):
@@ -77,7 +77,7 @@ def get_course_df(run_data, variable_param, stats, mode, output_dir):
 
 
 def plot_graph(course_df, variable_param, stats, mode, output_dir, label):
-    stats_renamed = {stat: stat.replace("_", " ") for stat in stats}
+    stats_renamed = {stat: stat.replace("_", " ").replace("prop ", "").replace("innovative ", "").replace("avg","") for stat in stats}
     course_df = course_df.rename(columns=stats_renamed)
     variable_param_spaced = variable_param.replace("_"," ")
     course_df = course_df.rename(columns={variable_param: variable_param_spaced})
