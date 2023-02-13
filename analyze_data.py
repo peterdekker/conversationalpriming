@@ -79,8 +79,12 @@ def main():
         os.makedirs(OUTPUT_DIR_MODERN)
 
     df = pd.read_csv("data/verbal_person-number_indexes_merged.csv")
-    # Create an excerpt of Serzant & Moroz (2022) data, for the supplementary material
-    df[["language", "proto_language", "person_number", "person", "number", "modern_form", "proto_form", "clade3"]].head(18).to_latex("excerpt_serzantmoroz2022.tex")
+
+
+    # Reporting: Create an excerpt of Serzant & Moroz (2022) data (for SI)
+    df[["language", "proto_language", "person_number", "person", "number", "modern_form", "proto_form", "clade3"]].head(18).to_latex(os.path.join(OUTPUT_DIR,"excerpt_serzantmoroz2022.tex"))
+
+
     df = df.drop(columns=["source", "comment", "proto_source", "proto_comments", "changed_GM"])
     stats_df(df, "original")
     # Filter out entries without form or protoform (removes languages without protolanguage + possibly more)
@@ -91,14 +95,14 @@ def main():
     #df = df[~df["language"].isin(languages_one_protoform_na["language"])]
     stats_df(df, "after removing proto NA")
 
-    # Creating tables with zero forms, to aid discussion in paper
+    # Reporting: Creating tables with zero forms, to aid discussion in paper
     proto_lengths = df.groupby(["proto_language","person_number"]).first()["proto_length"]
-    proto_lengths.to_csv("proto_lengths_fam.csv")
+    proto_lengths.to_csv(os.path.join(OUTPUT_DIR,"proto_lengths_fam.csv"))
     proto_lengths_zero = proto_lengths[proto_lengths == 0.0]
     # proto_lengths_zero = proto_lengths[proto_lengths["proto_length"] == 0.0]
-    proto_lengths_zero.to_csv("proto_lengths_fam_zero.csv")
+    proto_lengths_zero.to_csv(os.path.join(OUTPUT_DIR,"proto_lengths_fam_zero.csv"))
     modern_reflexes_proto_lengths_zero = pd.merge(df, proto_lengths_zero, on=["proto_language", "person_number"])
-    modern_reflexes_proto_lengths_zero.to_csv("modern_reflexes_proto_zero.csv")
+    modern_reflexes_proto_lengths_zero.to_csv(os.path.join(OUTPUT_DIR,"modern_reflexes_proto_zero.csv"))
 
 
     # Find languages which have both protoform and modern form with length 0
@@ -157,6 +161,18 @@ def main():
     df["proto_levenshtein"] = df.apply(lambda x: normalized_levenshtein(x["modern_form_corr"], x["proto_form_corr"], NORMALIZATION), axis=1)
 
     df["person_merged"] = df["person"].apply(lambda p: "third" if p=="third" else "firstsecond")
+
+    # Reporting: calculate proportion of forms with Levenshtein distance 0 that also have protoform 0
+    df_levenshtein0 = df[df["proto_levenshtein"]==0.0]
+    print("Distribution of proto lengths in all data:")
+    distr_proto_dataset = df["proto_length"].value_counts()
+    distr_proto_dataset.to_latex(os.path.join(OUTPUT_DIR,"distr_proto_dataset.tex"))
+    print(distr_proto_dataset)
+    print(f"Entries with Levenshtein 0: {len(df_levenshtein0)} (total entries: {len(df)})")
+    print("Distribution of proto lengths in entries with Levenshtein 0:")
+    distr_proto_lev0 = df_levenshtein0["proto_length"].value_counts()
+    distr_proto_lev0.to_latex(os.path.join(OUTPUT_DIR,"distr_proto_lev0.tex"))
+    print(distr_proto_lev0)
 
     ## Statistical analyses in R
     with robjects.local_context() as lc:
