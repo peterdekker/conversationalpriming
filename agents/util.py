@@ -60,14 +60,14 @@ def compute_internal(agents, person, innovator):
     probs = [agent.forms[person][INNOVATIVE_FORM] for agent in agents if agent.innovator==innovator or innovator==None]
     return mymean(probs)
 
-def compute_dominant(agents, person, innovator):
-    if innovator == None:
-        speakers_type = agents
-    else:
-        speakers_type = [agent for agent in agents if agent.innovator==innovator]
-    speakers_dominant = [agent for agent in speakers_type if agent.forms[person][INNOVATIVE_FORM]>= 0.5]
-    prop_speakers_dominant = len(speakers_dominant)/len(speakers_type)
-    return prop_speakers_dominant
+# def compute_dominant(agents, person, innovator):
+#     if innovator == None:
+#         speakers_type = agents
+#     else:
+#         speakers_type = [agent for agent in agents if agent.innovator==innovator]
+#     speakers_dominant = [agent for agent in speakers_type if agent.forms[person][INNOVATIVE_FORM]>= 0.5]
+#     prop_speakers_dominant = len(speakers_dominant)/len(speakers_type)
+#     return prop_speakers_dominant
 
 def compute_prop_innovative_1sg_conservator_internal(model):
     return compute_internal(model.agents, "1sg", False)
@@ -98,32 +98,32 @@ def compute_prop_innovative_3sg_total_internal(model):
 
 # Dominant measures
 
-def compute_prop_1sg_conservator_dominant(model):
-    return compute_dominant(model.agents, "1sg", False)
+# def compute_prop_1sg_conservator_dominant(model):
+#     return compute_dominant(model.agents, "1sg", False)
 
-def compute_prop_2sg_conservator_dominant(model):
-    return compute_dominant(model.agents, "2sg", False)
+# def compute_prop_2sg_conservator_dominant(model):
+#     return compute_dominant(model.agents, "2sg", False)
 
-def compute_prop_3sg_conservator_dominant(model):
-    return compute_dominant(model.agents, "3sg", False)
+# def compute_prop_3sg_conservator_dominant(model):
+#     return compute_dominant(model.agents, "3sg", False)
 
-def compute_prop_1sg_innovator_dominant(model):
-    return compute_dominant(model.agents, "1sg", True)
+# def compute_prop_1sg_innovator_dominant(model):
+#     return compute_dominant(model.agents, "1sg", True)
 
-def compute_prop_2sg_innovator_dominant(model):
-    return compute_dominant(model.agents, "2sg", True)
+# def compute_prop_2sg_innovator_dominant(model):
+#     return compute_dominant(model.agents, "2sg", True)
 
-def compute_prop_3sg_innovator_dominant(model):
-    return compute_dominant(model.agents, "3sg", True)
+# def compute_prop_3sg_innovator_dominant(model):
+#     return compute_dominant(model.agents, "3sg", True)
 
-def compute_prop_1sg_total_dominant(model):
-    return compute_dominant(model.agents, "1sg", None)
+# def compute_prop_1sg_total_dominant(model):
+#     return compute_dominant(model.agents, "1sg", None)
 
-def compute_prop_2sg_total_dominant(model):
-    return compute_dominant(model.agents, "2sg", None)
+# def compute_prop_2sg_total_dominant(model):
+#     return compute_dominant(model.agents, "2sg", None)
 
-def compute_prop_3sg_total_dominant(model):
-    return compute_dominant(model.agents, "3sg", None)
+# def compute_prop_3sg_total_dominant(model):
+#     return compute_dominant(model.agents, "3sg", None)
 
 ##
 def compute_n_communicated_1sg_avg(model):
