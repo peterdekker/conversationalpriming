@@ -73,7 +73,7 @@ class Model(Model):
 
         # Contains utterances of last step emptied after prop_innovative calculation at end of step
         self.communicated = defaultdict(list)
-        self.n_communicated = defaultdict(lambda: [0])
+        # self.n_communicated = defaultdict(lambda: [0])
         # Contains proportion innovative of all timesteps
         self.prop_innovative = defaultdict(list)
 
@@ -113,9 +113,9 @@ class Model(Model):
                 # "prop_1sg_total_dominant": util.compute_prop_1sg_total_dominant,
                 # "prop_2sg_total_dominant": util.compute_prop_2sg_total_dominant,
                 # "prop_3sg_total_dominant": util.compute_prop_3sg_total_dominant,
-                "n_communicated_1sg": util.compute_n_communicated_1sg_avg,
+                #"n_communicated_1sg": util.compute_n_communicated_1sg_avg,
                 #"n_communicated_2sg": util.compute_n_communicated_2sg_avg,
-                "n_communicated_3sg": util.compute_n_communicated_3sg_avg,
+                #"n_communicated_3sg": util.compute_n_communicated_3sg_avg,
             }
         )
 
@@ -168,7 +168,7 @@ class Model(Model):
         # Compute agent prop, every N iterations
         # This also empties variable
         # TODO: Remove this when running as script
-        if self.steps % STEPS_UPDATE_AGENT_COLOR == 0 and self.browser_visualization:
+        if self.browser_visualization and self.steps % STEPS_UPDATE_AGENT_COLOR == 0:
             util.update_prop_innovative_agents(self.agents)
 
         # Compute model prop

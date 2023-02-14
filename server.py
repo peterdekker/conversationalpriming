@@ -2,10 +2,10 @@ from mesa.visualization.ModularVisualization import ModularServer
 from mesa.visualization.modules import CanvasGrid, ChartModule, NetworkModule
 from mesa.visualization.UserParam import UserSettableParameter
 
-from model import Model
+from agents.model import Model
 
-from config import model_params_ui
-from util import compute_colours
+from agents.config import model_params_ui
+from agents.util import compute_colours
 
 
 def draw(agent):
@@ -30,13 +30,13 @@ def network_portrayal(G):
     portrayal["nodes"] = [
         {
             "id": node_id,
-            "size": 3 if agents else 1,
-            "color": compute_colours(agents[0]), #"#007959", # "#CC0000" if not agents or agents[0].wealth == 0 else "#007959",
+            "size": 3 if agentsInNode else 1,
+            "color": compute_colours(agentsInNode[0]), #"#007959", # "#CC0000" if not agents or agents[0].wealth == 0 else "#007959",
             "label": None
-            if not agents
-            else f"Agent:{agents[0].unique_id}",
+            if not agentsInNode
+            else f"Agent:{agentsInNode[0].unique_id}",
         }
-        for (node_id, agents) in G.nodes.data("agent")
+        for (node_id, agentsInNode) in G.nodes.data("agent")
     ]
 
     portrayal["edges"] = [
@@ -64,7 +64,7 @@ internal_3sg_chart = ChartModule([{"Label": "prop_innovative_3sg_innovator_inter
 # # dominant_2sg_chart = ChartModule([{"Label": "prop_2sg_innovator_dominant", "Color": "Green"}, {"Label": "prop_2sg_conservator_dominant", "Color": "Black"}, {"Label": "prop_2sg_total_dominant", "Color": "Blue"}])
 # dominant_3sg_chart = ChartModule([{"Label": "prop_3sg_innovator_dominant", "Color": "Green"}, {"Label": "prop_3sg_conservator_dominant", "Color": "Black"}, {"Label": "prop_3sg_total_dominant", "Color": "Blue"}])
 
-n_communicated_chart = ChartModule([{"Label": "n_communicated_1sg", "Color": "Red"}, {"Label": "n_communicated_2sg", "Color": "Blue"},{"Label": "n_communicated_3sg", "Color": "Yellow"}])
+#n_communicated_chart = ChartModule([{"Label": "n_communicated_1sg", "Color": "Red"}, {"Label": "n_communicated_2sg", "Color": "Blue"},{"Label": "n_communicated_3sg", "Color": "Yellow"}])
 
 server = ModularServer(Model,
                        [canvas_element, communicated_1sg_chart, communicated_3sg_chart, internal_1sg_chart, internal_3sg_chart], # dominant_1sg_chart, dominant_3sg_chart],

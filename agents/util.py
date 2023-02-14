@@ -126,17 +126,17 @@ def compute_prop_innovative_3sg_total_internal(model):
 #     return compute_dominant(model.agents, "3sg", None)
 
 ##
-def compute_n_communicated_1sg_avg(model):
-    last_stats = model.n_communicated["1sg"][:-AVG_WINDOW_STATS]
-    return mymean(last_stats)
-
-# def compute_n_communicated_2sg_avg(model):
-#     last_stats = model.n_communicated["2sg"][:-AVG_WINDOW_STATS]
+# def compute_n_communicated_1sg_avg(model):
+#     last_stats = model.n_communicated["1sg"][:-AVG_WINDOW_STATS]
 #     return mymean(last_stats)
 
-def compute_n_communicated_3sg_avg(model):
-    last_stats = model.n_communicated["3sg"][:-AVG_WINDOW_STATS]
-    return mymean(last_stats)
+# # def compute_n_communicated_2sg_avg(model):
+# #     last_stats = model.n_communicated["2sg"][:-AVG_WINDOW_STATS]
+# #     return mymean(last_stats)
+
+# def compute_n_communicated_3sg_avg(model):
+#     last_stats = model.n_communicated["3sg"][:-AVG_WINDOW_STATS]
+#     return mymean(last_stats)
 ######
 
 ##### Called every iteration: compute proportion innovative from list of utterances in this iteration.
@@ -145,14 +145,13 @@ def update_prop_innovative_model(model, persons, speaker_types, prop_innovative_
     # print(sorted([(k,len(v)) for k,v in model.communicated.items()]))
     for person in persons:
         for speaker_type in speaker_types:
-            # Stat per speaker
+            # Stat per speaker type
             stat = compute_prop_innovative(model.communicated[person, speaker_type])
             prop_innovative_obj[person, speaker_type].append(stat)
         # Total stat
         stat_total = compute_prop_innovative(model.communicated[person, None])
         prop_innovative_obj[person, None].append(stat_total)
-        # TODO: should clear of communicated_list also happen here?
-        model.n_communicated[person].append(0)
+        #model.n_communicated[person].append(0)
 
 def update_prop_innovative_agents(agents):
     for agent in agents:
@@ -171,13 +170,14 @@ def compute_prop_innovative(communicated_list):
 def update_communicated(form, person, speaker_type, model, agent):
     # For model: store forms per person and agent type
     model.communicated[person,speaker_type].append(form)
-    model.n_communicated[person][-1] +=1
+    # model.n_communicated[person][-1] +=1
 
     # Also store forms for both speaker_types together
     model.communicated[person,None].append(form)
-
-    # For agent: store all forms together, regardless of person and speaker type 
-    agent.communicated.append(form)
+    
+    if model.browser_visualization:
+        # # For agent: store all forms together, regardless of person and speaker type 
+        agent.communicated.append(form)
 
 def compute_colours(agent):
     #l = agent.prop_innovative * 50
