@@ -162,17 +162,21 @@ def main():
 
     df["person_merged"] = df["person"].apply(lambda p: "third" if p=="third" else "firstsecond")
 
-    # Reporting: calculate proportion of forms with Levenshtein distance 0 that also have protoform 0
+    ## Reporting: calculate proportion of forms with Levenshtein distance 0 that also have protoform 0
+    print("Distribution of persons in dataset")
+    distr_persons_dataset = df["person_number"].value_counts()
+    distr_persons_dataset.to_latex(os.path.join(OUTPUT_DIR,"distr_persons_dataset.tex"))
+    print(distr_persons_dataset)
+
     print("Distribution of proto lengths in all data:")
     distr_proto_dataset = df["proto_length"].value_counts()
     distr_proto_dataset.to_latex(os.path.join(OUTPUT_DIR,"distr_proto_dataset.tex"))
     print(distr_proto_dataset)
 
-    print("Distribution of persons and where protoform is empty")
-    distr_proto0_persons = df[df["proto_length"]==0.0]["person_number"].value_counts()
-    print(distr_proto0_persons)
-    distr_proto0_persons.to_latex(os.path.join(OUTPUT_DIR,"distr_proto0_persons.tex"))
-
+    print("Distribution of persons where protoform is empty")
+    distr_persons_proto0 = df[df["proto_length"]==0.0]["person_number"].value_counts()
+    distr_persons_proto0.to_latex(os.path.join(OUTPUT_DIR,"distr_persons_proto0.tex"))
+    print(distr_persons_proto0)
 
     df_levenshtein0 = df[df["proto_levenshtein"]==0.0]
     print(f"Entries with Levenshtein 0: {len(df_levenshtein0)} (total entries: {len(df)})")
@@ -180,10 +184,11 @@ def main():
     distr_proto_lev0 = df_levenshtein0["proto_length"].value_counts()
     distr_proto_lev0.to_latex(os.path.join(OUTPUT_DIR,"distr_proto_lev0.tex"))
     print(distr_proto_lev0)
+
     print("Distribution of persons, of entries with Levenshtein 0, and where protoform is empty")
-    distr_lev0_proto0_persons = df_levenshtein0[df_levenshtein0["proto_length"]==0.0]["person_number"].value_counts()
-    print(distr_lev0_proto0_persons)
-    distr_lev0_proto0_persons.to_latex(os.path.join(OUTPUT_DIR,"distr_lev0_proto0_persons.tex"))
+    distr_persons_lev0_proto0 = df_levenshtein0[df_levenshtein0["proto_length"]==0.0]["person_number"].value_counts()
+    print(distr_persons_lev0_proto0)
+    distr_persons_lev0_proto0.to_latex(os.path.join(OUTPUT_DIR,"distr_persons_lev0_proto0.tex"))
     
 
     ## Statistical analyses in R
