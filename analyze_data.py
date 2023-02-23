@@ -1,6 +1,7 @@
 
 # analyze_data.py: Standalone script to perform statistical analysis of length change in data of Serzant & Moroz (2022).
-# See README for more information on installation and expected input data.
+# Input data expected to be in: data/verbal_person-number_indexes_merged.csv
+# See README for more information on installation.
 
 import pandas as pd
 import editdistance
@@ -21,9 +22,9 @@ plt.rcParams['savefig.dpi'] = 300
 
 currentdir = os.path.dirname(os.path.realpath(__file__))
 
-CLTS_ARCHIVE_PATH = os.path.join(currentdir, "2.1.0.tar.gz")
-CLTS_ARCHIVE_URL = "https://github.com/cldf-clts/clts/archive/refs/tags/v2.1.0.tar.gz"
-CLTS_PATH = os.path.join(currentdir, "clts-2.1.0")
+# CLTS_ARCHIVE_PATH = os.path.join(currentdir, "2.1.0.tar.gz")
+# CLTS_ARCHIVE_URL = "https://github.com/cldf-clts/clts/archive/refs/tags/v2.1.0.tar.gz"
+# CLTS_PATH = os.path.join(currentdir, "clts-2.1.0")
 
 OUTPUT_DIR = "output_data"
 OUTPUT_DIR_PROTO = os.path.join(OUTPUT_DIR, "proto")
