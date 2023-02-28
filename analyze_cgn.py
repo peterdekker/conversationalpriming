@@ -11,9 +11,14 @@ import re
 
 CGN_DIR = os.path.join("data", "CGNAnn", "Data", "data", "annot", "text", "syn")
 
+OUTPUT_DIR = "output_data"
+OUTPUT_DIR_CGN = os.path.join(OUTPUT_DIR, "cgn")
+
 COMPONENTS_FACE_TO_FACE = ["a"]
 COMPONENTS_INTERACTION = ["a", "b", "c", "d", "e", "f", "g"]
-# COMPONENTS_ALL = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o"]
+COMPONENTS_ALL = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o"]
+
+PERSON_NUMBERS = ["1sg","2sg","2sg/pl", "3sg", "3sg-demonstr-pronoun","3sg-indef-pronoun","3sg-noun", "3sg-verb", "3sg-adj","3sg/pl-demonstr-pronoun", "1pl", "2pl", "3pl", "3pl-noun", "3pl-adj"]
 
 def pos_exact_to_person(pos_exact):
     if re.search("VNW\(pers,pron,.*1.*,ev", pos_exact):
@@ -30,8 +35,8 @@ def pos_exact_to_person(pos_exact):
         return "3sg-demonstr-pronoun"
     elif re.search("VNW\(aanw,pron", pos_exact): # Overlaps with previous regex, depends on evaluation order
         return "3sg/pl-demonstr-pronoun"
-    elif re.search("VNW\(aanw,adv-pron", pos_exact):
-        return "3sg/pl-demonstr-advpron"
+    # elif re.search("VNW\(aanw,adv-pron", pos_exact):
+    #     return "3sg/pl-demonstr-advpron"
     elif re.search("ADJ\(nom,basis,.*zonder-n.*", pos_exact):
         return "3sg-adj"
     elif re.search("VNW\(pers,pron,.*1.*,mv", pos_exact):
@@ -44,9 +49,9 @@ def pos_exact_to_person(pos_exact):
         return "3pl-noun"
     elif re.search("ADJ\(nom,basis,.*mv-n.*", pos_exact):
         return "3pl-adj"
-    elif re.search("VNW\(onbep.*mv-n", pos_exact):
-        return "3pl-indef-pronoun"
-    elif re.search("VNW\(onbep", pos_exact): # Overlaps with previous regex, depends on evaluation order
+    # elif re.search("VNW\(onbep.*mv-n", pos_exact):
+    #     return "3pl-indef-pronoun"
+    elif re.search("VNW\(onbep", pos_exact): # overlaps with previous, but that one commented out
         return "3sg-indef-pronoun"
     elif re.search("VNW\(pers,pron,.*2.*,getal", pos_exact):
         return "2sg/pl"
@@ -55,23 +60,23 @@ def pos_exact_to_person(pos_exact):
 
 # Frequencies of forms in subject position
 # VNW1     51932 personal pronoun nominative
-# VNW19    16244 demonstrative pronoun
+# VNW19    16244 demonstrative pronoun, independet use
 # VNW3     14475 personal pronoun standard (nominative or oblique)
 # N5        2521 noun
-# VNW22      922 indefinite pronoun, singular
+# VNW22      922 indefinite pronoun, independt use, singular
 # N3         828 noun
 # VNW5       792 NOT INCLUDE dialect personal pronoun (tag not finegrained enough per person)
 # N1         742 noun
 # VNW13      193 NOT INCLUDE betrekkelijk voornaamwoord (subordinate sentences, not what we want)
 # SPEC       179 NOT INCLUDE special
-# VNW20      171 NOT include aanwijzend voornaamwoord adv-pron. er, daar
-# VNW21      157 NOT INCLUDE, is put in front of noun, will count double. aanwijzend voornaamwoord det
+# VNW20      171 NOT include aanwijzend voornaamwoord adv-pron. er, daar. number not distinguished
+# VNW21      157 NOT INCLUDE, is put in front of noun, will count double. demonstrative pronoun det
 # LID        125 NOT INCLUDE, does not distinguish independent use (het regent) from adjective use (het boek). determiner
-# TW1         88 NOT INCLUDE, does not distinguish number. counting word
+# TW1         88 NOT INCLUDE, counting word, does not distinguish number.
 # VNW6        78 NOT INCLUDE person reflexive (mezelf, onszelf)
 # VG2         64 NOT INCLUDE voegwoord
 # VNW2        61 NOT INCLUDE pronoun oblique case
-# VNW26       48 NOT INCLUDE indefinite pronoun al/allebei, does not distinguish number
+# VNW26       48 NOT INCLUDE indefinite pronoun al/allebei, used adjectively and not distinguishing number.
 # WW6         40 substantive use of verb. (het) spelen
 # ADJ4        40 substantive use of adjective
 # ADJ9        38 NOT include, free use of adjective
@@ -117,19 +122,32 @@ def compute_frequencies(df, negraheader_df):
     # Merge exact POS tags into person-numbers
     df_filtered_pos_exact["person_number"] = df_filtered_pos_exact["pos_exact"].apply(pos_exact_to_person)
     # print(df[df["edge"]=="SU"]["tag"].value_counts())
-    print("Person frequencies:")
-    value_counts = df_filtered_pos_exact["person_number"].value_counts()
-    print(value_counts)
-    n_filtered = len(df_filtered_pos_exact)
-    n_filtered_no3sgpl = n_filtered - len(df_filtered_pos_exact[df_filtered_pos_exact["person_number"]=="3sg/pl-demonstr-pronoun"])
-    n_3sg = value_counts["3sg"] + value_counts["3sg-demonstr-pronoun"] + value_counts["3sg-indef-pronoun"] + value_counts["3sg-noun"] + value_counts["3sg-adj"] + value_counts["3sg-verb"] 
-    print(f"Total tokens: {n_filtered}. Total 3sg: {n_3sg}. Proportion 3sg: {n_3sg/n_filtered}. Proportion 3sg after removing 3sg/pl: {n_3sg/n_filtered_no3sgpl}")
-    print("Used forms")
-    for name, group in df_filtered_pos_exact.groupby("person_number"):
-        print(name)
-        print(group["word"].unique())
+    print("POS frequencies:")
+    frequencies_pos = df_filtered_pos_exact["person_number"].value_counts()
+    frequencies_pos = frequencies_pos.reindex(PERSON_NUMBERS, fill_value=0)
+    print(frequencies_pos)
+    frequencies_pos.to_latex(os.path.join(OUTPUT_DIR_CGN, "frequencies_pos.tex"))
+    print("Grouped person frequencies:")
+    frequencies_persons = pd.DataFrame()
+    frequencies_persons["frequency"] =frequencies_pos.groupby(lambda pos: pos.split("-")[0]).sum()
+    frequencies_persons["percentage"] = frequencies_persons["frequency"]/frequencies_persons["frequency"].sum() * 100
+    frequencies_persons["percentage_no3sgpl"] = frequencies_persons["frequency"]/(frequencies_persons["frequency"].sum()-frequencies_persons["frequency"].loc["3sg/pl"]) * 100
+    print(frequencies_persons)
+    frequencies_persons.to_latex(os.path.join(OUTPUT_DIR_CGN, "frequencies_persons.tex"), float_format="%.1f")
+
+    # n_filtered = len(df_filtered_pos_exact)
+    # n_filtered_no3sgpl = n_filtered - len(df_filtered_pos_exact[df_filtered_pos_exact["person_number"]=="3sg/pl-demonstr-pronoun"])
+    # n_3sg = frequencies_pos["3sg"] + frequencies_pos["3sg-demonstr-pronoun"] + frequencies_pos["3sg-indef-pronoun"] + frequencies_pos["3sg-noun"] + frequencies_pos["3sg-adj"] + frequencies_pos["3sg-verb"] 
+    # print(f"Total tokens: {n_filtered}. Total 3sg: {n_3sg}. Proportion 3sg: {n_3sg/n_filtered}. Proportion 3sg after removing 3sg/pl: {n_3sg/n_filtered_no3sgpl}")
+
+    # print("Used forms")
+    # for name, group in df_filtered_pos_exact.groupby("person_number"):
+    #     print(name)
+    #     print(group["word"].unique())
 
 def main():
+    if not os.path.exists(OUTPUT_DIR_CGN):
+        os.makedirs(OUTPUT_DIR_CGN)
     negraheader_df = pd.read_csv(os.path.join(CGN_DIR, "negraheader.txt"), sep="\s+", engine="python", header=None, names=["id", "morph", "pos_exact"], index_col=False, skiprows=lambda x: x<= 78 or x >= 400)
     negraheader_df = negraheader_df.drop(columns=["id"])
 
@@ -162,10 +180,6 @@ def main():
     print(" - Total")
     compute_frequencies(df_total, negraheader_df)
 
-    
-    # Filter on (automatic) generalized POS tags VNW1 and VNW 3: personal pronouns either in nominative case or standard case (not clear whether nom or acc)
-    # See negraheader.txt
-    # Filter on (manual) syntactic tag SU: subject. For now we leave out SUP (provisional subject, specific uses of 'er' and 'het')
 
 if __name__ == "__main__":
     main()
