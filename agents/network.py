@@ -170,8 +170,6 @@ def create_network_friend_of_friend(stranger_connect_prob, conservator_friend_of
     for a in agents:
         g.add_node(a, innovator=agent_types[a])
     pairs = list(combinations(agents, 2))
-    # TODO: Make sure innovator and conservator agents have same degree
-    # TODO: Shuffle combinations list?
     for it in range(n_iterations):
         # print(f"Iteration: {it}")
         for i, j in pairs:
@@ -256,7 +254,6 @@ def create_network_friend_of_friend_fixed_degree(stranger_connect_prob, conserva
                     g.add_edge(i, j)
         agents_not_full = get_agents_not_max_degree(g, max_degree)
 
-        # TODO: Recompute condition
     return g
 
 

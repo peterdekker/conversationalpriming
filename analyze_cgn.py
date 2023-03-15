@@ -58,51 +58,6 @@ def pos_exact_to_person(pos_exact):
     else:
         raise ValueError(f"POS tag not recognized: {pos_exact}")
 
-# Frequencies of forms in subject position
-# VNW1     51932 personal pronoun nominative
-# VNW19    16244 demonstrative pronoun, independet use
-# VNW3     14475 personal pronoun standard (nominative or oblique)
-# N5        2521 noun
-# VNW22      922 indefinite pronoun, independt use, singular
-# N3         828 noun
-# VNW5       792 NOT INCLUDE dialect personal pronoun (tag not finegrained enough per person)
-# N1         742 noun
-# VNW13      193 NOT INCLUDE betrekkelijk voornaamwoord (subordinate sentences, not what we want)
-# SPEC       179 NOT INCLUDE special
-# VNW20      171 NOT include aanwijzend voornaamwoord adv-pron. er, daar. number not distinguished
-# VNW21      157 NOT INCLUDE, is put in front of noun, will count double. demonstrative pronoun det
-# LID        125 NOT INCLUDE, does not distinguish independent use (het regent) from adjective use (het boek). determiner
-# TW1         88 NOT INCLUDE, counting word, does not distinguish number.
-# VNW6        78 NOT INCLUDE person reflexive (mezelf, onszelf)
-# VG2         64 NOT INCLUDE voegwoord
-# VNW2        61 NOT INCLUDE pronoun oblique case
-# VNW26       48 NOT INCLUDE indefinite pronoun al/allebei, used adjectively and not distinguishing number.
-# WW6         40 substantive use of verb. (het) spelen
-# ADJ4        40 substantive use of adjective
-# ADJ9        38 NOT include, free use of adjective
-# N7          38 proper noun plural
-# VNW25       29 NOT include, not always distinguishing number, indef
-# BW          24 NOT INClude, bijwoord
-# VNW24       18 NOT include, not always distinguishing number, indef
-# WW4         15 NOT include, normal infinitive
-# TSW         10 NOT include, interjection, ja
-#------
-# VNW11        8
-# VNW14        7
-# WW1          6
-# ADJ1         5
-# ADJ5         3
-# ADJ10        3
-# VNW27        2 indef dialect
-# WW2          2
-# VZ2          2
-# WW7          2
-# VG1          1
-# ADJ6         1
-# VNW16        1
-# ADJ2         1
-# VZ1          1
-# WW9          1
 
 def get_context(row):
     return row.name

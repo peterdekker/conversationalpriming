@@ -105,19 +105,6 @@ def evaluate_model(fixed_params, variable_params, iterations, steps):
         print(f"  Variable parameters: {params_print(variable_params)}")
     print(f"  Fixed parameters: {params_print(fixed_params)}")
 
-    # batch_run = BatchRunner(
-    #     Model,
-    #     variable_params,
-    #     fixed_params,
-    #     iterations=iterations,
-    #     max_steps=steps,
-    #     model_reporters={"datacollector": lambda m: m.datacollector}
-    # )
-
-    # batch_run.run_all()
-
-
-    # run_data = batch_run.get_model_vars_dataframe()
     if variable_params:
         all_params = variable_params | fixed_params
     else:

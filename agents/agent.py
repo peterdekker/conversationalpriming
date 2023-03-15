@@ -14,12 +14,8 @@ class Agent(mesa.Agent):
 
         self.pos = pos
         self.innovator = innovator
-        # TODO: later possibly add corpus probabilities
-        # TODO: Move initialization outside agent?
-        #self.verb_concepts = ["a"]
         self.persons = PERSONS
         self.forms = {}
-        #for c in self.verb_concepts:
         for p in self.persons:
             self.forms[p] = {"0":1-prop_innovative_forms, "1": prop_innovative_forms}
 

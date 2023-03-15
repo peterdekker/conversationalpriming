@@ -30,9 +30,8 @@ OUTPUT_DIR = "output_data"
 OUTPUT_DIR_PROTO = os.path.join(OUTPUT_DIR, "proto")
 OUTPUT_DIR_MODERN = os.path.join(OUTPUT_DIR, "modern")
 
-# User-settable param:
-# Include languages (and thus whole families) where one of the protoforms is zero
-EXCLUDE_LANGUAGES_PROTO_0 = False
+# User-settable params:
+EXCLUDE_LANGUAGES_PROTO_0 = False # Exclude languages (and thus whole families) where one of the protoforms is zero
 NORMALIZATION = "none"
 excl_proto0_label = "_exclproto0" if EXCLUDE_LANGUAGES_PROTO_0 else ""
 norm_label = f"_{NORMALIZATION}"
@@ -119,20 +118,15 @@ def main():
 
     ### Analysis length: difference modern form and protoform
     df["proto_diff_length"] = (df["modern_length"] - df["proto_length"])
-    # for a in df.groupby("proto_language")
-    # grouped_length = df.groupby(["proto_language", "person_number"]).mean().sort_values("proto_language")
-    #print(grouped.head)
-    #grouped.to_csv("output.csv")
     
     ### Analysis levenshtein distance in forms
 
     for form_type in ["modern_form", "proto_form"]:
         ## Split alternative forms based on delimiters , and /, and take first
-        # TODO: Save alternative forms
         df[f"{form_type}_corr"] = df[form_type].str.split(",|/").apply(get_first)
         
         ## Delete parts in brackets
-        # TODO: Create alternative forms based on letters in brackets os(i)
+        # Possible future: Create alternative forms based on letters in brackets os(i)
         #brackets = df[f"{form_type}_corr"].str.contains("\(.+\)")
         # print(brackets.value_counts())
         df[f"{form_type}_corr"] = df[f"{form_type}_corr"].str.replace("\(.+\)", "", regex=True)

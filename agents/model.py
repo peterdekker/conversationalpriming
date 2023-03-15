@@ -77,8 +77,7 @@ class Model(Model):
         # Contains proportion innovative of all timesteps
         self.prop_innovative = defaultdict(list)
 
-        # TODO: maybe later move data initialization from agent to model,
-        # so defining these here makes more sense
+
         self.persons = ["1sg", "2sg", "3sg"]
         self.speaker_types = [False, True]
         ##
@@ -165,13 +164,12 @@ class Model(Model):
         self.schedule.step()
         self.datacollector.collect(self)
 
-        # Compute agent prop, every N iterations
+        # Compute agent proportion communicate, every N iterations
         # This also empties variable
-        # TODO: Remove this when running as script
         if self.browser_visualization and self.steps % STEPS_UPDATE_AGENT_COLOR == 0:
             util.update_prop_innovative_agents(self.agents)
 
-        # Compute model prop
+        # Compute model proportion communicated
         util.update_prop_innovative_model(
             self, self.persons, self.speaker_types, self.prop_innovative)
 

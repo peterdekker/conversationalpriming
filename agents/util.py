@@ -14,7 +14,6 @@ def mymean(stats_list):
 
 
 #### DataCollector functions, called every iteration: take mean of last AVG_WINDOW values
-# TODO: call these methods _model_?
 
 # Communicated measures 
 def compute_prop_innovative_1sg_conservator_avg(model):
