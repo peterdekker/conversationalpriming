@@ -19,7 +19,7 @@ class Model(Model):
     Model class
     '''
 
-    def __init__(self, n_agents, prop_innovator_agents, init_prop_innovative_innovator, init_prop_innovative_conservator, freq_3sg, boost_conservative, boost_innovative, forget_weight, surprisal, entropy, repeats, conversational_priming, friend_network, innovator_no_conversational_priming, innovator_only_boost_production, n_interactions_interlocutor, browser_visualization, use_grid):
+    def __init__(self, n_agents, prop_innovator_agents, init_prop_innovative_innovator, init_prop_innovative_conservator, freq_3sg, boost_conservative, boost_innovative, forget_weight, surprisal, entropy, repeats, conversational_priming_prob, friend_network, innovator_no_conversational_priming, innovator_only_boost_production, n_interactions_interlocutor, browser_visualization, use_grid):
         '''
         Initialize field
         '''
@@ -35,7 +35,7 @@ class Model(Model):
         assert type(surprisal) == bool
         assert type(entropy) == bool
         assert type(repeats) == bool
-        assert type(conversational_priming) == bool
+        assert conversational_priming_prob >= 0 and conversational_priming_prob <= 1
         assert type(friend_network) == bool
         assert type(innovator_no_conversational_priming) == bool
         assert type(innovator_only_boost_production) == bool
@@ -55,7 +55,7 @@ class Model(Model):
         self.surprisal = surprisal
         self.entropy = entropy
         self.repeats = repeats
-        self.conversational_priming = conversational_priming
+        self.conversational_priming_prob = conversational_priming_prob
         self.friend_network = friend_network
         self.innovator_no_conversational_priming = innovator_no_conversational_priming
         self.innovator_only_boost_production = innovator_only_boost_production
