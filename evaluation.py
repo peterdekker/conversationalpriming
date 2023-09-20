@@ -1,7 +1,7 @@
 import argparse
 import pandas as pd
 import numpy as np
-from mesa.batchrunner import BatchRunner, batch_run
+from mesa.batchrunner import batch_run
 import os
 import seaborn as sns
 import matplotlib.pyplot as plt

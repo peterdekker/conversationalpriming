@@ -1,6 +1,6 @@
 from mesa.visualization.ModularVisualization import ModularServer
 from mesa.visualization.modules import CanvasGrid, ChartModule, NetworkModule
-from mesa.visualization.UserParam import UserSettableParameter
+#from mesa.visualization.UserParam import UserSettableParameter
 
 from agents.model import Model
 

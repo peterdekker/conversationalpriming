@@ -7,12 +7,12 @@ import numpy as np
 
 
 class Agent(mesa.Agent):
-    def __init__(self, pos, innovator, prop_innovative_forms, model):
+    def __init__(self, uid, innovator, prop_innovative_forms, model):
 
 
-        super().__init__(pos, model)
+        super().__init__(uid, model)
 
-        self.pos = pos
+        self.uid = uid
         self.innovator = innovator
         self.persons = PERSONS
         self.forms = {}
@@ -34,12 +34,12 @@ class Agent(mesa.Agent):
          Perform one interaction for this agent, with this agent as speaker
         '''
         if not self.model.use_grid: # default> use network
-            neighbors_nodes = self.model.grid.get_neighbors(self.pos, include_center=False)
+            neighbors_nodes = self.model.grid.get_neighborhood(self.uid, include_center=False)
             neighbors = self.model.grid.get_cell_list_contents(neighbors_nodes)
             listener = RG.choice(neighbors)
         
         if self.model.use_grid:
-             listener = RG.choice([a for a in self.model.agents if a.pos != self.pos])
+             listener = RG.choice([a for a in self.model.agents if a.uid != self.uid])
         for i in range(self.model.n_interactions_interlocutor):
             question = self.create_question()
             answer = listener.receive_question_reply(question)

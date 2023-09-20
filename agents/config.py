@@ -2,7 +2,7 @@ import numpy as np
 import logging
 import sys
 import datetime
-from mesa.visualization.UserParam import UserSettableParameter, Slider, Checkbox
+from mesa.visualization.UserParam import Slider, Checkbox
 
 logging.basicConfig(stream=sys.stderr, level=logging.ERROR)
 RG = np.random.default_rng()
@@ -17,7 +17,7 @@ OUTPUT_DIR = f'output-{str(datetime.datetime.now()).replace(" ","-").replace(":"
 
 # For evaluation script (not browser visualization)
 ITERATIONS = [50]
-STEPS = [5000]
+STEPS = [3000]
 
 N_AGENTS = 100
 PROP_INNOVATOR_AGENTS = 0.2
