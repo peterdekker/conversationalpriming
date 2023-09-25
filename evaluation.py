@@ -36,6 +36,9 @@ def create_graph(run_data, variable_param, stats, mode, output_dir):
     course_df = run_data
     course_df.to_csv(os.path.join(output_dir, f"{variable_param}-{mode}-raw.csv"))
 
+    # Drop timestep 0 with weird artefacts
+    course_df = course_df[course_df["timesteps"]>=10]
+
     plots(variable_param, stats, mode, output_dir, course_df)
 
 def create_contrast_persons_graph(run_data, stats, mode, output_dir, runlabel):
@@ -43,6 +46,9 @@ def create_contrast_persons_graph(run_data, stats, mode, output_dir, runlabel):
     #course_df = get_course_df(run_data, None, stats, mode, output_dir)
     course_df = run_data
     course_df.to_csv(os.path.join(output_dir, f"{mode}-raw.csv"))
+
+    # Drop timestep 0 with weird artefacts
+    course_df = course_df[course_df["timesteps"]>=10]
 
     stats_1sg_3sg_contrast = [stat for stat in stats if ("1sg" in stat or "3sg" in stat) and "total" not in stat]
     plot_contrast_persons_graph(course_df, stats_1sg_3sg_contrast, mode, output_dir, runlabel)
@@ -118,7 +124,7 @@ def evaluate_model(fixed_params, variable_params, iterations, steps):
     run_data = pd.DataFrame(results)
     run_data = run_data.rename(columns={"Step":"timesteps"})
     # Drop first timestep
-    run_data = run_data[run_data.timesteps != 0]
+    run_data = run_data #[run_data.timesteps != 0]
 
     return run_data
 
