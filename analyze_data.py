@@ -32,9 +32,10 @@ OUTPUT_DIR_MODERN = os.path.join(OUTPUT_DIR, "modern")
 
 # User-settable params:
 EXCLUDE_LANGUAGES_PROTO_0 = False # Exclude languages (and thus whole families) where one of the protoforms is zero
-NORMALIZATION = "none"
+NORMALISATION = "max"
 excl_proto0_label = "_exclproto0" if EXCLUDE_LANGUAGES_PROTO_0 else ""
-norm_label = f"_{NORMALIZATION}"
+norm_label = f"_{NORMALISATION}"
+NORM_STRING_TITLE = "normalised " if NORMALISATION is not "none" else "" # This assumes always 'max' normalisation, other types get the same label
 
 pd.set_option('display.max_rows', 100)
 img_extension_pyplots = "png"
@@ -43,7 +44,7 @@ person_markers = ["1sg", "2sg", "3sg", "1pl", "2pl", "3pl"]
 
 
 
-def normalized_levenshtein(modern,proto, norm):
+def normalised_levenshtein(modern,proto, norm):
     raw_dist = editdistance.eval(modern, proto)
     if norm == "mean":
         norm_len = np.mean([len(modern),len(proto)])
@@ -153,7 +154,7 @@ def main():
         # df[f"{form_type}_corr"] = df[f"{form_type}_corr"].apply(ipa_to_soundclass)
         df[f"{form_type}_corr"] = df[f"{form_type}_corr"].apply(unidecode.unidecode)
 
-    df["proto_levenshtein"] = df.apply(lambda x: normalized_levenshtein(x["modern_form_corr"], x["proto_form_corr"], NORMALIZATION), axis=1)
+    df["proto_levenshtein"] = df.apply(lambda x: normalised_levenshtein(x["modern_form_corr"], x["proto_form_corr"], NORMALISATION), axis=1)
 
     df["person_merged"] = df["person"].apply(lambda p: "third" if p=="third" else "firstsecond")
 
@@ -190,6 +191,7 @@ def main():
     with robjects.local_context() as lc:
         lc['df'] = df
 
+
         robjects.r(f'''
                 library(tidyverse)
                 library(lme4)
@@ -225,7 +227,7 @@ def main():
                 modelProtoLevSum <- summary(modelProtoLev)
                 predictionsProtoLev <- ggpredict(model=modelProtoLev, terms=c('person','number'))
                 plot(predictionsProtoLev)+
-                ggtitle("Mixed model Levenshtein distance proto and modern length")+
+                ggtitle("Mixed model {NORM_STRING_TITLE}Levenshtein distance proto and modern length")+
                 labs(y = "Levenshtein distance")
                 ggsave("{OUTPUT_DIR_PROTO}/predictions_proto_levenshtein{excl_proto0_label}{norm_label}.png", bg = "white")
                 ggsave("{OUTPUT_DIR_PROTO}/predictions_proto_levenshtein{excl_proto0_label}{norm_label}.pdf", bg = "white")
@@ -268,7 +270,7 @@ def main():
     # for (pl,pn), group in df.groupby(["proto_language", "person_number"]):
     #     # print(group[["proto_language", "person_number", "modern_form", "modern_length"]])
     #     modern_diff_length = group["modern_length"].aggregate(lambda x: pdist(np.array(x)[np.newaxis].T))
-    #     modern_levenshtein = group["modern_form_corr"].aggregate(lambda x: [normalized_levenshtein(a,b, NORMALIZATION) for a,b in combinations(np.array(x),2)])
+    #     modern_levenshtein = group["modern_form_corr"].aggregate(lambda x: [normalised_levenshtein(a,b, NORMALISATION) for a,b in combinations(np.array(x),2)])
     #     # print(modern_diff_length)
     #     # print(modern_levenshtein)
     #     d = pd.DataFrame()
