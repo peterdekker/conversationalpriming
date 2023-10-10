@@ -5,10 +5,3 @@ numpy
 seaborn
 matplotlib
 networkx
-
-# Only for statistical analysis
-statsmodels
-rpy2
-editdistance
-unidecode
-# scipy
