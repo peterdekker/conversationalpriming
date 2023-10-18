@@ -10,3 +10,10 @@ In 'contrast persons' mode, the script will output one graph, where 1sg and 3sg 
 ```python3 evaluation.py --contrast_persons --friend_network True```
 
 
+## Calculation proportion persons in Corpus Gesproken Nederlands (CGN, Spoken Dutch Corpus)
+analyse_cgn.py: Standalone script to count persons in Corpus Gesproken Nederlands (CGN, Spoken Dutch Corpus)
+Download the annotations of the CGN corpus (full CGN corpus with sound files is not needed):
+
+CGN-annotaties (Version 2.0.3) (2014) [Data set]. Available at the Dutch Language Institute: http://hdl.handle.net/10032/tm-a2-n5
+
+The script expects the main 'Data' folder of the corpus to be placed in the directory 'data/CGNAnn'.
