@@ -32,12 +32,11 @@ def params_print(params):
 def create_graph(run_data, variable_param, stats, mode, output_dir):
     print(f"{mode}:")
     # course_df = get_course_df(run_data, variable_param, stats, mode, output_dir)
-    # Drop first
     course_df = run_data
     course_df.to_csv(os.path.join(output_dir, f"{variable_param}-{mode}-raw.csv"))
 
-    # Drop timestep 0 with weird artefacts
-    course_df = course_df[course_df["timesteps"]>=10]
+    # Drop first timesteps with weird artefacts
+    # course_df = course_df[course_df["timesteps"]>=10]
 
     plots(variable_param, stats, mode, output_dir, course_df)
 
@@ -47,8 +46,8 @@ def create_contrast_persons_graph(run_data, stats, mode, output_dir, runlabel):
     course_df = run_data
     course_df.to_csv(os.path.join(output_dir, f"{mode}-raw.csv"))
 
-    # Drop timestep 0 with weird artefacts
-    course_df = course_df[course_df["timesteps"]>=10]
+    # Drop first timesteps with weird artefacts
+    # course_df = course_df[course_df["timesteps"]>=10]
 
     stats_1sg_3sg_contrast = [stat for stat in stats if ("1sg" in stat or "3sg" in stat) and "total" not in stat]
     plot_contrast_persons_graph(course_df, stats_1sg_3sg_contrast, mode, output_dir, runlabel)
@@ -71,8 +70,6 @@ def get_course_df(run_data, variable_param, stats, mode, output_dir):
         iteration_df = row["datacollector"].get_model_vars_dataframe()[stats]
         if variable_param: # in contrast_persons mode no variable param
             iteration_df[variable_param] = row[variable_param]
-        # Drop all rows with index 0, since this is a logging artefact
-        iteration_df = iteration_df.drop(0)
         iteration_dfs.append(iteration_df)
     course_df = pd.concat(iteration_dfs)
     # Old index (with duplicates because of different param settings and runs) becomes explicit column 'timesteps'
@@ -124,7 +121,7 @@ def evaluate_model(fixed_params, variable_params, iterations, steps):
     run_data = pd.DataFrame(results)
     run_data = run_data.rename(columns={"Step":"timesteps"})
     # Drop first timestep
-    run_data = run_data #[run_data.timesteps != 0]
+    # run_data = run_data #[run_data.timesteps != 0]
 
     return run_data
 
