@@ -25,7 +25,7 @@ INIT_PROP_INNOVATIVE_INNOVATOR = 0.9
 INIT_PROP_INNOVATIVE_CONSERVATOR = 0.00
 BOOST_CONSERVATIVE = 0.01
 BOOST_INNOVATIVE =  0.01 # 0.02 #
-FORGET_WEIGHT = 0.00
+DECAY = 0.00
 FREQ_3SG =  1/3 #0.5 #
 
 SURPRISAL = False
@@ -45,7 +45,7 @@ model_params = {
     "freq_3sg": {"ui": Slider("Frequency 3sg", FREQ_3SG, 0.0, 1.0, 0.01), "script": FREQ_3SG},
     "boost_conservative": {"ui": Slider("Boost conservative", BOOST_CONSERVATIVE, 0.0, 1.0, 0.01), "script": BOOST_CONSERVATIVE},
     "boost_innovative": {"ui": Slider("Boost innovative", BOOST_INNOVATIVE, 0.0, 1.0, 0.01), "script": BOOST_INNOVATIVE},
-    "forget_weight": {"ui": Slider("Forget weight", FORGET_WEIGHT, 0.0, 1.0, 0.01), "script": FORGET_WEIGHT},
+    "decay": {"ui": Slider("Forget weight", DECAY, 0.0, 1.0, 0.01), "script": DECAY},
     "surprisal": {"ui": Checkbox('Surprisal', value=SURPRISAL), "script": SURPRISAL},
     "entropy": {"ui": Checkbox('Entropy', value=ENTROPY), "script": ENTROPY},
     "repeats": {"ui": Checkbox('Repeats', value=REPEATS), "script": REPEATS},

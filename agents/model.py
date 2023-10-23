@@ -19,7 +19,7 @@ class Model(Model):
     Model class
     '''
 
-    def __init__(self, n_agents, prop_innovator_agents, init_prop_innovative_innovator, init_prop_innovative_conservator, freq_3sg, boost_conservative, boost_innovative, forget_weight, surprisal, entropy, repeats, conversational_priming_prob, friend_network, innovator_no_conversational_priming, innovator_only_boost_production, n_interactions_interlocutor, browser_visualization, use_grid):
+    def __init__(self, n_agents, prop_innovator_agents, init_prop_innovative_innovator, init_prop_innovative_conservator, freq_3sg, boost_conservative, boost_innovative, decay, surprisal, entropy, repeats, conversational_priming_prob, friend_network, innovator_no_conversational_priming, innovator_only_boost_production, n_interactions_interlocutor, browser_visualization, use_grid):
         '''
         Initialize field
         '''
@@ -31,7 +31,7 @@ class Model(Model):
 
         assert boost_conservative >= 0 and boost_conservative <= 1
         assert boost_innovative >= 0 and boost_innovative <= 1
-        assert forget_weight >= 0 and forget_weight <= 1
+        assert decay >= 0 and decay <= 1
         assert type(surprisal) == bool
         assert type(entropy) == bool
         assert type(repeats) == bool
@@ -51,7 +51,7 @@ class Model(Model):
         self.prop_innovator_agents = prop_innovator_agents
         self.boost_conservative = boost_conservative
         self.boost_innovative = boost_innovative
-        self.forget_weight = forget_weight
+        self.decay = decay
         self.surprisal = surprisal
         self.entropy = entropy
         self.repeats = repeats

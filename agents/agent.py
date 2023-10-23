@@ -48,7 +48,7 @@ class Agent(mesa.Agent):
             
             # After every interaction, forget token
             # Forget one form for every person. This makes frequency assymetry between persons relevant.
-            if self.model.forget_weight > 0.0:
+            if self.model.decay > 0.0:
                 for person in self.persons:
                     # Simulate sampling from list, by sampling with probability of form
                     # So if 0.9 probability for token 1: 0.9 chance to forget 1
@@ -128,7 +128,7 @@ class Agent(mesa.Agent):
     
     def forget_form(self, person, form):
         prob_dict = self.forms[person]
-        boost = self.model.forget_weight
+        boost = self.model.decay
         new_total = 1.0 + boost
         # Forget this form by boosting other form
         other_form = "1" if form=="0" else "0"
