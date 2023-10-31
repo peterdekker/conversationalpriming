@@ -50,8 +50,8 @@ class Agent(mesa.Agent):
             # Forget one form for every person. This makes frequency assymetry between persons relevant.
             if self.model.decay > 0.0:
                 for person in self.persons:
-                    # Simulate sampling from list, by sampling with probability of form
-                    # So if 0.9 probability for token 1: 0.9 chance to forget 1
+                    # Simulate sampling from list, by sampling with inverse probability of form
+                    # So if 0.9 probability for token 1: 0.1 chance to forget token 1 and 0.9 chance to forget token 0
                     sample_token = min(self.forms[person], key=self.forms[person].get) # choice_prob(self.forms[person], inverse=True) # 
                     self.forget_form(person, sample_token)
 
