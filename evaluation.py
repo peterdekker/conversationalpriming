@@ -7,7 +7,7 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 
 from agents.model import Model
-from agents.config import model_params_script, evaluation_params, bool_params, string_params, OUTPUT_DIR, IMG_FORMATS
+from agents.config import model_params_script, evaluation_params, bool_params, string_params, OUTPUT_DIR, IMG_FORMATS, N_PROCESSES
 import agents.util as util
 
 communicated_stats = ["prop_innovative_1sg_innovator_avg", "prop_innovative_1sg_conservator_avg", "prop_innovative_3sg_innovator_avg", "prop_innovative_3sg_conservator_avg"] #, "prop_innovative_1sg_total_avg", "prop_innovative_3sg_total_avg"]
@@ -102,7 +102,7 @@ def plot_contrast_persons_graph(course_df, stats, mode, output_dir, label):
     [plt.savefig(os.path.join(output_dir, f"{label}-{mode}.{img_format}"), format=img_format, dpi=300) for img_format in IMG_FORMATS]
     plt.clf()
 
-def evaluate_model(fixed_params, variable_params, iterations, steps):
+def evaluate_model(fixed_params, variable_params, iterations, steps, n_processes):
     print(f"- Running batch: {iterations} iterations of {steps} steps")
     if variable_params:
         print(f"  Variable parameters: {params_print(variable_params)}")
@@ -114,14 +114,14 @@ def evaluate_model(fixed_params, variable_params, iterations, steps):
         all_params = fixed_params
     results = batch_run(Model, 
                         parameters=all_params,
-                        number_processes=None,
+                        number_processes=n_processes,
                         iterations=iterations,
                         data_collection_period=1,
                         max_steps=steps)
     run_data = pd.DataFrame(results)
     run_data = run_data.rename(columns={"Step":"timesteps"})
-    # Drop first timestep
-    # run_data = run_data #[run_data.timesteps != 0]
+    # Drop first timestep: communicated is still empty, so 0
+    #run_data = run_data[run_data.timesteps != 0]
 
     return run_data
 
@@ -179,7 +179,7 @@ def main():
             given_model_params = {k: v[0] for k, v in args.items() if k in model_params_script and v is not None}
             fixed_params = {k: (v if k not in given_model_params else given_model_params[k]) for k, v in model_params_script.items()}
             run_data = evaluate_model(fixed_params, None,
-                                        iterations_setting, steps_setting)
+                                        iterations_setting, steps_setting, N_PROCESSES)
             create_contrast_persons_graph(run_data, stats=communicated_stats, mode="communicated", output_dir=output_dir_custom, runlabel=runlabel)
             
             # create_graph(run_data, var_param,
@@ -197,7 +197,7 @@ def main():
                 steps_setting = steps[0]
                 fixed_params = {k: v for k, v in model_params_script.items() if k != var_param}
                 run_data = evaluate_model(fixed_params, {var_param: var_param_settings},
-                                            iterations_setting, steps_setting)
+                                            iterations_setting, steps_setting, N_PROCESSES)
                 # create_graph(run_data, var_param,
                 #                     stats=dominant_stats, mode="dominant", output_dir=output_dir_custom)
 

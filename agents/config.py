@@ -9,15 +9,17 @@ RG = np.random.default_rng()
 INNOVATIVE_FORM = "1"
 PERSONS = ["1sg", "2sg", "3sg"]
 STEPS_UPDATE_AGENT_COLOR = 50
-AVG_WINDOW_STATS = 1
+AVG_WINDOW_STATS = 25
 LAST_N_STEPS_END_GRAPH = 500
 
 IMG_FORMATS = ["png", "pdf"]
 OUTPUT_DIR = f'output-{str(datetime.datetime.now()).replace(" ","-").replace(":",".")}'
 
+N_PROCESSES = 14 # Default: None (use all cores)
+
 # For evaluation script (not browser visualization)
 ITERATIONS = [50]
-STEPS = [5000]
+STEPS = [3000]
 
 N_AGENTS = 100
 PROP_INNOVATOR_AGENTS = 0.2

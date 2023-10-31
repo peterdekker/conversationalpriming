@@ -155,15 +155,13 @@ class Model(Model):
             util.update_prop_innovative_agents(self.agents)
 
         self.running = True
-        self.datacollector.collect(self)
 
     def step(self):
         '''
         Run one step of the model.
         '''
-
+        # print(f"Timestep: {self.steps}")
         self.schedule.step()
-        self.datacollector.collect(self)
 
         # Compute agent proportion communicate, every N iterations
         # This also empties variable
@@ -173,7 +171,9 @@ class Model(Model):
         # Compute model proportion communicated
         util.update_prop_innovative_model(
             self, self.persons, self.speaker_types, self.prop_innovative)
+        # print(self.prop_innovative)
+
+        # Only run datacollector now, once stats have been filled by update_prop_innovative_model
+        self.datacollector.collect(self)
 
         self.steps += 1
-        # if self.steps==1000:
-        #     print(f"forgets: {self.n_total_forgets}. boosts: {self.n_total_boosts}. forgets/boosts: {self.n_total_forgets/self.n_total_boosts}")

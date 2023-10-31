@@ -17,39 +17,39 @@ def mymean(stats_list):
 
 # Communicated measures 
 def compute_prop_innovative_1sg_conservator_avg(model):
-    last_stats = model.prop_innovative["1sg",False][:-AVG_WINDOW_STATS]
+    last_stats = model.prop_innovative["1sg",False][-AVG_WINDOW_STATS:]
     return mymean(last_stats)
 
 # def compute_prop_innovative_2sg_conservator_avg(model):
-#     last_stats = model.prop_innovative["2sg",False][:-AVG_WINDOW_STATS]
+#     last_stats = model.prop_innovative["2sg",False][-AVG_WINDOW_STATS:]
 #     return mymean(last_stats)
 
 def compute_prop_innovative_3sg_conservator_avg(model):
-    last_stats = model.prop_innovative["3sg",False][:-AVG_WINDOW_STATS]
+    last_stats = model.prop_innovative["3sg",False][-AVG_WINDOW_STATS:]
     return mymean(last_stats)
 
 def compute_prop_innovative_1sg_innovator_avg(model):
-    last_stats = model.prop_innovative["1sg",True][:-AVG_WINDOW_STATS]
+    last_stats = model.prop_innovative["1sg",True][-AVG_WINDOW_STATS:]
     return mymean(last_stats)
 
 # def compute_prop_innovative_2sg_innovator_avg(model):
-#     last_stats = model.prop_innovative["2sg",True][:-AVG_WINDOW_STATS]
+#     last_stats = model.prop_innovative["2sg",True][-AVG_WINDOW_STATS:]
 #     return mymean(last_stats)
 
 def compute_prop_innovative_3sg_innovator_avg(model):
-    last_stats = model.prop_innovative["3sg",True][:-AVG_WINDOW_STATS]
+    last_stats = model.prop_innovative["3sg",True][-AVG_WINDOW_STATS:]
     return mymean(last_stats)
 
 def compute_prop_innovative_1sg_total_avg(model):
-    last_stats = model.prop_innovative["1sg",None][:-AVG_WINDOW_STATS]
+    last_stats = model.prop_innovative["1sg",None][-AVG_WINDOW_STATS:]
     return mymean(last_stats)
 
 # def compute_prop_innovative_2sg_total_avg(model):
-#     last_stats = model.prop_innovative["2sg",None][:-AVG_WINDOW_STATS]
+#     last_stats = model.prop_innovative["2sg",None][-AVG_WINDOW_STATS:]
 #     return mymean(last_stats)
 
 def compute_prop_innovative_3sg_total_avg(model):
-    last_stats = model.prop_innovative["3sg",None][:-AVG_WINDOW_STATS]
+    last_stats = model.prop_innovative["3sg",None][-AVG_WINDOW_STATS:]
     return mymean(last_stats)
 
 ## Internal measures
@@ -145,12 +145,13 @@ def update_prop_innovative_model(model, persons, speaker_types, prop_innovative_
     for person in persons:
         for speaker_type in speaker_types:
             # Stat per speaker type
+            # print(person,speaker_type)
             stat = compute_prop_innovative(model.communicated[person, speaker_type])
             prop_innovative_obj[person, speaker_type].append(stat)
         # Total stat
+        # print(person,"total")
         stat_total = compute_prop_innovative(model.communicated[person, None])
         prop_innovative_obj[person, None].append(stat_total)
-        #model.n_communicated[person].append(0)
 
 def update_prop_innovative_agents(agents):
     for agent in agents:
@@ -163,6 +164,7 @@ def compute_prop_innovative(communicated_list):
     n_utterances = len(communicated_list)
     stat = communicated_list.count(INNOVATIVE_FORM)/n_utterances if n_utterances > 0 else 0
     # Empty variable, so only count proportion per iteration is calculated
+    # print(communicated_list, n_utterances, stat)
     communicated_list.clear()
     return stat
 
