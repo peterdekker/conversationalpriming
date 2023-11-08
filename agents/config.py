@@ -15,7 +15,7 @@ LAST_N_STEPS_END_GRAPH = 500
 IMG_FORMATS = ["png", "pdf"]
 OUTPUT_DIR = f'output-{str(datetime.datetime.now()).replace(" ","-").replace(":",".")}'
 
-N_PROCESSES = 14 # Default: None (use all cores)
+N_PROCESSES = None # Default: None (use all cores)
 
 # For evaluation script (not browser visualization)
 ITERATIONS = [100]
