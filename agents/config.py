@@ -22,6 +22,8 @@ ITERATIONS = [100]
 STEPS = [1000]
 
 N_AGENTS = 100
+N_AGENTS_INTERACTING = 100
+
 PROP_INNOVATOR_AGENTS = 0.2
 INIT_PROP_INNOVATIVE_INNOVATOR = 0.9
 INIT_PROP_INNOVATIVE_CONSERVATOR = 0.00
@@ -41,6 +43,7 @@ N_INTERACTIONS_INTERLOCUTOR = 1
 
 model_params = {
     "n_agents": {"ui": Slider("# agents", N_AGENTS, 0, 1000, 10), "script": N_AGENTS},
+    "n_agents_interacting": {"ui": Slider("# agents", N_AGENTS_INTERACTING, 0, 100, 100), "script": N_AGENTS_INTERACTING},
     "prop_innovator_agents": {"ui": Slider("Proportion innovator agents", PROP_INNOVATOR_AGENTS, 0.0, 1.0, 0.1), "script": PROP_INNOVATOR_AGENTS},
     "init_prop_innovative_innovator": {"ui": Slider("Proportion innovative forms in innovator agents", INIT_PROP_INNOVATIVE_INNOVATOR, 0.0, 1.0, 0.01), "script": INIT_PROP_INNOVATIVE_INNOVATOR},
     "init_prop_innovative_conservator": {"ui": Slider("Proportion innovative forms in conservator agents", INIT_PROP_INNOVATIVE_CONSERVATOR, 0.0, 1.0, 0.01), "script": INIT_PROP_INNOVATIVE_CONSERVATOR},

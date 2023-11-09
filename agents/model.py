@@ -19,11 +19,12 @@ class Model(Model):
     Model class
     '''
 
-    def __init__(self, n_agents, prop_innovator_agents, init_prop_innovative_innovator, init_prop_innovative_conservator, freq_3sg, boost_conservative, boost_innovative, decay, surprisal, entropy, repeats, conversational_priming_prob, friend_network, innovator_no_conversational_priming, innovator_only_boost_production, n_interactions_interlocutor, browser_visualization, use_grid):
+    def __init__(self, n_agents, n_agents_interacting, prop_innovator_agents, init_prop_innovative_innovator, init_prop_innovative_conservator, freq_3sg, boost_conservative, boost_innovative, decay, surprisal, entropy, repeats, conversational_priming_prob, friend_network, innovator_no_conversational_priming, innovator_only_boost_production, n_interactions_interlocutor, browser_visualization, use_grid):
         '''
         Initialize field
         '''
         assert n_agents % 1 == 0
+        assert n_agents_interacting % 1 == 0
         assert prop_innovator_agents >= 0 and prop_innovator_agents <= 1
         assert init_prop_innovative_innovator >= 0 and init_prop_innovative_innovator <= 1
         assert init_prop_innovative_conservator >= 0 and init_prop_innovative_conservator <= 1
@@ -48,6 +49,7 @@ class Model(Model):
                 "If surprisal or entropy is on, the proportion of innovative forms in innovator and conservator agents have to be > 0.0; to prevent NaN values in surprisal calculations.")
 
         self.n_agents = int(n_agents)
+        self.n_agents_interacting = int(n_agents_interacting)
         self.prop_innovator_agents = prop_innovator_agents
         self.boost_conservative = boost_conservative
         self.boost_innovative = boost_innovative
@@ -160,8 +162,13 @@ class Model(Model):
         '''
         Run one step of the model.
         '''
-        # print(f"Timestep: {self.steps}")
-        self.schedule.step()
+        # Do not use scheduler, but manually let only part of the agents speak
+        agents_interacting = RG.choice(self.agents, self.n_agents_interacting)
+        for agent in agents_interacting:
+            agent.step()
+        self.schedule.steps+=1
+        self.schedule.time+=1
+        #self.schedule.step()
 
         # Compute agent proportion communicate, every N iterations
         # This also empties variable
@@ -173,7 +180,6 @@ class Model(Model):
         #     self, self.persons, self.speaker_types, self.prop_innovative)
         # print(self.prop_innovative)
 
-        # Only run datacollector now, once stats have been filled by update_prop_innovative_model
         self.datacollector.collect(self)
 
         self.steps += 1

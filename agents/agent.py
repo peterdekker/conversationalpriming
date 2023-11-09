@@ -33,7 +33,7 @@ class Agent(mesa.Agent):
         '''
          Perform one interaction for this agent, with this agent as speaker
         '''
-        if not self.model.use_grid: # default> use network
+        if not self.model.use_grid: # default: use network
             neighbors_nodes = self.model.grid.get_neighborhood(self.uid, include_center=False)
             neighbors = self.model.grid.get_cell_list_contents(neighbors_nodes)
             listener = RG.choice(neighbors)
