@@ -9,7 +9,7 @@ RG = np.random.default_rng()
 INNOVATIVE_FORM = "1"
 PERSONS = ["1sg", "2sg", "3sg"]
 STEPS_UPDATE_AGENT_COLOR = 50
-AVG_WINDOW_STATS = 100
+AVG_WINDOW_STATS = 20
 LAST_N_STEPS_END_GRAPH = 500
 
 IMG_FORMATS = ["png", "pdf"]
