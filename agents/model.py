@@ -75,7 +75,7 @@ class Model(Model):
         self.communicated = defaultdict(list)
         # self.n_communicated = defaultdict(lambda: [0])
         # Contains proportion innovative of all timesteps
-        self.prop_innovative = defaultdict(list)
+        # self.prop_innovative = defaultdict(list)
 
 
         self.persons = ["1sg", "2sg", "3sg"]
@@ -168,9 +168,9 @@ class Model(Model):
         if self.browser_visualization and self.steps % STEPS_UPDATE_AGENT_COLOR == 0:
             util.update_prop_innovative_agents(self.agents)
 
-        # Compute model proportion communicated
-        util.update_prop_innovative_model(
-            self, self.persons, self.speaker_types, self.prop_innovative)
+        # # Compute model proportion communicated
+        # util.update_prop_innovative_model(
+        #     self, self.persons, self.speaker_types, self.prop_innovative)
         # print(self.prop_innovative)
 
         # Only run datacollector now, once stats have been filled by update_prop_innovative_model

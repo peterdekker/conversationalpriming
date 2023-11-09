@@ -16,39 +16,39 @@ def mymean(stats_list):
 
 # Communicated measures 
 def compute_prop_innovative_1sg_conservator_avg(model):
-    last_stat = model.prop_innovative["1sg",False][-1]#[-AVG_WINDOW_STATS:]
+    last_stat = compute_prop_innovative(model.communicated["1sg",False])#[-AVG_WINDOW_STATS:]
     return last_stat # mymean(last_stats)
 
 # def compute_prop_innovative_2sg_conservator_avg(model):
-#     last_stat = model.prop_innovative["2sg",False][-1]#[-AVG_WINDOW_STATS:]
+#     last_stat = compute_prop_innovative(model.communicated["2sg",False])#[-AVG_WINDOW_STATS:]
 #     return last_stat # mymean(last_stats)
 
 def compute_prop_innovative_3sg_conservator_avg(model):
-    last_stat = model.prop_innovative["3sg",False][-1]#[-AVG_WINDOW_STATS:]
+    last_stat = compute_prop_innovative(model.communicated["3sg",False])#[-AVG_WINDOW_STATS:]
     return last_stat # mymean(last_stats)
 
 def compute_prop_innovative_1sg_innovator_avg(model):
-    last_stat = model.prop_innovative["1sg",True][-1]#[-AVG_WINDOW_STATS:]
+    last_stat = compute_prop_innovative(model.communicated["1sg",True])#[-AVG_WINDOW_STATS:]
     return last_stat # mymean(last_stats)
 
 # def compute_prop_innovative_2sg_innovator_avg(model):
-#     last_stat = model.prop_innovative["2sg",True][-1]#[-AVG_WINDOW_STATS:]
+#     last_stat = compute_prop_innovative(model.communicated["2sg",True][)[-AVG_WINDOW_STATS:]
 #     return last_stat # mymean(last_stats)
 
 def compute_prop_innovative_3sg_innovator_avg(model):
-    last_stat = model.prop_innovative["3sg",True][-1]#[-AVG_WINDOW_STATS:]
+    last_stat = compute_prop_innovative(model.communicated["3sg",True])#[-AVG_WINDOW_STATS:]
     return last_stat # mymean(last_stats)
 
 def compute_prop_innovative_1sg_total_avg(model):
-    last_stat = model.prop_innovative["1sg",None][-1]#[-AVG_WINDOW_STATS:]
+    last_stat = compute_prop_innovative(model.communicated["1sg",None])#[-AVG_WINDOW_STATS:]
     return last_stat # mymean(last_stats)
 
 # def compute_prop_innovative_2sg_total_avg(model):
-#     last_stat = model.prop_innovative["2sg",None][-1]#[-AVG_WINDOW_STATS:]
+#     last_stat = compute_prop_innovative(model.communicated["2sg",None][)[-AVG_WINDOW_STATS:]
 #     return last_stat # mymean(last_stats)
 
 def compute_prop_innovative_3sg_total_avg(model):
-    last_stat = model.prop_innovative["3sg",None][-1]#[-AVG_WINDOW_STATS:]
+    last_stat = compute_prop_innovative(model.communicated["3sg",None])#[-AVG_WINDOW_STATS:]
     return last_stat # mymean(last_stats)
 
 ## Internal measures
@@ -139,18 +139,18 @@ def compute_prop_innovative_3sg_total_internal(model):
 
 ##### Called every iteration: compute proportion innovative from list of utterances in this iteration.
 # List of utterances is cleared after
-def update_prop_innovative_model(model, persons, speaker_types, prop_innovative_obj):
-    # print(sorted([(k,len(v)) for k,v in model.communicated.items()]))
-    for person in persons:
-        for speaker_type in speaker_types:
-            # Stat per speaker type
-            # print(person,speaker_type)
-            stat = compute_prop_innovative(model.communicated[person, speaker_type])
-            prop_innovative_obj[person, speaker_type].append(stat)
-        # Total stat
-        # print(person,"total")
-        stat_total = compute_prop_innovative(model.communicated[person, None])
-        prop_innovative_obj[person, None].append(stat_total)
+# def update_prop_innovative_model(model, persons, speaker_types, prop_innovative_obj):
+#     # print(sorted([(k,len(v)) for k,v in model.communicated.items()]))
+#     for person in persons:
+#         for speaker_type in speaker_types:
+#             # Stat per speaker type
+#             # print(person,speaker_type)
+#             stat = compute_prop_innovative(model.communicated[person, speaker_type])
+#             prop_innovative_obj[person, speaker_type] = stat
+#         # Total stat
+#         # print(person,"total")
+#         stat_total = compute_prop_innovative(model.communicated[person, None])
+#         prop_innovative_obj[person, None] = stat
 
 def update_prop_innovative_agents(agents):
     for agent in agents:
