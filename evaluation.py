@@ -7,7 +7,7 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 
 from agents.model import Model
-from agents.config import model_params_script, evaluation_params, bool_params, string_params, OUTPUT_DIR, IMG_FORMATS, N_PROCESSES
+from agents.config import model_params_script, evaluation_params, bool_params, string_params, OUTPUT_DIR, IMG_FORMATS, N_PROCESSES, AVG_WINDOW_STATS
 import agents.util as util
 
 communicated_stats = ["prop_innovative_1sg_innovator_avg", "prop_innovative_1sg_conservator_avg", "prop_innovative_3sg_innovator_avg", "prop_innovative_3sg_conservator_avg"] #, "prop_innovative_1sg_total_avg", "prop_innovative_3sg_total_avg"]
@@ -29,28 +29,24 @@ def params_print(params):
     return "".join([f"{k}: {v}   " for k, v in params.items()])
 
 
-def create_graph(run_data, variable_param, stats, mode, output_dir):
+def create_graph(course_df, variable_param, stats, mode, output_dir):
     print(f"{mode}:")
-    # course_df = get_course_df(run_data, variable_param, stats, mode, output_dir)
-    course_df = run_data
     course_df.to_csv(os.path.join(output_dir, f"{variable_param}-{mode}-raw.csv"))
 
-    # Drop first timesteps with weird artefacts
-    # course_df = course_df[course_df["timesteps"]>=10]
+    # Take rolling average after outputting raw data to file
+    course_df_rolling = course_df.groupby("RunId").rolling(AVG_WINDOW_STATS, min_periods=1).mean()
 
-    plots(variable_param, stats, mode, output_dir, course_df)
+    plots(variable_param, stats, mode, output_dir, course_df_rolling)
 
-def create_contrast_persons_graph(run_data, stats, mode, output_dir, runlabel):
+def create_contrast_persons_graph(course_df, stats, mode, output_dir, runlabel):
     print(f"{mode}:")
-    #course_df = get_course_df(run_data, None, stats, mode, output_dir)
-    course_df = run_data
     course_df.to_csv(os.path.join(output_dir, f"{mode}-raw.csv"))
 
-    # Drop first timesteps with weird artefacts
-    # course_df = course_df[course_df["timesteps"]>=10]
+    # Take rolling average after outputting raw data to file
+    course_df_rolling = course_df.groupby("RunId").rolling(AVG_WINDOW_STATS, min_periods=1).mean()
 
     stats_1sg_3sg_contrast = [stat for stat in stats if ("1sg" in stat or "3sg" in stat) and "total" not in stat]
-    plot_contrast_persons_graph(course_df, stats_1sg_3sg_contrast, mode, output_dir, runlabel)
+    plot_contrast_persons_graph(course_df_rolling, stats_1sg_3sg_contrast, mode, output_dir, runlabel)
 
 def plots(variable_param, stats, mode, output_dir, course_df):
     # print("Plot graph 1sg-3sg.")
@@ -120,8 +116,6 @@ def evaluate_model(fixed_params, variable_params, iterations, steps, n_processes
                         max_steps=steps)
     run_data = pd.DataFrame(results)
     run_data = run_data.rename(columns={"Step":"timesteps"})
-    # Drop first timestep: communicated is still empty, so 0
-    #run_data = run_data[run_data.timesteps != 0]
 
     return run_data
 
