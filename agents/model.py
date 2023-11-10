@@ -19,7 +19,7 @@ class Model(Model):
     Model class
     '''
 
-    def __init__(self, n_agents, n_agents_interacting, prop_innovator_agents, init_prop_innovative_innovator, init_prop_innovative_conservator, freq_3sg, boost_conservative, boost_innovative, decay, surprisal, entropy, repeats, conversational_priming_prob, friend_network, innovator_no_conversational_priming, innovator_only_boost_production, n_interactions_interlocutor, browser_visualization, use_grid):
+    def __init__(self, n_agents, n_agents_interacting, prop_innovator_agents, init_prop_innovative_innovator, init_prop_innovative_conservator, freq_3sg, increase_conservative, increase_innovative, double_increase_conv_priming_production, decay, surprisal, entropy, repeats, conversational_priming_prob, friend_network, innovator_no_conversational_priming, innovator_only_increase_production, n_interactions_interlocutor, browser_visualization, use_grid):
         '''
         Initialize field
         '''
@@ -30,8 +30,9 @@ class Model(Model):
         assert init_prop_innovative_conservator >= 0 and init_prop_innovative_conservator <= 1
         assert freq_3sg >= 0 and freq_3sg <= 1
 
-        assert boost_conservative >= 0 and boost_conservative <= 1
-        assert boost_innovative >= 0 and boost_innovative <= 1
+        assert increase_conservative >= 0 and increase_conservative <= 1
+        assert increase_innovative >= 0 and increase_innovative <= 1
+        assert type(double_increase_conv_priming_production) == bool
         assert decay >= 0 and decay <= 1
         assert type(surprisal) == bool
         assert type(entropy) == bool
@@ -39,7 +40,7 @@ class Model(Model):
         assert conversational_priming_prob >= 0 and conversational_priming_prob <= 1
         assert type(friend_network) == bool
         assert type(innovator_no_conversational_priming) == bool
-        assert type(innovator_only_boost_production) == bool
+        assert type(innovator_only_increase_production) == bool
         assert n_interactions_interlocutor >= 1 and n_interactions_interlocutor <= 100
         assert type(browser_visualization) == bool
         assert type(use_grid)==bool
@@ -51,8 +52,9 @@ class Model(Model):
         self.n_agents = int(n_agents)
         self.n_agents_interacting = int(n_agents_interacting)
         self.prop_innovator_agents = prop_innovator_agents
-        self.boost_conservative = boost_conservative
-        self.boost_innovative = boost_innovative
+        self.increase_conservative = increase_conservative
+        self.increase_innovative = increase_innovative
+        self.double_increase_conv_priming_production = double_increase_conv_priming_production
         self.decay = decay
         self.surprisal = surprisal
         self.entropy = entropy
@@ -60,7 +62,7 @@ class Model(Model):
         self.conversational_priming_prob = conversational_priming_prob
         self.friend_network = friend_network
         self.innovator_no_conversational_priming = innovator_no_conversational_priming
-        self.innovator_only_boost_production = innovator_only_boost_production
+        self.innovator_only_increase_production = innovator_only_increase_production
         self.n_interactions_interlocutor = int(n_interactions_interlocutor)
         self.browser_visualization = browser_visualization
         self.use_grid = use_grid
@@ -70,7 +72,7 @@ class Model(Model):
         self.steps = 0
 
         # Diagnostic variables
-        self.n_total_boosts = 0
+        self.n_total_increases = 0
         self.n_total_forgets = 0
 
         # Contains utterances of last step emptied after prop_innovative calculation at end of step
