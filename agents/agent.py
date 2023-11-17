@@ -108,9 +108,16 @@ class Agent(mesa.Agent):
         SURPRISAL_THRESHOLD = 1000000
         prob_dict = self.forms[person]
         if form == INNOVATIVE_FORM:
-            increase = self.model.increase_innovative
-        else:
-            increase = self.model.increase_conservative
+            if person == "3sg" and self.model.increase_innovative_3sg is not None:
+                increase = self.model.increase_innovative_3sg
+            else:
+                increase = self.model.increase_innovative
+        else: # conservative
+            if person == "3sg" and self.model.increase_conservative_3sg is not None:
+                increase = self.model.increase_conservative_3sg
+            else:
+                increase = self.model.increase_conservative
+        print(f"{person},{form}:{increase}")
         if double_increase_conv_priming_production:
             increase *= 2
         if self.model.surprisal:

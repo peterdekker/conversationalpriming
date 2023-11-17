@@ -29,6 +29,8 @@ INIT_PROP_INNOVATIVE_INNOVATOR = 0.9
 INIT_PROP_INNOVATIVE_CONSERVATOR = 0.00
 INCREASE_CONSERVATIVE = 0.01
 INCREASE_INNOVATIVE =  0.01 # 0.02 #
+INCREASE_CONSERVATIVE_3SG = None
+INCREASE_INNOVATIVE_3SG =  None # 0.02 #
 DOUBLE_INCREASE_CONV_PRIMING_PRODUCTION = False
 DECAY = 0.00
 FREQ_3SG =  1/3 #0.5 #
@@ -51,6 +53,8 @@ model_params = {
     "freq_3sg": {"ui": Slider("Frequency 3sg", FREQ_3SG, 0.0, 1.0, 0.01), "script": FREQ_3SG},
     "increase_conservative": {"ui": Slider("Increase conservative", INCREASE_CONSERVATIVE, 0.0, 1.0, 0.01), "script": INCREASE_CONSERVATIVE},
     "increase_innovative": {"ui": Slider("Increase innovative", INCREASE_INNOVATIVE, 0.0, 1.0, 0.01), "script": INCREASE_INNOVATIVE},
+    "increase_conservative_3sg": {"ui": None, "script": INCREASE_CONSERVATIVE_3SG},
+    "increase_innovative_3sg": {"ui": None, "script": INCREASE_INNOVATIVE_3SG},
     "double_increase_conv_priming_production": {"ui": Checkbox('double_increase_conv_priming_production', value=DOUBLE_INCREASE_CONV_PRIMING_PRODUCTION), "script": DOUBLE_INCREASE_CONV_PRIMING_PRODUCTION},
     "decay": {"ui": Slider("Forget weight", DECAY, 0.0, 1.0, 0.01), "script": DECAY},
     "surprisal": {"ui": Checkbox('Surprisal', value=SURPRISAL), "script": SURPRISAL},
