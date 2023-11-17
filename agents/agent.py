@@ -117,7 +117,7 @@ class Agent(mesa.Agent):
                 increase = self.model.increase_conservative_3sg
             else:
                 increase = self.model.increase_conservative
-        print(f"{person},{form}:{increase}")
+        # print(f"{person},{form}:{increase}")
         if double_increase_conv_priming_production:
             increase *= 2
         if self.model.surprisal:
