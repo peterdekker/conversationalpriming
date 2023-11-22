@@ -19,7 +19,7 @@ class Model(Model):
     Model class
     '''
 
-    def __init__(self, n_agents, n_agents_interacting, prop_innovator_agents, init_prop_innovative_innovator, init_prop_innovative_conservator, freq_3sg, increase_conservative, increase_innovative, increase_conservative_3sg, increase_innovative_3sg, double_increase_conv_priming_production, decay, surprisal, entropy, repeats, conversational_priming_prob, friend_network, innovator_no_conversational_priming, innovator_only_increase_production, n_interactions_interlocutor, browser_visualization, use_grid):
+    def __init__(self, n_agents, n_agents_interacting, prop_innovator_agents, init_prop_innovative_innovator, init_prop_innovative_conservator, freq_3sg, increase_conservative, increase_innovative, increase_conservative_3sg, increase_innovative_3sg, double_increase_conv_priming_production, decay, decay_3sg, surprisal, entropy, repeats, conversational_priming_prob, friend_network, innovator_no_conversational_priming, innovator_only_increase_production, n_interactions_interlocutor, browser_visualization, use_grid):
         '''
         Initialize field
         '''
@@ -32,7 +32,7 @@ class Model(Model):
 
         assert increase_conservative >= 0 and increase_conservative <= 1
         assert increase_innovative >= 0 and increase_innovative <= 1
-        # No assertion for increase_conservative_3sg and increase_innovative_3sg variables, because they can be either Null or a float
+        # No assertion for increase_conservative_3sg and increase_innovative_3sg and decay_3sg variables, because they can be either Null or a float
         assert type(double_increase_conv_priming_production) == bool
         assert decay >= 0 and decay <= 1
         assert type(surprisal) == bool
@@ -59,6 +59,7 @@ class Model(Model):
         self.increase_innovative_3sg = increase_innovative_3sg
         self.double_increase_conv_priming_production = double_increase_conv_priming_production
         self.decay = decay
+        self.decay_3sg = decay_3sg
         self.surprisal = surprisal
         self.entropy = entropy
         self.repeats = repeats

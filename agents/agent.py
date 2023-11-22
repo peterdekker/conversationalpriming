@@ -48,12 +48,17 @@ class Agent(mesa.Agent):
             
             # After every interaction, forget token
             # Forget one form for every person. This makes frequency assymetry between persons relevant.
-            if self.model.decay > 0.0:
+            if self.model.decay > 0.0 or (self.model.decay_3sg is not None and self.model.decay_3sg > 0.0):
                 for person in self.persons:
+                    if person == "3sg":
+                        decay_prob = self.model.decay_3sg if self.model.decay_3sg is not None else self.model.decay
+                    else:
+                        decay_prob = self.model.decay
+                        
                     # Simulate sampling from list, by sampling with inverse probability of form
                     # So if 0.9 probability for token 1: 0.1 chance to forget token 1 and 0.9 chance to forget token 0
                     sample_token = min(self.forms[person], key=self.forms[person].get) # choice_prob(self.forms[person], inverse=True) # 
-                    self.forget_form(person, sample_token)
+                    self.forget_form(person, sample_token, decay_prob)
 
 
     def create_question(self):
@@ -137,9 +142,9 @@ class Agent(mesa.Agent):
         # Counter for diagnostic purposes
         self.model.n_total_increases += 1
     
-    def forget_form(self, person, form):
+    def forget_form(self, person, form, decay_prob):
         prob_dict = self.forms[person]
-        increase = self.model.decay
+        increase = decay_prob
         new_total = 1.0 + increase
         # Forget this form by increaseing other form
         other_form = "1" if form=="0" else "0"

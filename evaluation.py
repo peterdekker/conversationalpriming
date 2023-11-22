@@ -7,7 +7,7 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 
 from agents.model import Model
-from agents.config import model_params_script, evaluation_params, bool_params, string_params, OUTPUT_DIR, IMG_FORMATS, N_PROCESSES, AVG_WINDOW_STATS
+from agents.config import model_params_script, evaluation_params, bool_params, string_params, int_params, OUTPUT_DIR, IMG_FORMATS, N_PROCESSES, AVG_WINDOW_STATS
 import agents.util as util
 
 communicated_stats = ["prop_innovative_1sg_innovator_avg", "prop_innovative_1sg_conservator_avg", "prop_innovative_3sg_innovator_avg", "prop_innovative_3sg_conservator_avg"] #, "prop_innovative_1sg_total_avg", "prop_innovative_3sg_total_avg"]
@@ -124,8 +124,15 @@ def main():
     parser = argparse.ArgumentParser(description='Run agent model from terminal.')
     model_group = parser.add_argument_group('model', 'Model parameters')
     for param in model_params_script:
-        model_group.add_argument(f"--{param}", nargs="+",
-                                 type=str2bool if param in bool_params else float)
+        if param in bool_params:
+            model_group.add_argument(f"--{param}", nargs="+",
+                                    type=str2bool)
+        elif param in int_params:
+            model_group.add_argument(f"--{param}", nargs="+",
+                                    type=int)
+        else:
+            model_group.add_argument(f"--{param}", nargs="+",
+                                    type=float)
     evaluation_group = parser.add_argument_group('evaluation', 'Evaluation parameters')
     for param in evaluation_params:
         if param in bool_params:
