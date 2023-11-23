@@ -162,9 +162,6 @@ def compute_prop_innovative(communicated_list):
     #TODO: optimize count?
     n_utterances = len(communicated_list)
     stat = communicated_list.count(INNOVATIVE_FORM)/n_utterances if n_utterances > 0 else 0
-    # Empty variable, so only count proportion per iteration is calculated
-    # print(communicated_list, n_utterances, stat)
-    communicated_list.clear()
     return stat
 
 def update_communicated(form, person, speaker_type, model, agent):
@@ -176,6 +173,7 @@ def update_communicated(form, person, speaker_type, model, agent):
     model.communicated[person,None].append(form)
     
     if model.browser_visualization:
+        print("Browser visualization")
         # # For agent: store all forms together, regardless of person and speaker type 
         agent.communicated.append(form)
 

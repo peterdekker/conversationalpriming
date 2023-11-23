@@ -79,7 +79,7 @@ class Model(Model):
         self.n_total_increases = 0
         self.n_total_forgets = 0
 
-        # Contains utterances of last step emptied after prop_innovative calculation at end of step
+        # Contains utterances of last step
         self.communicated = defaultdict(list)
         # self.n_communicated = defaultdict(lambda: [0])
         # Contains proportion innovative of all timesteps
@@ -102,15 +102,15 @@ class Model(Model):
                 "prop_innovative_1sg_total_avg": util.compute_prop_innovative_1sg_total_avg,
                 #"prop_innovative_2sg_total_avg": util.compute_prop_innovative_2sg_total_avg,
                 "prop_innovative_3sg_total_avg": util.compute_prop_innovative_3sg_total_avg,
-                "prop_innovative_1sg_innovator_internal": util.compute_prop_innovative_1sg_innovator_internal,
-                #"prop_innovative_2sg_innovator_internal": util.compute_prop_innovative_2sg_innovator_internal,
-                "prop_innovative_3sg_innovator_internal": util.compute_prop_innovative_3sg_innovator_internal,
-                "prop_innovative_1sg_conservator_internal": util.compute_prop_innovative_1sg_conservator_internal,
-                #"prop_innovative_2sg_conservator_internal": util.compute_prop_innovative_2sg_conservator_internal,
-                "prop_innovative_3sg_conservator_internal": util.compute_prop_innovative_3sg_conservator_internal,
-                "prop_innovative_1sg_total_internal": util.compute_prop_innovative_1sg_total_internal,
-                #"prop_innovative_2sg_total_internal": util.compute_prop_innovative_2sg_total_internal,
-                "prop_innovative_3sg_total_internal": util.compute_prop_innovative_3sg_total_internal,
+                # "prop_innovative_1sg_innovator_internal": util.compute_prop_innovative_1sg_innovator_internal,
+                # #"prop_innovative_2sg_innovator_internal": util.compute_prop_innovative_2sg_innovator_internal,
+                # "prop_innovative_3sg_innovator_internal": util.compute_prop_innovative_3sg_innovator_internal,
+                # "prop_innovative_1sg_conservator_internal": util.compute_prop_innovative_1sg_conservator_internal,
+                # #"prop_innovative_2sg_conservator_internal": util.compute_prop_innovative_2sg_conservator_internal,
+                # "prop_innovative_3sg_conservator_internal": util.compute_prop_innovative_3sg_conservator_internal,
+                # "prop_innovative_1sg_total_internal": util.compute_prop_innovative_1sg_total_internal,
+                # #"prop_innovative_2sg_total_internal": util.compute_prop_innovative_2sg_total_internal,
+                # "prop_innovative_3sg_total_internal": util.compute_prop_innovative_3sg_total_internal,
                 # "prop_1sg_innovator_dominant": util.compute_prop_1sg_innovator_dominant,
                 # "prop_2sg_innovator_dominant": util.compute_prop_2sg_innovator_dominant,
                 # "prop_3sg_innovator_dominant": util.compute_prop_3sg_innovator_dominant,
@@ -187,5 +187,8 @@ class Model(Model):
         # print(self.prop_innovative)
 
         self.datacollector.collect(self)
+        # After stats have been calculated, empty dict with communicated forms of this timestep
+        for key in self.communicated:
+            self.communicated[key].clear()
 
         self.steps += 1
