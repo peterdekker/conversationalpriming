@@ -38,7 +38,7 @@ class Agent(mesa.Agent):
             neighbors = self.model.grid.get_cell_list_contents(neighbors_nodes)
             listener = RG.choice(neighbors)
         else: # obsolete: use grid
-             listener = RG.choice([a for a in self.model.agents if a.uid != self.uid])
+             listener = RG.choice([a for a in self.model.agents_list if a.uid != self.uid])
         
         for i in range(self.model.n_interactions_interlocutor):
             question = self.create_question()
