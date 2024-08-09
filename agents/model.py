@@ -20,9 +20,7 @@ class Model(Model):
     '''
 
     def __init__(self, n_agents, n_agents_interacting, prop_innovator_agents, init_prop_innovative_innovator, init_prop_innovative_conservator, freq_3sg, increase_conservative, increase_innovative, increase_conservative_3sg, increase_innovative_3sg, double_increase_conv_priming_production, decay, decay_3sg, surprisal, entropy, repeats, conversational_priming_prob, friend_network, innovator_no_conversational_priming, innovator_only_increase_production, n_interactions_interlocutor, browser_visualization, use_grid):
-        '''
-        Initialize field
-        '''
+        super().__init__()
         assert n_agents % 1 == 0
         assert n_agents_interacting % 1 == 0
         assert prop_innovator_agents >= 0 and prop_innovator_agents <= 1
@@ -158,9 +156,9 @@ class Model(Model):
                 self.grid.position_agent(agent, (x, y))
                 self.schedule.add(agent)
 
-        self.agents = self.schedule.agents
+        self.agents_list = self.schedule.agents
         if self.browser_visualization:
-            util.update_prop_innovative_agents(self.agents)
+            util.update_prop_innovative_agents(self.agents_list)
 
         self.running = True
 
@@ -169,7 +167,7 @@ class Model(Model):
         Run one step of the model.
         '''
         # Do not use scheduler, but manually let only part of the agents speak
-        agents_interacting = RG.choice(self.agents, self.n_agents_interacting)
+        agents_interacting = RG.choice(self.agents_list, self.n_agents_interacting)
         for agent in agents_interacting:
             agent.step()
         self.schedule.steps+=1
@@ -179,7 +177,7 @@ class Model(Model):
         # Compute agent proportion communicate, every N iterations
         # This also empties variable
         if self.browser_visualization and self.steps % STEPS_UPDATE_AGENT_COLOR == 0:
-            util.update_prop_innovative_agents(self.agents)
+            util.update_prop_innovative_agents(self.agents_list)
 
         # # Compute model proportion communicated
         # util.update_prop_innovative_model(

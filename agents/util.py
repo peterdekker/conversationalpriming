@@ -59,31 +59,31 @@ def compute_internal(agents, person, innovator):
     return mymean(probs)
 
 def compute_prop_innovative_1sg_conservator_internal(model):
-    return compute_internal(model.agents, "1sg", False)
+    return compute_internal(model.agents_list, "1sg", False)
 
 # def compute_prop_innovative_2sg_conservator_internal(model):
-#     return compute_internal(model.agents, "2sg", False)
+#     return compute_internal(model.agents_list, "2sg", False)
 
 def compute_prop_innovative_3sg_conservator_internal(model):
-    return compute_internal(model.agents, "3sg", False)
+    return compute_internal(model.agents_list, "3sg", False)
 
 def compute_prop_innovative_1sg_innovator_internal(model):
-    return compute_internal(model.agents, "1sg", True)
+    return compute_internal(model.agents_list, "1sg", True)
 
 # def compute_prop_innovative_2sg_innovator_internal(model):
-#     return compute_internal(model.agents, "2sg", True)
+#     return compute_internal(model.agents_list, "2sg", True)
 
 def compute_prop_innovative_3sg_innovator_internal(model):
-    return compute_internal(model.agents, "3sg", True)
+    return compute_internal(model.agents_list, "3sg", True)
 
 def compute_prop_innovative_1sg_total_internal(model):
-    return compute_internal(model.agents, "1sg", None)
+    return compute_internal(model.agents_list, "1sg", None)
 
 # def compute_prop_innovative_2sg_total_internal(model):
-#     return compute_internal(model.agents, "2sg", None)
+#     return compute_internal(model.agents_list, "2sg", None)
 
 def compute_prop_innovative_3sg_total_internal(model):
-    return compute_internal(model.agents, "3sg", None)
+    return compute_internal(model.agents_list, "3sg", None)
 
 
 def update_prop_innovative_agents(agents):
