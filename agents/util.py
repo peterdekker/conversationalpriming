@@ -58,15 +58,6 @@ def compute_internal(agents, person, innovator):
     probs = [agent.forms[person][INNOVATIVE_FORM] for agent in agents if agent.innovator==innovator or innovator==None]
     return mymean(probs)
 
-# def compute_dominant(agents, person, innovator):
-#     if innovator == None:
-#         speakers_type = agents
-#     else:
-#         speakers_type = [agent for agent in agents if agent.innovator==innovator]
-#     speakers_dominant = [agent for agent in speakers_type if agent.forms[person][INNOVATIVE_FORM]>= 0.5]
-#     prop_speakers_dominant = len(speakers_dominant)/len(speakers_type)
-#     return prop_speakers_dominant
-
 def compute_prop_innovative_1sg_conservator_internal(model):
     return compute_internal(model.agents, "1sg", False)
 
@@ -94,63 +85,6 @@ def compute_prop_innovative_1sg_total_internal(model):
 def compute_prop_innovative_3sg_total_internal(model):
     return compute_internal(model.agents, "3sg", None)
 
-# Dominant measures
-
-# def compute_prop_1sg_conservator_dominant(model):
-#     return compute_dominant(model.agents, "1sg", False)
-
-# def compute_prop_2sg_conservator_dominant(model):
-#     return compute_dominant(model.agents, "2sg", False)
-
-# def compute_prop_3sg_conservator_dominant(model):
-#     return compute_dominant(model.agents, "3sg", False)
-
-# def compute_prop_1sg_innovator_dominant(model):
-#     return compute_dominant(model.agents, "1sg", True)
-
-# def compute_prop_2sg_innovator_dominant(model):
-#     return compute_dominant(model.agents, "2sg", True)
-
-# def compute_prop_3sg_innovator_dominant(model):
-#     return compute_dominant(model.agents, "3sg", True)
-
-# def compute_prop_1sg_total_dominant(model):
-#     return compute_dominant(model.agents, "1sg", None)
-
-# def compute_prop_2sg_total_dominant(model):
-#     return compute_dominant(model.agents, "2sg", None)
-
-# def compute_prop_3sg_total_dominant(model):
-#     return compute_dominant(model.agents, "3sg", None)
-
-##
-# def compute_n_communicated_1sg_avg(model):
-#     last_stats = model.n_communicated["1sg"][:-AVG_WINDOW_STATS]
-#     return mymean(last_stats)
-
-# # def compute_n_communicated_2sg_avg(model):
-# #     last_stats = model.n_communicated["2sg"][:-AVG_WINDOW_STATS]
-# #     return mymean(last_stats)
-
-# def compute_n_communicated_3sg_avg(model):
-#     last_stats = model.n_communicated["3sg"][:-AVG_WINDOW_STATS]
-#     return mymean(last_stats)
-######
-
-##### Called every iteration: compute proportion innovative from list of utterances in this iteration.
-# List of utterances is cleared after
-# def update_prop_innovative_model(model, persons, speaker_types, prop_innovative_obj):
-#     # print(sorted([(k,len(v)) for k,v in model.communicated.items()]))
-#     for person in persons:
-#         for speaker_type in speaker_types:
-#             # Stat per speaker type
-#             # print(person,speaker_type)
-#             stat = compute_prop_innovative(model.communicated[person, speaker_type])
-#             prop_innovative_obj[person, speaker_type] = stat
-#         # Total stat
-#         # print(person,"total")
-#         stat_total = compute_prop_innovative(model.communicated[person, None])
-#         prop_innovative_obj[person, None] = stat
 
 def update_prop_innovative_agents(agents):
     for agent in agents:
@@ -167,7 +101,6 @@ def compute_prop_innovative(communicated_list):
 def update_communicated(form, person, speaker_type, model, agent):
     # For model: store forms per person and agent type
     model.communicated[person,speaker_type].append(form)
-    # model.n_communicated[person][-1] +=1
 
     # Also store forms for both speaker_types together
     model.communicated[person,None].append(form)
@@ -178,9 +111,6 @@ def update_communicated(form, person, speaker_type, model, agent):
         agent.communicated.append(form)
 
 def compute_colours(agent):
-    #l = agent.prop_innovative * 50
-    # HSL: H->0-360,  S->0-100%, L->100% L50% is maximum color, 100% is white
-    #return colour_str([110, 90, l])
     return "#04b529" if agent.prop_innovative > 0.5 else "#000000"
 
 
