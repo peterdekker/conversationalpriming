@@ -17,8 +17,7 @@ OUTPUT_DIR = f'output-{str(datetime.datetime.now()).replace(" ","-").replace(":"
 
 N_PROCESSES = None # Default: None (use all cores)
 
-# For evaluation script (not browser visualization)
-ITERATIONS = [100]
+ITERATIONS = [2]
 STEPS = [1000]
 
 N_AGENTS = 100
@@ -28,12 +27,12 @@ PROP_INNOVATOR_AGENTS = 0.2
 INIT_PROP_INNOVATIVE_INNOVATOR = 0.9
 INIT_PROP_INNOVATIVE_CONSERVATOR = 0.00
 INCREASE_CONSERVATIVE = 0.01
-INCREASE_INNOVATIVE =  0.01 # 0.02
+INCREASE_INNOVATIVE =  0.01
 INCREASE_CONSERVATIVE_3SG = None
-INCREASE_INNOVATIVE_3SG =  None #0.175
-DOUBLE_INCREASE_CONV_PRIMING_PRODUCTION = False #
-DECAY = 0.00
-DECAY_3SG = None
+INCREASE_INNOVATIVE_3SG =  None
+AMPLIFIED_INCREASE_CONV_PRIMING_PRODUCTION = False
+DECAY = 0.00 # Decay for other persons than 3SG
+DECAY_3SG = None # If None: will be set to same value as DECAY (other persons than 3SG)
 FREQ_3SG =  1/3
 
 SURPRISAL = False
@@ -56,7 +55,7 @@ model_params = {
     "increase_innovative": {"ui": Slider("Increase innovative", INCREASE_INNOVATIVE, 0.0, 1.0, 0.01), "script": INCREASE_INNOVATIVE},
     "increase_conservative_3sg": {"ui": None, "script": INCREASE_CONSERVATIVE_3SG},
     "increase_innovative_3sg": {"ui": None, "script": INCREASE_INNOVATIVE_3SG},
-    "double_increase_conv_priming_production": {"ui": Checkbox('double_increase_conv_priming_production', value=DOUBLE_INCREASE_CONV_PRIMING_PRODUCTION), "script": DOUBLE_INCREASE_CONV_PRIMING_PRODUCTION},
+    "amplified_increase_conv_priming_production": {"ui": Checkbox('amplified_increase_conv_priming_production', value=AMPLIFIED_INCREASE_CONV_PRIMING_PRODUCTION), "script": AMPLIFIED_INCREASE_CONV_PRIMING_PRODUCTION},
     "decay": {"ui": Slider("Forget weight", DECAY, 0.0, 1.0, 0.01), "script": DECAY},
     "decay_3sg": {"ui": None, "script": DECAY_3SG},
     "surprisal": {"ui": Checkbox('Surprisal', value=SURPRISAL), "script": SURPRISAL},
@@ -83,6 +82,6 @@ evaluation_params = {
     "contrast_persons": False
 }
 
-bool_params = ["surprisal", "entropy", "repeats", "conversational_priming", "friend_network", "innovator_no_conversational_priming", "innovator_only_increase_production", "browser_visualization", "use_grid",  "contrast_persons", "double_increase_conv_priming_production"]
+bool_params = ["surprisal", "entropy", "repeats", "conversational_priming", "friend_network", "innovator_no_conversational_priming", "innovator_only_increase_production", "browser_visualization", "use_grid",  "contrast_persons", "amplified_increase_conv_priming_production"]
 int_params = ["n_agents", "n_agents_interacting", "n_interactions_interlocutor"]
 string_params = ["runlabel", "plot_from_raw"]

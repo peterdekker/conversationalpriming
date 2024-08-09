@@ -66,8 +66,6 @@ def experiment_small_world():
 
 
 def experiment_barbell():
-    # connected_cliques = create_connected_cliques_graph()
-    # check_clustering_degree(connected_cliques)
     barbell = nx.barbell_graph(50, 0)
     check_clustering_degree(barbell)
 
@@ -119,16 +117,11 @@ def experiment_friend_of_friend_fixed_degree(n_agents, p_innovator, stranger_con
         [clustering_coeffs[id] for id in ids_innovator])
     clustering_conservator_mean = np.mean(
         [clustering_coeffs[id] for id in ids_conservator])
-    # print(
-    #     f"Mean clustering coefficient, innovator: {clustering_innovator_mean}, conservator: {clustering_conservator_mean}")
 
     degree_innovator_mean = np.mean([g.degree[id] for id in ids_innovator])
     degree_conservator_mean = np.mean(
         [g.degree[id] for id in ids_conservator])
-    # print(
-    #     f"Degree, innovator: {degree_innovator_mean}, conservator: {degree_conservator_mean}")
     if dodraw:
-        #draw(g)
         pos = nx.kamada_kawai_layout(g)
         nodes=g.nodes()
         colors = ids_innovator = ["green" if attrs["innovator"] == True else "grey" for id, attrs in g.nodes(data=True)]
@@ -171,9 +164,8 @@ def create_network_friend_of_friend(stranger_connect_prob, conservator_friend_of
         g.add_node(a, innovator=agent_types[a])
     pairs = list(combinations(agents, 2))
     for it in range(n_iterations):
-        # print(f"Iteration: {it}")
         for i, j in pairs:
-            # print(f"Evaluating edge {i,j}")
+            # Evaluating edge i,j
             if g.has_edge(i, j):
                 # print(f"- Edge {i,j} already exists. Only possible when running multiple iterations.")
                 continue
@@ -181,20 +173,17 @@ def create_network_friend_of_friend(stranger_connect_prob, conservator_friend_of
             common_neighbors = list(nx.common_neighbors(g, i, j))
             connect_prob = None
             if not common_neighbors:
-                # print(f"- No common neighbors: {common_neighbors}")
                 connect_prob = stranger_connect_prob
             else:
                 # If there is a neighbor in common
-                # print(f"- Common neighbors: {common_neighbors}")
                 # Use innovative prob if one of the nodes is innovative
                 if g.nodes[i]["innovator"] == 1 or g.nodes[j]["innovator"] == 1:
-                    # print(f"- One of the nodes {i,j} is innovative")
+                    # One of the nodes {i,j} is innovative
                     connect_prob = innovator_friend_of_friend_connect_prob
                 else:
-                    # print(f"- None of the nodes {i,j} is innovative")
+                    # None of the nodes {i,j} is innovative
                     connect_prob = conservator_friend_of_friend_connect_prob
             if random.random() < connect_prob:
-                # print(f"- Add edge {i,j}")
                 g.add_edge(i, j)
     return g
 
@@ -237,20 +226,17 @@ def create_network_friend_of_friend_fixed_degree(stranger_connect_prob, conserva
                 common_neighbors = list(nx.common_neighbors(g, i, j))
                 connect_prob = None
                 if not common_neighbors:
-                    # print(f"- No common neighbors: {common_neighbors}")
                     connect_prob = stranger_connect_prob
                 else:
                     # If there is a neighbor in common
-                    # print(f"- Common neighbors: {common_neighbors}")
                     # Use innovative prob if one of the nodes is innovative
                     if g.nodes[i]["innovator"] == 1 or g.nodes[j]["innovator"] == 1:
-                        # print(f"- One of the nodes {i,j} is innovative")
+                        # One of the nodes {i,j} is innovative
                         connect_prob = innovator_friend_of_friend_connect_prob
                     else:
-                        # print(f"- None of the nodes {i,j} is innovative")
+                        # None of the nodes {i,j} is innovative
                         connect_prob = conservator_friend_of_friend_connect_prob
                 if random.random() < connect_prob:
-                    # print(f"- Add edge {i,j}")
                     g.add_edge(i, j)
         agents_not_full = get_agents_not_max_degree(g, max_degree)
 
@@ -264,10 +250,7 @@ def create_network_complete(n_agents, agent_types):
     return graph
 
 
-# experiment_small_world()
-# experiment_connected_cliques()
 if __name__ == "__main__":
-    #explore_params_fof_fixed()
 
     print("Fixed:")
     experiment_friend_of_friend_fixed_degree(n_agents=100, p_innovator=0.2, stranger_connect_prob=0.3, conservator_friend_of_friend_connect_prob=1.0,

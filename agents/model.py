@@ -19,7 +19,7 @@ class Model(Model):
     Model class
     '''
 
-    def __init__(self, n_agents, n_agents_interacting, prop_innovator_agents, init_prop_innovative_innovator, init_prop_innovative_conservator, freq_3sg, increase_conservative, increase_innovative, increase_conservative_3sg, increase_innovative_3sg, double_increase_conv_priming_production, decay, decay_3sg, surprisal, entropy, repeats, conversational_priming_prob, friend_network, innovator_no_conversational_priming, innovator_only_increase_production, n_interactions_interlocutor, browser_visualization, use_grid):
+    def __init__(self, n_agents, n_agents_interacting, prop_innovator_agents, init_prop_innovative_innovator, init_prop_innovative_conservator, freq_3sg, increase_conservative, increase_innovative, increase_conservative_3sg, increase_innovative_3sg, amplified_increase_conv_priming_production, decay, decay_3sg, surprisal, entropy, repeats, conversational_priming_prob, friend_network, innovator_no_conversational_priming, innovator_only_increase_production, n_interactions_interlocutor, browser_visualization, use_grid):
         super().__init__()
         assert n_agents % 1 == 0
         assert n_agents_interacting % 1 == 0
@@ -31,7 +31,7 @@ class Model(Model):
         assert increase_conservative >= 0 and increase_conservative <= 1
         assert increase_innovative >= 0 and increase_innovative <= 1
         # No assertion for increase_conservative_3sg and increase_innovative_3sg and decay_3sg variables, because they can be either Null or a float
-        assert type(double_increase_conv_priming_production) == bool
+        assert type(amplified_increase_conv_priming_production) == bool
         assert decay >= 0 and decay <= 1
         assert type(surprisal) == bool
         assert type(entropy) == bool
@@ -55,7 +55,7 @@ class Model(Model):
         self.increase_innovative = increase_innovative
         self.increase_conservative_3sg = increase_conservative_3sg
         self.increase_innovative_3sg = increase_innovative_3sg
-        self.double_increase_conv_priming_production = double_increase_conv_priming_production
+        self.amplified_increase_conv_priming_production = amplified_increase_conv_priming_production
         self.decay = decay
         self.decay_3sg = decay_3sg
         self.surprisal = surprisal
@@ -79,10 +79,6 @@ class Model(Model):
 
         # Contains utterances of last step
         self.communicated = defaultdict(list)
-        # self.n_communicated = defaultdict(lambda: [0])
-        # Contains proportion innovative of all timesteps
-        # self.prop_innovative = defaultdict(list)
-
 
         self.persons = ["1sg", "2sg", "3sg"]
         self.speaker_types = [False, True]
@@ -109,18 +105,6 @@ class Model(Model):
                 # "prop_innovative_1sg_total_internal": util.compute_prop_innovative_1sg_total_internal,
                 # #"prop_innovative_2sg_total_internal": util.compute_prop_innovative_2sg_total_internal,
                 # "prop_innovative_3sg_total_internal": util.compute_prop_innovative_3sg_total_internal,
-                # "prop_1sg_innovator_dominant": util.compute_prop_1sg_innovator_dominant,
-                # "prop_2sg_innovator_dominant": util.compute_prop_2sg_innovator_dominant,
-                # "prop_3sg_innovator_dominant": util.compute_prop_3sg_innovator_dominant,
-                # "prop_1sg_conservator_dominant": util.compute_prop_1sg_conservator_dominant,
-                # "prop_2sg_conservator_dominant": util.compute_prop_2sg_conservator_dominant,
-                # "prop_3sg_conservator_dominant": util.compute_prop_3sg_conservator_dominant,
-                # "prop_1sg_total_dominant": util.compute_prop_1sg_total_dominant,
-                # "prop_2sg_total_dominant": util.compute_prop_2sg_total_dominant,
-                # "prop_3sg_total_dominant": util.compute_prop_3sg_total_dominant,
-                #"n_communicated_1sg": util.compute_n_communicated_1sg_avg,
-                #"n_communicated_2sg": util.compute_n_communicated_2sg_avg,
-                #"n_communicated_3sg": util.compute_n_communicated_3sg_avg,
             }
         )
 
@@ -142,10 +126,6 @@ class Model(Model):
                 self.grid.place_agent(agent, node_name)
         ## Old random mixing grid code
         if self.use_grid:
-            # Set up agents
-            # We use a grid iterator that returns
-            # the coordinates of a cell as well as
-            # its contents. (coord_iter)
             self.grid = SingleGrid(10,10, torus=True)
             for i, cell in enumerate(self.grid.coord_iter()):
                 x = cell[1]
@@ -178,11 +158,6 @@ class Model(Model):
         # This also empties variable
         if self.browser_visualization and self.steps % STEPS_UPDATE_AGENT_COLOR == 0:
             util.update_prop_innovative_agents(self.agents_list)
-
-        # # Compute model proportion communicated
-        # util.update_prop_innovative_model(
-        #     self, self.persons, self.speaker_types, self.prop_innovative)
-        # print(self.prop_innovative)
 
         self.datacollector.collect(self)
         # After stats have been calculated, empty dict with communicated forms of this timestep
