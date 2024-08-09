@@ -1,5 +1,5 @@
-# Conversational priming in repetitional responses:
-This repository contains the code for the agent-based model (in folder ''agents'') and the data analysis scripts for the paper ``Conversational priming in repetitional responses as a mechanism in language change: Evidence from agent-based modelling'' by Peter Dekker, Sonja Gipper and Bart de Boer.
+# Code for _Conversational priming in repetitional responses as a mechanism in language change: Evidence from agent-based modelling_
+This repository contains the code for the agent-based model (in folder ''agents'') and the data analysis scripts for the paper "Conversational priming in repetitional responses as a mechanism in language change: Evidence from agent-based modelling'' by Peter Dekker, Sonja Gipper and Bart de Boer.
 
 ## Agent-based model
 In normal mode, give the variable parameter and its parameter values you want to evaluate. All parameters not given are instantiated with fixed defaults. The script will output seperate files for communicated stats and internal stats (on the y-axis), for 1sg/3sg, for the different values of the variable parameter (x-axis). The graph will show lines for innovative, conservative speakers and the total. E.g.:
